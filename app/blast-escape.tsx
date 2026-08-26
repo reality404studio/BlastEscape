@@ -258,7 +258,7 @@ const LEVELS: Level[] = [
   {
     name: 'LEVEL 8',
     subtitle: 'AIR SLALOM',
-    hint: 'Hold right into the launch post. Then reverse on every blast: right, left, right, left, right.',
+    hint: 'Hold right into the launch post. B1 lifts off, then flip direction on every blast: left, right, left, right.',
     start: { x: 92, y: 514 },
     platforms: [
       { x: 0, y: 550, w: 484, h: 50 },
@@ -268,13 +268,13 @@ const LEVELS: Level[] = [
       { x: 942, y: 0, w: 18, h: 600 },
     ],
     bombs: [
-      { x: 425, y: 532, delay: -2.6, label: 'B1' },
-      { x: 616, y: 398, delay: -2.18, label: 'B2', floating: true },
-      { x: 378, y: 265, delay: -1.76, label: 'B3', floating: true },
-      { x: 630, y: 163, delay: -1.34, label: 'B4', floating: true },
-      { x: 461, y: 147, delay: -0.92, label: 'B5', floating: true },
+      { x: 410, y: 532, delay: -2.4, label: 'B1' },
+      { x: 590, y: 452, delay: -1.9, label: 'B2', floating: true },
+      { x: 445, y: 346, delay: -1.5, label: 'B3', floating: true },
+      { x: 656, y: 213, delay: -1.1, label: 'B4', floating: true },
+      { x: 491, y: 135, delay: -0.7, label: 'B5', floating: true },
     ],
-    exit: { x: 518, y: 89, w: 76, h: 64 },
+    exit: { x: 550, y: 97, w: 86, h: 70 },
     pit: { x: 484, y: 500, w: 476, h: 100 },
     requiredCombo: 5,
   },
@@ -557,10 +557,10 @@ export default function BlastEscape() {
       // Level 8 clean route: hold right into the launch post, then reverse on
       // every blast. Switch points are the B2..B5 fuse times.
       const demoDirection =
-        levelElapsed < 2.62 ? 1
-          : levelElapsed < 3.04 ? -1
-            : levelElapsed < 3.46 ? 1
-              : levelElapsed < 3.88 ? -1
+        levelElapsed < 2.90 ? 1
+          : levelElapsed < 3.30 ? -1
+            : levelElapsed < 3.70 ? 1
+              : levelElapsed < 4.10 ? -1
                 : 1;
       const direction = demoActive
         ? demoDirection

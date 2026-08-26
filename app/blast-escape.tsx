@@ -24,7 +24,14 @@ const CONFIG = {
 } as const;
 
 type Rect = { x: number; y: number; w: number; h: number };
-type Bomb = { x: number; y: number; timer: number; delay: number; label: string };
+type Bomb = {
+  x: number;
+  y: number;
+  timer: number;
+  delay: number;
+  label: string;
+  floating?: boolean;
+};
 type Particle = { x: number; y: number; vx: number; vy: number; life: number };
 type Wave = { x: number; y: number; radius: number; life: number };
 type LaunchVector = { x: number; y: number; vx: number; vy: number; life: number };
@@ -34,7 +41,7 @@ type Level = {
   hint: string;
   start: { x: number; y: number };
   platforms: Rect[];
-  bombs: Array<{ x: number; y: number; delay: number; label: string }>;
+  bombs: Array<{ x: number; y: number; delay: number; label: string; floating?: boolean }>;
   exit: Rect;
   opening?: Rect;
 };
@@ -97,24 +104,24 @@ const LEVELS: Level[] = [
   },
   {
     name: 'LEVEL 4',
-    subtitle: 'BLAST RELAY',
-    hint: 'Thread the gap. Read the second fuse. Choose which side receives the blast.',
+    subtitle: 'AIR COMBO',
+    hint: 'First blast starts the chain. Meet the floating bomb before you touch down.',
     start: { x: 92, y: 514 },
     platforms: [
       { x: 0, y: 550, w: 960, h: 50 },
-      { x: 18, y: 330, w: 430, h: 22 },
-      { x: 540, y: 330, w: 220, h: 22 },
-      { x: 740, y: 200, w: 202, h: 22 },
+      { x: 18, y: 350, w: 432, h: 22 },
+      { x: 580, y: 350, w: 140, h: 22 },
+      { x: 750, y: 190, w: 192, h: 22 },
       { x: 0, y: 0, w: 960, h: 18 },
       { x: 0, y: 0, w: 18, h: 600 },
       { x: 942, y: 0, w: 18, h: 600 },
     ],
     bombs: [
-      { x: 390, y: 532, delay: 0, label: 'B1' },
-      { x: 632, y: 312, delay: 1.35, label: 'B2' },
+      { x: 400, y: 532, delay: 0, label: 'B1' },
+      { x: 625, y: 260, delay: 0.7, label: 'B2', floating: true },
     ],
-    exit: { x: 842, y: 136, w: 54, h: 64 },
-    opening: { x: 448, y: 330, w: 92, h: 22 },
+    exit: { x: 842, y: 126, w: 54, h: 64 },
+    opening: { x: 450, y: 350, w: 130, h: 22 },
   },
 ];
 
@@ -163,6 +170,9 @@ export default function BlastEscape() {
     let particles: Particle[] = [];
     let waves: Wave[] = [];
     let launchVectors: LaunchVector[] = [];
+    let comboCount = 0;
+    let comboFlashCount = 0;
+    let comboFlashLife = 0;
     let activeLevelIndex = 0;
     let bombs = freshBombs(LEVELS[activeLevelIndex]);
     const player = {
@@ -186,6 +196,9 @@ export default function BlastEscape() {
       particles = [];
       waves = [];
       launchVectors = [];
+      comboCount = 0;
+      comboFlashCount = 0;
+      comboFlashLife = 0;
       shake = 0;
       escapedAt = 0;
       setStatus('playing');
@@ -260,6 +273,7 @@ export default function BlastEscape() {
           player.vy = 0;
         }
       }
+      if (player.grounded) comboCount = 0;
     };
 
     const explode = (bomb: Bomb) => {
@@ -295,6 +309,12 @@ export default function BlastEscape() {
       );
       const impulseX = (rawX / length) * impulse;
       const impulseY = (biasedY / length) * impulse;
+      const continuesAirChain = !player.grounded && comboCount > 0;
+      comboCount = continuesAirChain ? comboCount + 1 : 1;
+      if (continuesAirChain) {
+        comboFlashCount = comboCount;
+        comboFlashLife = 1.5;
+      }
       player.vx += impulseX;
       player.vy += impulseY;
       player.grounded = false;
@@ -334,6 +354,7 @@ export default function BlastEscape() {
       waves = waves.filter((wave) => wave.life > 0);
       launchVectors.forEach((vector) => (vector.life -= dt));
       launchVectors = launchVectors.filter((vector) => vector.life > 0);
+      comboFlashLife = Math.max(0, comboFlashLife - dt);
       shake *= Math.pow(0.04, dt);
     };
 
@@ -426,6 +447,22 @@ export default function BlastEscape() {
         const fraction = Math.min(1, visibleTimer / CONFIG.bombFuseDuration);
         const urgency = 1 - fraction;
         const pulse = 1 + Math.sin(time / (105 - urgency * 55)) * 0.08;
+        if (bomb.floating) {
+          const hover = Math.sin(time / 220) * 3;
+          ctx.strokeStyle = `rgba(102, 242, 213, ${0.28 + (hover + 3) * 0.035})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.ellipse(bomb.x, bomb.y + 28, 31 + hover, 8, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.strokeStyle = 'rgba(102, 242, 213, 0.18)';
+          ctx.beginPath();
+          ctx.ellipse(bomb.x, bomb.y + 28, 45 - hover, 12, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.fillStyle = '#66f2d5';
+          ctx.font = '700 10px ui-monospace, monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText('AIR RELAY', bomb.x, bomb.y + 52);
+        }
         if (debugEnabled) {
           ctx.strokeStyle = 'rgba(255,92,72,0.34)';
           ctx.lineWidth = 1.5;
@@ -486,6 +523,31 @@ export default function BlastEscape() {
       ctx.fillStyle = '#16131b';
       ctx.fillRect(player.x + (player.vx >= 0 ? 17 : 6), player.y + 10, 3, 3);
 
+      if (activeLevelIndex === 3 && comboCount === 1 && !player.grounded) {
+        ctx.fillStyle = 'rgba(7, 9, 13, 0.82)';
+        roundedRect(ctx, player.x - 34, player.y - 34, 94, 22, 5);
+        ctx.fill();
+        ctx.fillStyle = '#66f2d5';
+        ctx.font = '700 10px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('AIR CHAIN 1', player.x + CONFIG.playerWidth / 2, player.y - 19);
+      }
+
+      if (comboFlashLife > 0 && comboFlashCount >= 2) {
+        const comboScale = 1 + Math.min(0.18, comboFlashLife * 0.12);
+        ctx.save();
+        ctx.translate(CONFIG.worldWidth / 2, 72);
+        ctx.scale(comboScale, comboScale);
+        ctx.fillStyle = `rgba(102, 242, 213, ${Math.min(1, comboFlashLife * 1.6)})`;
+        ctx.font = '900 30px ui-sans-serif, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${comboFlashCount}X AIR COMBO`, 0, 0);
+        ctx.fillStyle = `rgba(244, 240, 232, ${Math.min(0.85, comboFlashLife)})`;
+        ctx.font = '700 10px ui-monospace, monospace';
+        ctx.fillText('NO LANDING BETWEEN BLASTS', 0, 20);
+        ctx.restore();
+      }
+
       if (debugEnabled) {
         ctx.fillStyle = 'rgba(7, 9, 13, 0.82)';
         roundedRect(ctx, 30, 28, 276, 92, 8); ctx.fill();
@@ -497,7 +559,7 @@ export default function BlastEscape() {
         ctx.font = '12px ui-monospace, monospace';
         ctx.fillText(`velocity  x ${player.vx.toFixed(1)}  y ${player.vy.toFixed(1)}`, 46, 73);
         ctx.fillText(`timers    ${bombs.map((bomb) => bomb.timer.toFixed(1)).join(' / ')}`, 46, 94);
-        ctx.fillText(`grounded  ${player.grounded ? 'yes' : 'no'}`, 46, 115);
+        ctx.fillText(`grounded  ${player.grounded ? 'yes' : 'no'}  combo ${comboCount}`, 46, 115);
       }
 
       if (escapedAt > 0) {

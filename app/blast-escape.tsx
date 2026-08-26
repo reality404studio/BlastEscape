@@ -44,6 +44,8 @@ type Level = {
   bombs: Array<{ x: number; y: number; delay: number; label: string; floating?: boolean }>;
   exit: Rect;
   opening?: Rect;
+  spikes?: Rect[];
+  pit?: Rect;
 };
 
 const LEVELS: Level[] = [
@@ -123,6 +125,28 @@ const LEVELS: Level[] = [
     exit: { x: 842, y: 126, w: 54, h: 64 },
     opening: { x: 450, y: 350, w: 130, h: 22 },
   },
+  {
+    name: 'LEVEL 5',
+    subtitle: 'SYNTHESIS I',
+    hint: 'Find the line between the void and the teeth.',
+    start: { x: 92, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 300, h: 50 },
+      { x: 370, y: 500, w: 160, h: 22 },
+      { x: 600, y: 360, w: 342, h: 22 },
+      { x: 300, y: 200, w: 130, h: 20 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [
+      { x: 190, y: 532, delay: 0, label: 'B1' },
+      { x: 455, y: 470, delay: 0.75, label: 'B2', floating: true },
+    ],
+    exit: { x: 842, y: 296, w: 54, h: 64 },
+    spikes: [{ x: 300, y: 220, w: 130, h: 65 }],
+    pit: { x: 300, y: 500, w: 300, h: 100 },
+  },
 ];
 
 function freshBombs(level: Level): Bomb[] {
@@ -142,6 +166,45 @@ function roundedRect(
 ) {
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, radius);
+}
+
+function spikeTriangles(strip: Rect) {
+  const toothCount = Math.max(1, Math.round(strip.w / 24));
+  const toothWidth = strip.w / toothCount;
+  return Array.from({ length: toothCount }, (_, index) => {
+    const left = strip.x + toothWidth * index;
+    return [
+      { x: left, y: strip.y },
+      { x: left + toothWidth, y: strip.y },
+      { x: left + toothWidth / 2, y: strip.y + strip.h },
+    ];
+  });
+}
+
+function triangleOverlapsRect(triangle: Array<{ x: number; y: number }>, rect: Rect) {
+  const rectPoints = [
+    { x: rect.x, y: rect.y },
+    { x: rect.x + rect.w, y: rect.y },
+    { x: rect.x + rect.w, y: rect.y + rect.h },
+    { x: rect.x, y: rect.y + rect.h },
+  ];
+  const axes = [
+    { x: 1, y: 0 },
+    { x: 0, y: 1 },
+    ...triangle.map((point, index) => {
+      const next = triangle[(index + 1) % triangle.length];
+      return { x: -(next.y - point.y), y: next.x - point.x };
+    }),
+  ];
+
+  return axes.every((axis) => {
+    const triangleProjection = triangle.map((point) => point.x * axis.x + point.y * axis.y);
+    const rectProjection = rectPoints.map((point) => point.x * axis.x + point.y * axis.y);
+    return (
+      Math.max(...triangleProjection) >= Math.min(...rectProjection) &&
+      Math.max(...rectProjection) >= Math.min(...triangleProjection)
+    );
+  });
 }
 
 export default function BlastEscape() {
@@ -234,6 +297,10 @@ export default function BlastEscape() {
     });
     const overlaps = (a: Rect, b: Rect) =>
       a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+    const touchesSpikes = (rect: Rect, spikes: Rect[] = []) =>
+      spikes.some((strip) =>
+        spikeTriangles(strip).some((triangle) => triangleOverlapsRect(triangle, rect)),
+      );
 
     const movePlayer = (dt: number) => {
       const level = LEVELS[activeLevelIndex];
@@ -325,7 +392,13 @@ export default function BlastEscape() {
     const update = (dt: number, time: number) => {
       if (escapedAt === 0) {
         const level = LEVELS[activeLevelIndex];
-        for (let i = 0; i < 3; i += 1) movePlayer(dt / 3);
+        for (let i = 0; i < 3; i += 1) {
+          movePlayer(dt / 3);
+          if (touchesSpikes(playerRect(), level.spikes)) {
+            reset();
+            return;
+          }
+        }
         for (const bomb of bombs) {
           bomb.timer -= dt;
           if (bomb.timer <= 0) {
@@ -402,6 +475,22 @@ export default function BlastEscape() {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(960, y); ctx.stroke();
       }
 
+      if (level.pit) {
+        const pitGradient = ctx.createLinearGradient(0, level.pit.y, 0, level.pit.y + level.pit.h);
+        pitGradient.addColorStop(0, 'rgba(2, 2, 6, 0.18)');
+        pitGradient.addColorStop(1, 'rgba(0, 0, 2, 0.94)');
+        ctx.fillStyle = pitGradient;
+        ctx.fillRect(level.pit.x, level.pit.y, level.pit.w, level.pit.h);
+        ctx.strokeStyle = 'rgba(255, 80, 61, 0.16)';
+        ctx.lineWidth = 2;
+        for (let x = level.pit.x + 18; x < level.pit.x + level.pit.w; x += 34) {
+          ctx.beginPath();
+          ctx.moveTo(x, level.pit.y + 24);
+          ctx.lineTo(x, level.pit.y + level.pit.h - 8);
+          ctx.stroke();
+        }
+      }
+
       level.platforms.forEach((platform) => {
         const isBoundary = platform.h === CONFIG.worldHeight || platform.y === 0;
         ctx.fillStyle = isBoundary ? '#24212a' : '#302d38';
@@ -410,6 +499,23 @@ export default function BlastEscape() {
           ctx.fillStyle = '#706979';
           ctx.fillRect(platform.x, platform.y, platform.w, 3);
         }
+      });
+
+      level.spikes?.forEach((strip) => {
+        ctx.fillStyle = '#ff3f35';
+        ctx.shadowColor = 'rgba(255, 63, 53, 0.65)';
+        ctx.shadowBlur = 9;
+        spikeTriangles(strip).forEach((triangle) => {
+          ctx.beginPath();
+          ctx.moveTo(triangle[0].x, triangle[0].y);
+          ctx.lineTo(triangle[1].x, triangle[1].y);
+          ctx.lineTo(triangle[2].x, triangle[2].y);
+          ctx.closePath();
+          ctx.fill();
+        });
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#fff1dc';
+        ctx.fillRect(strip.x, strip.y, strip.w, 3);
       });
 
       if (level.opening) {

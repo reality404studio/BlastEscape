@@ -95,6 +95,27 @@ const LEVELS: Level[] = [
     exit: { x: 588, y: 296, w: 54, h: 64 },
     opening: { x: 390, y: 300, w: 100, h: 22 },
   },
+  {
+    name: 'LEVEL 4',
+    subtitle: 'BLAST RELAY',
+    hint: 'Thread the gap. Read the second fuse. Choose which side receives the blast.',
+    start: { x: 92, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 960, h: 50 },
+      { x: 18, y: 330, w: 430, h: 22 },
+      { x: 540, y: 330, w: 220, h: 22 },
+      { x: 740, y: 200, w: 202, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [
+      { x: 390, y: 532, delay: 0, label: 'B1' },
+      { x: 632, y: 312, delay: 1.35, label: 'B2' },
+    ],
+    exit: { x: 842, y: 136, w: 54, h: 64 },
+    opening: { x: 448, y: 330, w: 92, h: 22 },
+  },
 ];
 
 function freshBombs(level: Level): Bomb[] {

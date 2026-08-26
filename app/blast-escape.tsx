@@ -35,6 +35,15 @@ type Bomb = {
 type Particle = { x: number; y: number; vx: number; vy: number; life: number };
 type Wave = { x: number; y: number; radius: number; life: number };
 type LaunchVector = { x: number; y: number; vx: number; vy: number; life: number };
+type MovingPlatform = {
+  fromX: number;
+  toX: number;
+  y: number;
+  w: number;
+  h: number;
+  speed: number;
+  phase: number;
+};
 type Level = {
   name: string;
   subtitle: string;
@@ -46,6 +55,7 @@ type Level = {
   opening?: Rect;
   spikes?: Rect[];
   pit?: Rect;
+  movingPlatform?: MovingPlatform;
 };
 
 const LEVELS: Level[] = [
@@ -147,7 +157,47 @@ const LEVELS: Level[] = [
     spikes: [{ x: 300, y: 220, w: 130, h: 65 }],
     pit: { x: 300, y: 500, w: 300, h: 100 },
   },
+  {
+    name: 'LEVEL 6',
+    subtitle: 'INTERCEPT',
+    hint: 'Launch for where the platform will be. Close blast, fast exit. Wide blast, safer ride.',
+    start: { x: 92, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 330, h: 50 },
+      { x: 840, y: 450, w: 102, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [{ x: 250, y: 532, delay: -2.8, label: 'B1' }],
+    exit: { x: 876, y: 386, w: 54, h: 64 },
+    pit: { x: 330, y: 450, w: 510, h: 150 },
+    movingPlatform: {
+      fromX: 440,
+      toX: 700,
+      y: 450,
+      w: 140,
+      h: 22,
+      speed: 140,
+      phase: 2.14,
+    },
+  },
 ];
+
+function movingPlatformAt(platform: MovingPlatform, time: number) {
+  const travelTime = (platform.toX - platform.fromX) / platform.speed;
+  const cycleTime = travelTime * 2;
+  const cyclePosition = (time + platform.phase) % cycleTime;
+  const movingRight = cyclePosition < travelTime;
+  const x = movingRight
+    ? platform.fromX + cyclePosition * platform.speed
+    : platform.toX - (cyclePosition - travelTime) * platform.speed;
+
+  return {
+    rect: { x, y: platform.y, w: platform.w, h: platform.h },
+    velocityX: movingRight ? platform.speed : -platform.speed,
+  };
+}
 
 function freshBombs(level: Level): Bomb[] {
   return level.bombs.map((bomb) => ({
@@ -237,6 +287,7 @@ export default function BlastEscape() {
     let comboFlashCount = 0;
     let comboFlashLife = 0;
     let activeLevelIndex = 0;
+    let levelElapsed = 0;
     let bombs = freshBombs(LEVELS[activeLevelIndex]);
     const player = {
       x: LEVELS[activeLevelIndex].start.x,
@@ -244,6 +295,7 @@ export default function BlastEscape() {
       vx: 0,
       vy: 0,
       grounded: true,
+      onMovingPlatform: false,
     };
 
     const reset = () => {
@@ -254,7 +306,9 @@ export default function BlastEscape() {
         vx: 0,
         vy: 0,
         grounded: true,
+        onMovingPlatform: false,
       });
+      levelElapsed = 0;
       bombs = freshBombs(level);
       particles = [];
       waves = [];
@@ -304,6 +358,22 @@ export default function BlastEscape() {
 
     const movePlayer = (dt: number) => {
       const level = LEVELS[activeLevelIndex];
+      const movingBefore = level.movingPlatform
+        ? movingPlatformAt(level.movingPlatform, levelElapsed)
+        : undefined;
+      levelElapsed += dt;
+      const movingAfter = level.movingPlatform
+        ? movingPlatformAt(level.movingPlatform, levelElapsed)
+        : undefined;
+
+      if (player.grounded && player.onMovingPlatform && movingBefore && movingAfter) {
+        player.x += movingAfter.rect.x - movingBefore.rect.x;
+      }
+
+      const collisionPlatforms = [
+        ...level.platforms.map((rect) => ({ rect, moving: false })),
+        ...(movingAfter ? [{ rect: movingAfter.rect, moving: true }] : []),
+      ];
       const keys = keysRef.current;
       const direction =
         (keys.has('d') || keys.has('arrowright') ? 1 : 0) -
@@ -316,12 +386,12 @@ export default function BlastEscape() {
 
       const oldX = player.x;
       player.x += player.vx * dt;
-      for (const platform of level.platforms) {
-        if (!overlaps(playerRect(), platform)) continue;
-        if (player.vx > 0 && oldX + CONFIG.playerWidth <= platform.x + 2) {
-          player.x = platform.x - CONFIG.playerWidth;
-        } else if (player.vx < 0 && oldX >= platform.x + platform.w - 2) {
-          player.x = platform.x + platform.w;
+      for (const platform of collisionPlatforms) {
+        if (!overlaps(playerRect(), platform.rect)) continue;
+        if (player.vx > 0 && oldX + CONFIG.playerWidth <= platform.rect.x + 2) {
+          player.x = platform.rect.x - CONFIG.playerWidth;
+        } else if (player.vx < 0 && oldX >= platform.rect.x + platform.rect.w - 2) {
+          player.x = platform.rect.x + platform.rect.w;
         }
         player.vx = 0;
       }
@@ -329,14 +399,16 @@ export default function BlastEscape() {
       const oldY = player.y;
       player.y += player.vy * dt;
       player.grounded = false;
-      for (const platform of level.platforms) {
-        if (!overlaps(playerRect(), platform)) continue;
-        if (player.vy >= 0 && oldY + CONFIG.playerHeight <= platform.y + 4) {
-          player.y = platform.y - CONFIG.playerHeight;
+      player.onMovingPlatform = false;
+      for (const platform of collisionPlatforms) {
+        if (!overlaps(playerRect(), platform.rect)) continue;
+        if (player.vy >= 0 && oldY + CONFIG.playerHeight <= platform.rect.y + 4) {
+          player.y = platform.rect.y - CONFIG.playerHeight;
           player.vy = 0;
           player.grounded = true;
-        } else if (player.vy < 0 && oldY >= platform.y + platform.h - 4) {
-          player.y = platform.y + platform.h;
+          player.onMovingPlatform = platform.moving;
+        } else if (player.vy < 0 && oldY >= platform.rect.y + platform.rect.h - 4) {
+          player.y = platform.rect.y + platform.rect.h;
           player.vy = 0;
         }
       }
@@ -385,6 +457,7 @@ export default function BlastEscape() {
       player.vx += impulseX;
       player.vy += impulseY;
       player.grounded = false;
+      player.onMovingPlatform = false;
       shake = CONFIG.screenShake;
       launchVectors.push({ x: centerX, y: centerY, vx: impulseX, vy: impulseY, life: 1.15 });
     };
@@ -456,6 +529,9 @@ export default function BlastEscape() {
 
     const draw = (time: number) => {
       const level = LEVELS[activeLevelIndex];
+      const movingPlatform = level.movingPlatform
+        ? movingPlatformAt(level.movingPlatform, levelElapsed)
+        : undefined;
       ctx.setTransform(canvas.width / CONFIG.worldWidth, 0, 0, canvas.height / CONFIG.worldHeight, 0, 0);
       ctx.clearRect(0, 0, CONFIG.worldWidth, CONFIG.worldHeight);
       const gradient = ctx.createLinearGradient(0, 0, 0, CONFIG.worldHeight);
@@ -491,6 +567,25 @@ export default function BlastEscape() {
         }
       }
 
+      if (level.movingPlatform) {
+        const trackY = level.movingPlatform.y + level.movingPlatform.h / 2;
+        ctx.strokeStyle = 'rgba(102, 242, 213, 0.3)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([7, 7]);
+        ctx.beginPath();
+        ctx.moveTo(level.movingPlatform.fromX + level.movingPlatform.w / 2, trackY);
+        ctx.lineTo(level.movingPlatform.toX + level.movingPlatform.w / 2, trackY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(102, 242, 213, 0.5)';
+        ctx.beginPath();
+        ctx.arc(level.movingPlatform.fromX + level.movingPlatform.w / 2, trackY, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(level.movingPlatform.toX + level.movingPlatform.w / 2, trackY, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
       level.platforms.forEach((platform) => {
         const isBoundary = platform.h === CONFIG.worldHeight || platform.y === 0;
         ctx.fillStyle = isBoundary ? '#24212a' : '#302d38';
@@ -500,6 +595,28 @@ export default function BlastEscape() {
           ctx.fillRect(platform.x, platform.y, platform.w, 3);
         }
       });
+
+      if (movingPlatform) {
+        const { rect, velocityX } = movingPlatform;
+        ctx.fillStyle = '#25443f';
+        ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+        ctx.fillStyle = '#66f2d5';
+        ctx.fillRect(rect.x, rect.y, rect.w, 4);
+        ctx.strokeStyle = 'rgba(102, 242, 213, 0.72)';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+
+        const direction = Math.sign(velocityX);
+        ctx.strokeStyle = 'rgba(102, 242, 213, 0.78)';
+        ctx.lineWidth = 2;
+        for (let x = rect.x + 42; x <= rect.x + rect.w - 30; x += 32) {
+          ctx.beginPath();
+          ctx.moveTo(x - direction * 7, rect.y + 9);
+          ctx.lineTo(x, rect.y + 15);
+          ctx.lineTo(x - direction * 7, rect.y + 21);
+          ctx.stroke();
+        }
+      }
 
       level.spikes?.forEach((strip) => {
         ctx.fillStyle = '#ff3f35';

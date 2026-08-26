@@ -46,15 +46,6 @@ type ContactParticle = {
 };
 type Wave = { x: number; y: number; radius: number; life: number };
 type BlastFlash = { x: number; y: number; life: number };
-type LaunchVector = { x: number; y: number; vx: number; vy: number; life: number; label: string };
-type TrajectoryPoint = { x: number; y: number };
-type TrajectoryTrace = {
-  bombLabel: string;
-  points: TrajectoryPoint[];
-  elapsed: number;
-  sampleElapsed: number;
-  active: boolean;
-};
 type MovingPlatform = {
   fromX: number;
   toX: number;
@@ -81,11 +72,6 @@ type Level = {
 
 // How long the clear overlay holds before the next level loads.
 const LEVEL_ADVANCE_DELAY = 1600;
-const MAX_RECENT_TRAJECTORIES = 5;
-const MAX_TRAJECTORY_POINTS = 150;
-const MAX_TRAJECTORY_DURATION = 5;
-const TRAJECTORY_SAMPLE_INTERVAL = 1 / 30;
-const TRAJECTORY_COLORS = ['#66f2d5', '#6eb6ff', '#ffc44f', '#ff8f70', '#c9a7ff'];
 
 const VISUAL = {
   void: '#07070b',
@@ -358,14 +344,11 @@ export default function BlastEscape() {
   const keysRef = useRef(new Set<string>());
   const resetRef = useRef<() => void>(() => undefined);
   const changeLevelRef = useRef<(index: number) => void>(() => undefined);
-  const demoRef = useRef<() => void>(() => undefined);
-  const [debug, setDebug] = useState(false);
   const [status, setStatus] = useState<'playing' | 'escaped'>('playing');
   const [levelIndex, setLevelIndex] = useState(0);
   const [clearedLevels, setClearedLevels] = useState<number[]>([]);
 
   const selectLevel = useCallback((index: number) => changeLevelRef.current(index), []);
-  const playDemo = useCallback(() => demoRef.current(), []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -375,7 +358,6 @@ export default function BlastEscape() {
 
     let animationFrame = 0;
     let previousTime = performance.now();
-    let debugEnabled = false;
     let shake = 0;
     let escapedAt = 0;
     let particles: Particle[] = [];
@@ -383,15 +365,11 @@ export default function BlastEscape() {
     let waves: Wave[] = [];
     let blastFlashes: BlastFlash[] = [];
     let landingSquash = 0;
-    let launchVectors: LaunchVector[] = [];
-    let trajectoryTraces: TrajectoryTrace[] = [];
-    let activeTrace: TrajectoryTrace | undefined;
     let comboCount = 0;
     let comboFlashCount = 0;
     let comboFlashLife = 0;
     let activeLevelIndex = 0;
     let levelElapsed = 0;
-    let demoActive = false;
     let bombs = freshBombs(LEVELS[activeLevelIndex]);
     const player = {
       x: LEVELS[activeLevelIndex].start.x,
@@ -404,67 +382,8 @@ export default function BlastEscape() {
     };
 
     const horizontalVelocity = () => player.controlVx + player.blastVx;
-    const playerCenter = (): TrajectoryPoint => ({
-      x: player.x + CONFIG.playerWidth / 2,
-      y: player.y + CONFIG.playerHeight / 2,
-    });
-    const recordTracePoint = (trace: TrajectoryTrace, force = false) => {
-      const point = playerCenter();
-      const previous = trace.points.at(-1);
-      if (force || !previous || Math.hypot(point.x - previous.x, point.y - previous.y) >= 2) {
-        trace.points.push(point);
-      }
-    };
-    const finishActiveTrace = () => {
-      if (!activeTrace) return;
-      activeTrace.active = false;
-      activeTrace = undefined;
-    };
-    const startTrajectoryTrace = (bombLabel: string) => {
-      if (!debugEnabled) return;
-      finishActiveTrace();
-      const trace: TrajectoryTrace = {
-        bombLabel,
-        points: [playerCenter()],
-        elapsed: 0,
-        sampleElapsed: 0,
-        active: true,
-      };
-      trajectoryTraces = [
-        ...trajectoryTraces.slice(-(MAX_RECENT_TRAJECTORIES - 1)),
-        trace,
-      ];
-      activeTrace = trace;
-    };
-    const sampleActiveTrace = (dt: number) => {
-      if (!activeTrace) return;
-      activeTrace.elapsed += dt;
-      activeTrace.sampleElapsed += dt;
-      if (player.grounded) {
-        recordTracePoint(activeTrace, true);
-        finishActiveTrace();
-        return;
-      }
-      if (activeTrace.sampleElapsed >= TRAJECTORY_SAMPLE_INTERVAL) {
-        activeTrace.sampleElapsed %= TRAJECTORY_SAMPLE_INTERVAL;
-        recordTracePoint(activeTrace);
-      }
-      if (
-        activeTrace.elapsed >= MAX_TRAJECTORY_DURATION ||
-        activeTrace.points.length >= MAX_TRAJECTORY_POINTS
-      ) {
-        finishActiveTrace();
-      }
-    };
-
-    const reset = (clearTrajectories = true) => {
+    const reset = () => {
       const level = LEVELS[activeLevelIndex];
-      if (clearTrajectories) {
-        trajectoryTraces = [];
-        activeTrace = undefined;
-      } else {
-        finishActiveTrace();
-      }
       Object.assign(player, {
         x: level.start.x,
         y: level.start.y,
@@ -475,14 +394,12 @@ export default function BlastEscape() {
         onMovingPlatform: false,
       });
       levelElapsed = 0;
-      demoActive = false;
       bombs = freshBombs(level);
       particles = [];
       contactParticles = [];
       waves = [];
       blastFlashes = [];
       landingSquash = 0;
-      launchVectors = [];
       comboCount = 0;
       comboFlashCount = 0;
       comboFlashLife = 0;
@@ -497,22 +414,11 @@ export default function BlastEscape() {
       reset();
     };
     changeLevelRef.current = goToLevel;
-    demoRef.current = () => {
-      activeLevelIndex = LEVELS.length - 1;
-      setLevelIndex(activeLevelIndex);
-      reset();
-      demoActive = true;
-    };
 
     const onKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase();
-      if (['a', 'd', 'arrowleft', 'arrowright', 'r', 'g'].includes(key)) event.preventDefault();
+      if (['a', 'd', 'arrowleft', 'arrowright', 'r'].includes(key)) event.preventDefault();
       if (key === 'r') reset();
-      if (['a', 'd', 'arrowleft', 'arrowright'].includes(key)) demoActive = false;
-      if (key === 'g' && !event.repeat) {
-        debugEnabled = !debugEnabled;
-        setDebug(debugEnabled);
-      }
       keysRef.current.add(key);
     };
     const onKeyUp = (event: KeyboardEvent) => keysRef.current.delete(event.key.toLowerCase());
@@ -554,18 +460,9 @@ export default function BlastEscape() {
         ...(movingAfter ? [{ rect: movingAfter.rect, moving: true }] : []),
       ];
       const keys = keysRef.current;
-      // Level 8 clean route: hold right into the launch post, then reverse on
-      // every blast. Switch points are the B2..B5 fuse times.
-      const demoDirection =
-        levelElapsed < 2.90 ? 1
-          : levelElapsed < 3.30 ? -1
-            : levelElapsed < 3.70 ? 1
-              : levelElapsed < 4.10 ? -1
-                : 1;
-      const direction = demoActive
-        ? demoDirection
-        : (keys.has('d') || keys.has('arrowright') ? 1 : 0) -
-          (keys.has('a') || keys.has('arrowleft') ? 1 : 0);
+      const direction =
+        (keys.has('d') || keys.has('arrowright') ? 1 : 0) -
+        (keys.has('a') || keys.has('arrowleft') ? 1 : 0);
       const acceleration = player.grounded ? CONFIG.runAcceleration : CONFIG.airAcceleration;
       if (direction !== 0) player.controlVx += direction * acceleration * dt;
       else if (player.grounded) {
@@ -636,7 +533,6 @@ export default function BlastEscape() {
         }
       }
       if (player.grounded) comboCount = 0;
-      sampleActiveTrace(dt);
     };
 
     const explode = (bomb: Bomb) => {
@@ -659,18 +555,6 @@ export default function BlastEscape() {
       const rawX = centerX - bomb.x;
       const rawY = centerY - bomb.y;
       const distance = Math.hypot(rawX, rawY);
-      if (demoActive) {
-        console.info('[LEVEL8_DEMO]', bomb.label, JSON.stringify({
-          time: levelElapsed.toFixed(2),
-          x: centerX.toFixed(1),
-          y: centerY.toFixed(1),
-          distance: distance.toFixed(1),
-          controlVx: player.controlVx.toFixed(1),
-          blastVx: player.blastVx.toFixed(1),
-          vy: player.vy.toFixed(1),
-          comboCount,
-        }));
-      }
       if (distance > CONFIG.explosionRadius) return;
 
       const biasedY = rawY - CONFIG.explosionVerticalBias;
@@ -696,15 +580,6 @@ export default function BlastEscape() {
       player.grounded = false;
       player.onMovingPlatform = false;
       shake = CONFIG.screenShake;
-      launchVectors.push({
-        x: centerX,
-        y: centerY,
-        vx: impulseX,
-        vy: impulseY,
-        life: 1.15,
-        label: bomb.label,
-      });
-      startTrajectoryTrace(bomb.label);
     };
 
     const update = (dt: number, time: number) => {
@@ -713,7 +588,7 @@ export default function BlastEscape() {
         for (let i = 0; i < 3; i += 1) {
           movePlayer(dt / 3);
           if (touchesSpikes(playerRect(), level.spikes)) {
-            reset(false);
+            reset();
             return;
           }
         }
@@ -727,19 +602,13 @@ export default function BlastEscape() {
         const exitUnlocked = !level.requiredCombo || comboCount >= level.requiredCombo;
         if (exitUnlocked && overlaps(playerRect(), level.exit)) {
           escapedAt = time;
-          finishActiveTrace();
           setStatus('escaped');
           const clearedIndex = activeLevelIndex;
           setClearedLevels((previous) =>
             previous.includes(clearedIndex) ? previous : [...previous, clearedIndex],
           );
         }
-        if (player.y > CONFIG.worldHeight + 80) {
-          if (demoActive) {
-            console.info('[LEVEL8_DEMO] fell', JSON.stringify({ time: levelElapsed.toFixed(2) }));
-          }
-          reset(false);
-        }
+        if (player.y > CONFIG.worldHeight + 80) reset();
       } else if (
         activeLevelIndex < LEVELS.length - 1 &&
         time - escapedAt > LEVEL_ADVANCE_DELAY
@@ -768,34 +637,9 @@ export default function BlastEscape() {
       waves = waves.filter((wave) => wave.life > 0);
       blastFlashes.forEach((flash) => (flash.life -= dt * 9));
       blastFlashes = blastFlashes.filter((flash) => flash.life > 0);
-      launchVectors.forEach((vector) => (vector.life -= dt));
-      launchVectors = launchVectors.filter((vector) => vector.life > 0);
       comboFlashLife = Math.max(0, comboFlashLife - dt);
       landingSquash = Math.max(0, landingSquash - dt * 5.5);
       shake *= Math.pow(0.04, dt);
-    };
-
-    const drawArrow = (
-      startX: number,
-      startY: number,
-      endX: number,
-      endY: number,
-      color: string,
-    ) => {
-      const angle = Math.atan2(endY - startY, endX - startX);
-      ctx.strokeStyle = color;
-      ctx.fillStyle = color;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(startX, startY);
-      ctx.lineTo(endX, endY);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(endX, endY);
-      ctx.lineTo(endX - 9 * Math.cos(angle - 0.5), endY - 9 * Math.sin(angle - 0.5));
-      ctx.lineTo(endX - 9 * Math.cos(angle + 0.5), endY - 9 * Math.sin(angle + 0.5));
-      ctx.closePath();
-      ctx.fill();
     };
 
     const draw = (time: number) => {
@@ -952,16 +796,14 @@ export default function BlastEscape() {
       if (level.opening) {
         ctx.fillStyle = 'rgba(102, 242, 213, 0.06)';
         ctx.fillRect(level.opening.x, level.opening.y - 8, level.opening.w, level.opening.h + 16);
-        ctx.strokeStyle = debugEnabled ? 'rgba(102, 242, 213, 0.8)' : 'rgba(102, 242, 213, 0.22)';
-        ctx.lineWidth = debugEnabled ? 2 : 1;
-        ctx.setLineDash(debugEnabled ? [6, 5] : []);
+        ctx.strokeStyle = 'rgba(102, 242, 213, 0.22)';
+        ctx.lineWidth = 1;
         ctx.strokeRect(level.opening.x, level.opening.y - 8, level.opening.w, level.opening.h + 16);
-        ctx.setLineDash([]);
-        ctx.fillStyle = debugEnabled ? '#66f2d5' : 'rgba(102, 242, 213, 0.52)';
+        ctx.fillStyle = 'rgba(102, 242, 213, 0.52)';
         ctx.font = '700 10px ui-monospace, monospace';
         ctx.textAlign = 'center';
         ctx.fillText(
-          debugEnabled ? `${level.opening.w - CONFIG.playerWidth} PX PLAYER WINDOW` : 'OPENING',
+          'OPENING',
           level.opening.x + level.opening.w / 2,
           level.opening.y + 53,
         );
@@ -1025,18 +867,6 @@ export default function BlastEscape() {
           ctx.textAlign = 'center';
           ctx.fillText('AIR RELAY', bomb.x, bomb.y + 52);
         }
-        if (debugEnabled) {
-          ctx.strokeStyle = 'rgba(255,92,72,0.34)';
-          ctx.lineWidth = 1.5;
-          ctx.setLineDash([7, 7]);
-          ctx.beginPath(); ctx.arc(bomb.x, bomb.y, CONFIG.explosionRadius, 0, Math.PI * 2); ctx.stroke();
-          ctx.setLineDash([]);
-          ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-          ctx.beginPath();
-          ctx.moveTo(bomb.x, bomb.y);
-          ctx.lineTo(player.x + CONFIG.playerWidth / 2, player.y + CONFIG.playerHeight / 2);
-          ctx.stroke();
-        }
         ctx.save();
         ctx.translate(bomb.x, bomb.y);
         ctx.scale(pulse, pulse);
@@ -1094,44 +924,6 @@ export default function BlastEscape() {
       });
       ctx.globalAlpha = 1;
 
-      if (debugEnabled) {
-        trajectoryTraces.forEach((trace, index) => {
-          if (trace.points.length < 2) return;
-          const age = trajectoryTraces.length - 1 - index;
-          ctx.globalAlpha = trace.active ? 0.9 : Math.max(0.28, 0.7 - age * 0.1);
-          ctx.strokeStyle = TRAJECTORY_COLORS[index % TRAJECTORY_COLORS.length];
-          ctx.lineWidth = trace.active ? 2.5 : 1.5;
-          ctx.beginPath();
-          trace.points.forEach((point, pointIndex) => {
-            if (pointIndex === 0) ctx.moveTo(point.x, point.y);
-            else ctx.lineTo(point.x, point.y);
-          });
-          ctx.stroke();
-          const origin = trace.points[0];
-          ctx.fillStyle = ctx.strokeStyle;
-          ctx.beginPath();
-          ctx.arc(origin.x, origin.y, trace.active ? 4 : 3, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.font = '700 10px ui-monospace, monospace';
-          ctx.textAlign = 'left';
-          ctx.fillText(trace.bombLabel, origin.x + 7, origin.y - 7);
-        });
-        ctx.globalAlpha = 1;
-        launchVectors.forEach((vector) => {
-          drawArrow(vector.x, vector.y, vector.x + vector.vx * 0.16, vector.y + vector.vy * 0.16, '#66f2d5');
-          ctx.fillStyle = '#66f2d5';
-          ctx.font = '700 10px ui-monospace, monospace';
-          ctx.textAlign = 'left';
-          ctx.fillText(vector.label, vector.x + 7, vector.y - 7);
-        });
-        drawArrow(
-          player.x + CONFIG.playerWidth / 2,
-          player.y - 5,
-          player.x + CONFIG.playerWidth / 2 + horizontalVelocity() * 0.14,
-          player.y - 5 + player.vy * 0.14,
-          '#6eb6ff',
-        );
-      }
 
       ctx.save();
       ctx.translate(player.x + CONFIG.playerWidth / 2, player.y + CONFIG.playerHeight);
@@ -1180,29 +972,6 @@ export default function BlastEscape() {
         ctx.restore();
       }
 
-      if (debugEnabled) {
-        ctx.fillStyle = 'rgba(7, 9, 13, 0.82)';
-        roundedRect(ctx, 30, 28, 390, 137, 8); ctx.fill();
-        ctx.fillStyle = '#66f2d5';
-        ctx.font = '700 12px ui-monospace, monospace';
-        ctx.textAlign = 'left';
-        ctx.fillText('DEBUG / G', 46, 50);
-        ctx.fillStyle = '#d8d4dc';
-        ctx.font = '12px ui-monospace, monospace';
-        ctx.fillText(`control vx  ${player.controlVx.toFixed(1)}`, 46, 73);
-        ctx.fillText(`blast vx    ${player.blastVx.toFixed(1)}`, 46, 92);
-        ctx.fillText(`total vx    ${horizontalVelocity().toFixed(1)}  vy ${player.vy.toFixed(1)}`, 46, 111);
-        ctx.fillText(
-          `trace       ${activeTrace?.bombLabel ?? 'idle'}  recent ${trajectoryTraces.length}/${MAX_RECENT_TRAJECTORIES}`,
-          46,
-          130,
-        );
-        ctx.fillText(
-          `timers      ${bombs.map((bomb) => `${bomb.label}:${bomb.timer.toFixed(1)}`).join(' ')}`,
-          46,
-          149,
-        );
-      }
 
       if (escapedAt > 0) {
         const nextLevel = LEVELS[activeLevelIndex + 1];
@@ -1291,8 +1060,6 @@ export default function BlastEscape() {
         <div className="control-group"><span className="key">A</span><span className="key">←</span><small>MOVE LEFT</small></div>
         <div className="control-group"><span className="key">D</span><span className="key">→</span><small>MOVE RIGHT</small></div>
         <div className="control-group"><span className="key">R</span><small>RESTART</small></div>
-        <button className="demo-control" onClick={playDemo} type="button">5X DEMO</button>
-        <div className="control-group debug-control"><span className="key">G</span><small>{debug ? 'DEBUG ON' : 'DEBUG'}</small></div>
       </section>
       <p className="hint">{LEVELS[levelIndex].hint}</p>
     </main>

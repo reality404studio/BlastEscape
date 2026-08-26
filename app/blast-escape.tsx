@@ -11,6 +11,8 @@ const CONFIG = {
   airAcceleration: 760,
   maxRunSpeed: 275,
   groundFriction: 0.8,
+  blastAirRetention: 0.985,
+  blastGroundRetention: 0.68,
   gravity: 1180,
   maxFallSpeed: 920,
   explosionRadius: 154,
@@ -34,7 +36,15 @@ type Bomb = {
 };
 type Particle = { x: number; y: number; vx: number; vy: number; life: number };
 type Wave = { x: number; y: number; radius: number; life: number };
-type LaunchVector = { x: number; y: number; vx: number; vy: number; life: number };
+type LaunchVector = { x: number; y: number; vx: number; vy: number; life: number; label: string };
+type TrajectoryPoint = { x: number; y: number };
+type TrajectoryTrace = {
+  bombLabel: string;
+  points: TrajectoryPoint[];
+  elapsed: number;
+  sampleElapsed: number;
+  active: boolean;
+};
 type MovingPlatform = {
   fromX: number;
   toX: number;
@@ -57,6 +67,12 @@ type Level = {
   pit?: Rect;
   movingPlatform?: MovingPlatform;
 };
+
+const MAX_RECENT_TRAJECTORIES = 5;
+const MAX_TRAJECTORY_POINTS = 150;
+const MAX_TRAJECTORY_DURATION = 5;
+const TRAJECTORY_SAMPLE_INTERVAL = 1 / 30;
+const TRAJECTORY_COLORS = ['#66f2d5', '#6eb6ff', '#ffc44f', '#ff8f70', '#c9a7ff'];
 
 const LEVELS: Level[] = [
   {
@@ -310,6 +326,8 @@ export default function BlastEscape() {
     let particles: Particle[] = [];
     let waves: Wave[] = [];
     let launchVectors: LaunchVector[] = [];
+    let trajectoryTraces: TrajectoryTrace[] = [];
+    let activeTrace: TrajectoryTrace | undefined;
     let comboCount = 0;
     let comboFlashCount = 0;
     let comboFlashLife = 0;
@@ -319,18 +337,80 @@ export default function BlastEscape() {
     const player = {
       x: LEVELS[activeLevelIndex].start.x,
       y: LEVELS[activeLevelIndex].start.y,
-      vx: 0,
+      controlVx: 0,
+      blastVx: 0,
       vy: 0,
       grounded: true,
       onMovingPlatform: false,
     };
 
-    const reset = () => {
+    const horizontalVelocity = () => player.controlVx + player.blastVx;
+    const playerCenter = (): TrajectoryPoint => ({
+      x: player.x + CONFIG.playerWidth / 2,
+      y: player.y + CONFIG.playerHeight / 2,
+    });
+    const recordTracePoint = (trace: TrajectoryTrace, force = false) => {
+      const point = playerCenter();
+      const previous = trace.points.at(-1);
+      if (force || !previous || Math.hypot(point.x - previous.x, point.y - previous.y) >= 2) {
+        trace.points.push(point);
+      }
+    };
+    const finishActiveTrace = () => {
+      if (!activeTrace) return;
+      activeTrace.active = false;
+      activeTrace = undefined;
+    };
+    const startTrajectoryTrace = (bombLabel: string) => {
+      if (!debugEnabled) return;
+      finishActiveTrace();
+      const trace: TrajectoryTrace = {
+        bombLabel,
+        points: [playerCenter()],
+        elapsed: 0,
+        sampleElapsed: 0,
+        active: true,
+      };
+      trajectoryTraces = [
+        ...trajectoryTraces.slice(-(MAX_RECENT_TRAJECTORIES - 1)),
+        trace,
+      ];
+      activeTrace = trace;
+    };
+    const sampleActiveTrace = (dt: number) => {
+      if (!activeTrace) return;
+      activeTrace.elapsed += dt;
+      activeTrace.sampleElapsed += dt;
+      if (player.grounded) {
+        recordTracePoint(activeTrace, true);
+        finishActiveTrace();
+        return;
+      }
+      if (activeTrace.sampleElapsed >= TRAJECTORY_SAMPLE_INTERVAL) {
+        activeTrace.sampleElapsed %= TRAJECTORY_SAMPLE_INTERVAL;
+        recordTracePoint(activeTrace);
+      }
+      if (
+        activeTrace.elapsed >= MAX_TRAJECTORY_DURATION ||
+        activeTrace.points.length >= MAX_TRAJECTORY_POINTS
+      ) {
+        finishActiveTrace();
+      }
+    };
+
+    const reset = (clearTrajectories = true) => {
       const level = LEVELS[activeLevelIndex];
+      if (clearTrajectories) {
+        trajectoryTraces = [];
+        activeTrace = undefined;
+      } else {
+        finishActiveTrace();
+      }
       Object.assign(player, {
         x: level.start.x,
         y: level.start.y,
-        vx: 0,
+        controlVx: 0,
+        blastVx: 0,
         vy: 0,
         grounded: true,
         onMovingPlatform: false,
@@ -406,21 +486,39 @@ export default function BlastEscape() {
         (keys.has('d') || keys.has('arrowright') ? 1 : 0) -
         (keys.has('a') || keys.has('arrowleft') ? 1 : 0);
       const acceleration = player.grounded ? CONFIG.runAcceleration : CONFIG.airAcceleration;
-      if (direction !== 0) player.vx += direction * acceleration * dt;
-      else if (player.grounded) player.vx *= Math.pow(CONFIG.groundFriction, dt * 60);
-      player.vx = Math.max(-CONFIG.maxRunSpeed, Math.min(CONFIG.maxRunSpeed, player.vx));
+      if (direction !== 0) player.controlVx += direction * acceleration * dt;
+      else if (player.grounded) {
+        player.controlVx *= Math.pow(CONFIG.groundFriction, dt * 60);
+      }
+      player.controlVx = Math.max(
+        -CONFIG.maxRunSpeed,
+        Math.min(CONFIG.maxRunSpeed, player.controlVx),
+      );
+      const blastRetention = player.grounded
+        ? CONFIG.blastGroundRetention
+        : CONFIG.blastAirRetention;
+      player.blastVx *= Math.pow(blastRetention, dt * 60);
+      if (Math.abs(player.blastVx) < 0.5) player.blastVx = 0;
       player.vy = Math.min(CONFIG.maxFallSpeed, player.vy + CONFIG.gravity * dt);
 
       const oldX = player.x;
-      player.x += player.vx * dt;
+      const totalVx = horizontalVelocity();
+      player.x += totalVx * dt;
       for (const platform of collisionPlatforms) {
         if (!overlaps(playerRect(), platform.rect)) continue;
-        if (player.vx > 0 && oldX + CONFIG.playerWidth <= platform.rect.x + 2) {
+        let collidedHorizontally = false;
+        if (totalVx > 0 && oldX + CONFIG.playerWidth <= platform.rect.x + 2) {
           player.x = platform.rect.x - CONFIG.playerWidth;
-        } else if (player.vx < 0 && oldX >= platform.rect.x + platform.rect.w - 2) {
+          collidedHorizontally = true;
+        } else if (totalVx < 0 && oldX >= platform.rect.x + platform.rect.w - 2) {
           player.x = platform.rect.x + platform.rect.w;
+          collidedHorizontally = true;
         }
-        player.vx = 0;
+        if (collidedHorizontally) {
+          player.controlVx = 0;
+          player.blastVx = 0;
+          break;
+        }
       }
 
       const oldY = player.y;
@@ -440,6 +538,7 @@ export default function BlastEscape() {
         }
       }
       if (player.grounded) comboCount = 0;
+      sampleActiveTrace(dt);
     };
 
     const explode = (bomb: Bomb) => {
@@ -481,12 +580,20 @@ export default function BlastEscape() {
         comboFlashCount = comboCount;
         comboFlashLife = 1.5;
       }
-      player.vx += impulseX;
+      player.blastVx += impulseX;
       player.vy += impulseY;
       player.grounded = false;
       player.onMovingPlatform = false;
       shake = CONFIG.screenShake;
-      launchVectors.push({ x: centerX, y: centerY, vx: impulseX, vy: impulseY, life: 1.15 });
+      launchVectors.push({
+        x: centerX,
+        y: centerY,
+        vx: impulseX,
+        vy: impulseY,
+        life: 1.15,
+        label: bomb.label,
+      });
+      startTrajectoryTrace(bomb.label);
     };
 
     const update = (dt: number, time: number) => {
@@ -495,7 +602,7 @@ export default function BlastEscape() {
         for (let i = 0; i < 3; i += 1) {
           movePlayer(dt / 3);
           if (touchesSpikes(playerRect(), level.spikes)) {
-            reset();
+            reset(false);
             return;
           }
         }
@@ -508,9 +615,10 @@ export default function BlastEscape() {
         }
         if (overlaps(playerRect(), level.exit)) {
           escapedAt = time;
+          finishActiveTrace();
           setStatus('escaped');
         }
-        if (player.y > CONFIG.worldHeight + 80) reset();
+        if (player.y > CONFIG.worldHeight + 80) reset(false);
       }
 
       particles.forEach((particle) => {
@@ -753,13 +861,39 @@ export default function BlastEscape() {
       ctx.globalAlpha = 1;
 
       if (debugEnabled) {
+        trajectoryTraces.forEach((trace, index) => {
+          if (trace.points.length < 2) return;
+          const age = trajectoryTraces.length - 1 - index;
+          ctx.globalAlpha = trace.active ? 0.9 : Math.max(0.28, 0.7 - age * 0.1);
+          ctx.strokeStyle = TRAJECTORY_COLORS[index % TRAJECTORY_COLORS.length];
+          ctx.lineWidth = trace.active ? 2.5 : 1.5;
+          ctx.beginPath();
+          trace.points.forEach((point, pointIndex) => {
+            if (pointIndex === 0) ctx.moveTo(point.x, point.y);
+            else ctx.lineTo(point.x, point.y);
+          });
+          ctx.stroke();
+          const origin = trace.points[0];
+          ctx.fillStyle = ctx.strokeStyle;
+          ctx.beginPath();
+          ctx.arc(origin.x, origin.y, trace.active ? 4 : 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.font = '700 10px ui-monospace, monospace';
+          ctx.textAlign = 'left';
+          ctx.fillText(trace.bombLabel, origin.x + 7, origin.y - 7);
+        });
+        ctx.globalAlpha = 1;
         launchVectors.forEach((vector) => {
           drawArrow(vector.x, vector.y, vector.x + vector.vx * 0.16, vector.y + vector.vy * 0.16, '#66f2d5');
+          ctx.fillStyle = '#66f2d5';
+          ctx.font = '700 10px ui-monospace, monospace';
+          ctx.textAlign = 'left';
+          ctx.fillText(vector.label, vector.x + 7, vector.y - 7);
         });
         drawArrow(
           player.x + CONFIG.playerWidth / 2,
           player.y - 5,
-          player.x + CONFIG.playerWidth / 2 + player.vx * 0.14,
+          player.x + CONFIG.playerWidth / 2 + horizontalVelocity() * 0.14,
           player.y - 5 + player.vy * 0.14,
           '#6eb6ff',
         );
@@ -771,7 +905,7 @@ export default function BlastEscape() {
       ctx.fillStyle = '#ff4e3a';
       ctx.fillRect(player.x + 5, player.y + 9, 16, 5);
       ctx.fillStyle = '#16131b';
-      ctx.fillRect(player.x + (player.vx >= 0 ? 17 : 6), player.y + 10, 3, 3);
+      ctx.fillRect(player.x + (horizontalVelocity() >= 0 ? 17 : 6), player.y + 10, 3, 3);
 
       if (activeLevelIndex === 3 && comboCount === 1 && !player.grounded) {
         ctx.fillStyle = 'rgba(7, 9, 13, 0.82)';
@@ -800,16 +934,26 @@ export default function BlastEscape() {
 
       if (debugEnabled) {
         ctx.fillStyle = 'rgba(7, 9, 13, 0.82)';
-        roundedRect(ctx, 30, 28, 276, 92, 8); ctx.fill();
+        roundedRect(ctx, 30, 28, 390, 137, 8); ctx.fill();
         ctx.fillStyle = '#66f2d5';
         ctx.font = '700 12px ui-monospace, monospace';
         ctx.textAlign = 'left';
         ctx.fillText('DEBUG / G', 46, 50);
         ctx.fillStyle = '#d8d4dc';
         ctx.font = '12px ui-monospace, monospace';
-        ctx.fillText(`velocity  x ${player.vx.toFixed(1)}  y ${player.vy.toFixed(1)}`, 46, 73);
-        ctx.fillText(`timers    ${bombs.map((bomb) => bomb.timer.toFixed(1)).join(' / ')}`, 46, 94);
-        ctx.fillText(`grounded  ${player.grounded ? 'yes' : 'no'}  combo ${comboCount}`, 46, 115);
+        ctx.fillText(`control vx  ${player.controlVx.toFixed(1)}`, 46, 73);
+        ctx.fillText(`blast vx    ${player.blastVx.toFixed(1)}`, 46, 92);
+        ctx.fillText(`total vx    ${horizontalVelocity().toFixed(1)}  vy ${player.vy.toFixed(1)}`, 46, 111);
+        ctx.fillText(
+          `trace       ${activeTrace?.bombLabel ?? 'idle'}  recent ${trajectoryTraces.length}/${MAX_RECENT_TRAJECTORIES}`,
+          46,
+          130,
+        );
+        ctx.fillText(
+          `timers      ${bombs.map((bomb) => `${bomb.label}:${bomb.timer.toFixed(1)}`).join(' ')}`,
+          46,
+          149,
+        );
       }
 
       if (escapedAt > 0) {

@@ -79,6 +79,8 @@ type Level = {
   requiredCombo?: number;
 };
 
+// How long the clear overlay holds before the next level loads.
+const LEVEL_ADVANCE_DELAY = 1600;
 const MAX_RECENT_TRAJECTORIES = 5;
 const MAX_TRAJECTORY_POINTS = 150;
 const MAX_TRAJECTORY_DURATION = 5;
@@ -360,8 +362,8 @@ export default function BlastEscape() {
   const [debug, setDebug] = useState(false);
   const [status, setStatus] = useState<'playing' | 'escaped'>('playing');
   const [levelIndex, setLevelIndex] = useState(0);
+  const [clearedLevels, setClearedLevels] = useState<number[]>([]);
 
-  const restart = useCallback(() => resetRef.current(), []);
   const selectLevel = useCallback((index: number) => changeLevelRef.current(index), []);
   const playDemo = useCallback(() => demoRef.current(), []);
 
@@ -489,11 +491,12 @@ export default function BlastEscape() {
       setStatus('playing');
     };
     resetRef.current = reset;
-    changeLevelRef.current = (index: number) => {
+    const goToLevel = (index: number) => {
       activeLevelIndex = Math.max(0, Math.min(LEVELS.length - 1, index));
       setLevelIndex(activeLevelIndex);
       reset();
     };
+    changeLevelRef.current = goToLevel;
     demoRef.current = () => {
       activeLevelIndex = LEVELS.length - 1;
       setLevelIndex(activeLevelIndex);
@@ -726,6 +729,10 @@ export default function BlastEscape() {
           escapedAt = time;
           finishActiveTrace();
           setStatus('escaped');
+          const clearedIndex = activeLevelIndex;
+          setClearedLevels((previous) =>
+            previous.includes(clearedIndex) ? previous : [...previous, clearedIndex],
+          );
         }
         if (player.y > CONFIG.worldHeight + 80) {
           if (demoActive) {
@@ -733,6 +740,11 @@ export default function BlastEscape() {
           }
           reset(false);
         }
+      } else if (
+        activeLevelIndex < LEVELS.length - 1 &&
+        time - escapedAt > LEVEL_ADVANCE_DELAY
+      ) {
+        goToLevel(activeLevelIndex + 1);
       }
 
       particles.forEach((particle) => {
@@ -1193,15 +1205,25 @@ export default function BlastEscape() {
       }
 
       if (escapedAt > 0) {
+        const nextLevel = LEVELS[activeLevelIndex + 1];
         ctx.fillStyle = 'rgba(4,4,8,0.64)';
         ctx.fillRect(0, 0, CONFIG.worldWidth, CONFIG.worldHeight);
-        ctx.fillStyle = '#ffc44f';
+        ctx.fillStyle = VISUAL.gold;
         ctx.font = '900 74px ui-sans-serif, system-ui, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('OUTBOUND', 480, 284);
+        ctx.fillText(nextLevel ? 'OUTBOUND' : 'ALL CLEAR', 480, 284);
         ctx.fillStyle = '#f5f2eb';
         ctx.font = '600 16px ui-monospace, monospace';
-        ctx.fillText('DIRECTIVE COMPLETE / PRESS R TO REPEAT', 480, 322);
+        if (nextLevel) {
+          ctx.fillText(`NEXT / ${nextLevel.name} — ${nextLevel.subtitle}`, 480, 322);
+          const progress = Math.min(1, (time - escapedAt) / LEVEL_ADVANCE_DELAY);
+          ctx.fillStyle = 'rgba(255, 196, 79, 0.2)';
+          ctx.fillRect(390, 344, 180, 4);
+          ctx.fillStyle = VISUAL.gold;
+          ctx.fillRect(390, 344, 180 * progress, 4);
+        } else {
+          ctx.fillText('EVERY DIRECTIVE COMPLETE / UNIT U-07 IS OUT', 480, 322);
+        }
       }
       ctx.restore();
     };
@@ -1233,7 +1255,12 @@ export default function BlastEscape() {
         <div className="level-nav" aria-label="Select level">
           {LEVELS.map((level, index) => (
             <button
-              className={levelIndex === index ? 'level-button active' : 'level-button'}
+              aria-label={`${level.name}${clearedLevels.includes(index) ? ' (cleared)' : ''}`}
+              className={[
+                'level-button',
+                levelIndex === index ? 'active' : '',
+                clearedLevels.includes(index) ? 'cleared' : '',
+              ].filter(Boolean).join(' ')}
               key={level.name}
               onClick={() => selectLevel(index)}
               type="button"
@@ -1253,13 +1280,9 @@ export default function BlastEscape() {
           aria-label={`${LEVELS[levelIndex].name}: ${LEVELS[levelIndex].subtitle}`}
         />
         <div className="corner-label">{LEVELS[levelIndex].name} / {LEVELS[levelIndex].subtitle}</div>
-        {status === 'escaped' && (
-          <button
-            className="restart-overlay"
-            onClick={() => levelIndex === 0 ? selectLevel(1) : restart()}
-            type="button"
-          >
-            {levelIndex === 0 ? 'Play Level 2' : 'Ride again'}
+        {status === 'escaped' && levelIndex === LEVELS.length - 1 && (
+          <button className="restart-overlay" onClick={() => selectLevel(0)} type="button">
+            Run it again from Level 1
           </button>
         )}
       </section>

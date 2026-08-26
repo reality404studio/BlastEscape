@@ -13,8 +13,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Blast Escape — Movement Prototype',
-  description: 'Ride timed environmental explosions to escape a one-room platforming test.',
+  title: 'Blast Escape — Outbound Directive',
+  description: 'A tiny industrial robot cannot jump. The abandoned factory still expects it to reach outbound.',
+  openGraph: {
+    title: 'Blast Escape — Outbound Directive',
+    description: 'A tiny industrial robot cannot jump. The abandoned factory still expects it to reach outbound.',
+    images: [{ url: '/og.png', width: 1731, height: 909, alt: 'Blast Escape key art' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Blast Escape — Outbound Directive',
+    description: 'A tiny industrial robot cannot jump. The abandoned factory still expects it to reach outbound.',
+    images: ['/og.png'],
+  },
 };
 
 export default function RootLayout({

@@ -182,6 +182,33 @@ const LEVELS: Level[] = [
       phase: 2.14,
     },
   },
+  {
+    name: 'LEVEL 7',
+    subtitle: 'RETURN ARC',
+    hint: 'Clear the hanging teeth after B1. Return left with B2, then launch from the left side of B3.',
+    start: { x: 92, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 330, h: 50 },
+      { x: 40, y: 140, w: 210, h: 22 },
+      { x: 250, y: 300, w: 250, h: 22 },
+      { x: 400, y: 470, w: 390, h: 22 },
+      { x: 360, y: 70, w: 140, h: 20 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [
+      { x: 250, y: 532, delay: -2.5, label: 'B1' },
+      { x: 680, y: 452, delay: -0.2, label: 'B2' },
+      { x: 400, y: 282, delay: 1.9, label: 'B3' },
+    ],
+    exit: { x: 120, y: 76, w: 54, h: 64 },
+    spikes: [
+      { x: 250, y: 322, w: 70, h: 58 },
+      { x: 360, y: 90, w: 140, h: 70 },
+    ],
+    pit: { x: 330, y: 470, w: 630, h: 130 },
+  },
 ];
 
 function movingPlatformAt(platform: MovingPlatform, time: number) {

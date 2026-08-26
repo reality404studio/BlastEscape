@@ -179,6 +179,24 @@ Before accepting Level 7, answer yes to all of these:
 
 Levels 8–10 should be authored by composing known grammar rather than by introducing large new systems every time.
 
+### Level 8 intent — AIR SLALOM
+
+```text
+LEVEL 8 — AIR SLALOM
+Primary route: START -> B1 -> steer right into B2 -> reverse left into B3 -> steer right into B4 -> dip left into B5 -> steer right through EXIT
+Launch job(s): B1 starts the flight; B2, B3, and B4 alternate the horizontal line; B5 catches the final descent, supplies the last lift, and unlocks the 5X exit.
+Landing window(s): No intermediate landing window; the airborne exit is the only completion window.
+Timing window(s): Commit/expiring; B2, B3, B4, and B5 detonate in sequence and cannot be waited out safely.
+Recovery state: A weak B1 setup may fall back to the start floor; missing any air relay is fatal over the pit.
+Mastery shortcut: None; mastery is expressed as a centered, low-correction five-blast line.
+New concept, if any: A fully airborne slalom with no platform reset between blast decisions and an exit that opens at 5X.
+What previous skills are recombined: Level 2 air steering, Level 4 air chaining, and Level 7 direction reversal.
+```
+
+The relay spacing should make the directional changes meaningful. Holding one direction for the
+whole route or skipping any relay must leave the exit locked, while a deliberate
+right-left-right-left-right steering sequence into the final lift has a stable success window.
+
 Before implementation, write a short level intent using this template:
 
 ```text

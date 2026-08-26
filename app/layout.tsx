@@ -13,6 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // Social previews resolve relative image paths against this. Without it Next
+  // falls back to localhost and the shared card renders nothing.
+  metadataBase: new URL('https://blast-escape.reality404studio.workers.dev'),
   title: 'Blast Escape — Outbound Directive',
   description: 'A tiny industrial robot cannot jump. The abandoned factory still expects it to reach outbound.',
   openGraph: {

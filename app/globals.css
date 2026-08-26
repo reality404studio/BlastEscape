@@ -60,6 +60,32 @@ h1 {
 
 .mission span { color: var(--ink); }
 
+.level-nav {
+  display: flex;
+  gap: 7px;
+  margin-left: auto;
+}
+
+.level-button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #4b4653;
+  border-radius: 4px;
+  background: #17141c;
+  color: var(--muted);
+  font: 700 11px/1 var(--font-geist-mono), monospace;
+  cursor: pointer;
+}
+
+.level-button:hover { border-color: #77717f; color: var(--ink); }
+
+.level-button.active {
+  border-color: var(--hot);
+  background: rgba(255, 81, 62, .13);
+  color: var(--ink);
+  box-shadow: inset 0 -2px 0 var(--hot);
+}
+
 .game-frame {
   position: relative;
   overflow: hidden;
@@ -151,6 +177,7 @@ h1 {
 @media (max-width: 680px) {
   .game-shell { width: min(100% - 18px, 1100px); padding-top: 16px; }
   .mission { display: none; }
+  .level-nav { margin-left: auto; }
   .controls { gap: 10px; flex-wrap: wrap; padding: 11px 0; }
   .control-group small { display: none; }
   .debug-control { margin-left: auto; }

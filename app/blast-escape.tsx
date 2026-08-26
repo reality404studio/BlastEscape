@@ -28,23 +28,77 @@ type Bomb = { x: number; y: number; timer: number; delay: number; label: string 
 type Particle = { x: number; y: number; vx: number; vy: number; life: number };
 type Wave = { x: number; y: number; radius: number; life: number };
 type LaunchVector = { x: number; y: number; vx: number; vy: number; life: number };
+type Level = {
+  name: string;
+  subtitle: string;
+  hint: string;
+  start: { x: number; y: number };
+  platforms: Rect[];
+  bombs: Array<{ x: number; y: number; delay: number; label: string }>;
+  exit: Rect;
+  opening?: Rect;
+};
 
-const PLATFORMS: Rect[] = [
-  { x: 0, y: 550, w: 960, h: 50 },
-  { x: 396, y: 402, w: 224, h: 22 },
-  { x: 704, y: 238, w: 210, h: 22 },
-  { x: 0, y: 0, w: 18, h: 600 },
-  { x: 942, y: 0, w: 18, h: 600 },
+const LEVELS: Level[] = [
+  {
+    name: 'LEVEL 1',
+    subtitle: 'TEST CHAMBER',
+    hint: 'Get close. Pick a side. Let the blast do the jumping.',
+    start: { x: 92, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 960, h: 50 },
+      { x: 396, y: 402, w: 224, h: 22 },
+      { x: 704, y: 238, w: 210, h: 22 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [
+      { x: 304, y: 532, delay: 0, label: 'B1' },
+      { x: 535, y: 384, delay: 1.7, label: 'B2' },
+      { x: 754, y: 220, delay: 3.2, label: 'B3' },
+    ],
+    exit: { x: 822, y: 174, w: 54, h: 64 },
+  },
+  {
+    name: 'LEVEL 2',
+    subtitle: 'TRAJECTORY TEST',
+    hint: 'Choose your launch line. Steer through the opening while airborne.',
+    start: { x: 92, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 960, h: 50 },
+      { x: 18, y: 330, w: 477, h: 28 },
+      { x: 610, y: 330, w: 332, h: 28 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [{ x: 460, y: 532, delay: 0, label: 'B1' }],
+    exit: { x: 838, y: 266, w: 54, h: 64 },
+    opening: { x: 495, y: 330, w: 115, h: 28 },
+  },
+  {
+    name: 'LEVEL 3',
+    subtitle: 'TIGHT POCKET',
+    hint: 'Thread the slot. Brake in midair. Land in the pocket.',
+    start: { x: 92, y: 464 },
+    platforms: [
+      { x: 0, y: 500, w: 390, h: 22 },
+      { x: 18, y: 300, w: 372, h: 22 },
+      { x: 490, y: 300, w: 30, h: 22 },
+      { x: 560, y: 360, w: 110, h: 22 },
+      { x: 520, y: 170, w: 180, h: 22 },
+      { x: 700, y: 170, w: 28, h: 330 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [{ x: 350, y: 482, delay: 0, label: 'B1' }],
+    exit: { x: 588, y: 296, w: 54, h: 64 },
+    opening: { x: 390, y: 300, w: 100, h: 22 },
+  },
 ];
 
-const BOMB_LAYOUT = [
-  { x: 304, y: 532, delay: 0, label: 'B1' },
-  { x: 535, y: 384, delay: 1.7, label: 'B2' },
-  { x: 754, y: 220, delay: 3.2, label: 'B3' },
-];
-
-function freshBombs(): Bomb[] {
-  return BOMB_LAYOUT.map((bomb) => ({
+function freshBombs(level: Level): Bomb[] {
+  return level.bombs.map((bomb) => ({
     ...bomb,
     timer: CONFIG.bombFuseDuration + bomb.delay,
   }));
@@ -66,10 +120,13 @@ export default function BlastEscape() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const keysRef = useRef(new Set<string>());
   const resetRef = useRef<() => void>(() => undefined);
+  const changeLevelRef = useRef<(index: number) => void>(() => undefined);
   const [debug, setDebug] = useState(false);
   const [status, setStatus] = useState<'playing' | 'escaped'>('playing');
+  const [levelIndex, setLevelIndex] = useState(0);
 
   const restart = useCallback(() => resetRef.current(), []);
+  const selectLevel = useCallback((index: number) => changeLevelRef.current(index), []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -85,12 +142,26 @@ export default function BlastEscape() {
     let particles: Particle[] = [];
     let waves: Wave[] = [];
     let launchVectors: LaunchVector[] = [];
-    let bombs = freshBombs();
-    const player = { x: 92, y: 514, vx: 0, vy: 0, grounded: true };
+    let activeLevelIndex = 0;
+    let bombs = freshBombs(LEVELS[activeLevelIndex]);
+    const player = {
+      x: LEVELS[activeLevelIndex].start.x,
+      y: LEVELS[activeLevelIndex].start.y,
+      vx: 0,
+      vy: 0,
+      grounded: true,
+    };
 
     const reset = () => {
-      Object.assign(player, { x: 92, y: 514, vx: 0, vy: 0, grounded: true });
-      bombs = freshBombs();
+      const level = LEVELS[activeLevelIndex];
+      Object.assign(player, {
+        x: level.start.x,
+        y: level.start.y,
+        vx: 0,
+        vy: 0,
+        grounded: true,
+      });
+      bombs = freshBombs(level);
       particles = [];
       waves = [];
       launchVectors = [];
@@ -99,6 +170,11 @@ export default function BlastEscape() {
       setStatus('playing');
     };
     resetRef.current = reset;
+    changeLevelRef.current = (index: number) => {
+      activeLevelIndex = Math.max(0, Math.min(LEVELS.length - 1, index));
+      setLevelIndex(activeLevelIndex);
+      reset();
+    };
 
     const onKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase();
@@ -126,6 +202,7 @@ export default function BlastEscape() {
       a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 
     const movePlayer = (dt: number) => {
+      const level = LEVELS[activeLevelIndex];
       const keys = keysRef.current;
       const direction =
         (keys.has('d') || keys.has('arrowright') ? 1 : 0) -
@@ -138,7 +215,7 @@ export default function BlastEscape() {
 
       const oldX = player.x;
       player.x += player.vx * dt;
-      for (const platform of PLATFORMS) {
+      for (const platform of level.platforms) {
         if (!overlaps(playerRect(), platform)) continue;
         if (player.vx > 0 && oldX + CONFIG.playerWidth <= platform.x + 2) {
           player.x = platform.x - CONFIG.playerWidth;
@@ -151,7 +228,7 @@ export default function BlastEscape() {
       const oldY = player.y;
       player.y += player.vy * dt;
       player.grounded = false;
-      for (const platform of PLATFORMS) {
+      for (const platform of level.platforms) {
         if (!overlaps(playerRect(), platform)) continue;
         if (player.vy >= 0 && oldY + CONFIG.playerHeight <= platform.y + 4) {
           player.y = platform.y - CONFIG.playerHeight;
@@ -206,6 +283,7 @@ export default function BlastEscape() {
 
     const update = (dt: number, time: number) => {
       if (escapedAt === 0) {
+        const level = LEVELS[activeLevelIndex];
         for (let i = 0; i < 3; i += 1) movePlayer(dt / 3);
         for (const bomb of bombs) {
           bomb.timer -= dt;
@@ -214,7 +292,7 @@ export default function BlastEscape() {
             bomb.timer += CONFIG.bombRepeatInterval;
           }
         }
-        if (overlaps(playerRect(), { x: 822, y: 174, w: 54, h: 64 })) {
+        if (overlaps(playerRect(), level.exit)) {
           escapedAt = time;
           setStatus('escaped');
         }
@@ -262,6 +340,7 @@ export default function BlastEscape() {
     };
 
     const draw = (time: number) => {
+      const level = LEVELS[activeLevelIndex];
       ctx.setTransform(canvas.width / CONFIG.worldWidth, 0, 0, canvas.height / CONFIG.worldHeight, 0, 0);
       ctx.clearRect(0, 0, CONFIG.worldWidth, CONFIG.worldHeight);
       const gradient = ctx.createLinearGradient(0, 0, 0, CONFIG.worldHeight);
@@ -281,25 +360,45 @@ export default function BlastEscape() {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(960, y); ctx.stroke();
       }
 
-      PLATFORMS.forEach((platform, index) => {
-        ctx.fillStyle = index < 3 ? '#302d38' : '#24212a';
+      level.platforms.forEach((platform) => {
+        const isBoundary = platform.h === CONFIG.worldHeight || platform.y === 0;
+        ctx.fillStyle = isBoundary ? '#24212a' : '#302d38';
         ctx.fillRect(platform.x, platform.y, platform.w, platform.h);
-        if (index < 3) {
+        if (!isBoundary) {
           ctx.fillStyle = '#706979';
           ctx.fillRect(platform.x, platform.y, platform.w, 3);
         }
       });
 
+      if (level.opening) {
+        ctx.fillStyle = 'rgba(102, 242, 213, 0.06)';
+        ctx.fillRect(level.opening.x, level.opening.y - 8, level.opening.w, level.opening.h + 16);
+        ctx.strokeStyle = debugEnabled ? 'rgba(102, 242, 213, 0.8)' : 'rgba(102, 242, 213, 0.22)';
+        ctx.lineWidth = debugEnabled ? 2 : 1;
+        ctx.setLineDash(debugEnabled ? [6, 5] : []);
+        ctx.strokeRect(level.opening.x, level.opening.y - 8, level.opening.w, level.opening.h + 16);
+        ctx.setLineDash([]);
+        ctx.fillStyle = debugEnabled ? '#66f2d5' : 'rgba(102, 242, 213, 0.52)';
+        ctx.font = '700 10px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          debugEnabled ? `${level.opening.w - CONFIG.playerWidth} PX PLAYER WINDOW` : 'OPENING',
+          level.opening.x + level.opening.w / 2,
+          level.opening.y + 53,
+        );
+      }
+
+      const exit = level.exit;
       ctx.fillStyle = 'rgba(255,200,86,0.09)';
-      ctx.fillRect(812, 158, 74, 80);
+      ctx.fillRect(exit.x - 10, exit.y - 16, exit.w + 20, exit.h + 16);
       ctx.strokeStyle = '#ffc44f';
       ctx.lineWidth = 3;
-      ctx.strokeRect(822, 174, 54, 64);
+      ctx.strokeRect(exit.x, exit.y, exit.w, exit.h);
       ctx.fillStyle = '#ffc44f';
-      ctx.beginPath(); ctx.arc(865, 207, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(exit.x + exit.w - 11, exit.y + exit.h / 2, 3, 0, Math.PI * 2); ctx.fill();
       ctx.font = '700 11px ui-monospace, monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('EXIT', 849, 151);
+      ctx.fillText('EXIT', exit.x + exit.w / 2, exit.y - 23);
 
       bombs.forEach((bomb) => {
         const visibleTimer = Math.max(0, bomb.timer);
@@ -418,6 +517,18 @@ export default function BlastEscape() {
           <p className="eyebrow">Movement experiment / v0</p>
           <h1>Blast Escape</h1>
         </div>
+        <div className="level-nav" aria-label="Select level">
+          {LEVELS.map((level, index) => (
+            <button
+              className={levelIndex === index ? 'level-button active' : 'level-button'}
+              key={level.name}
+              onClick={() => selectLevel(index)}
+              type="button"
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
         <p className="mission"><span>Reach the exit.</span> You cannot jump.</p>
       </section>
 
@@ -426,11 +537,17 @@ export default function BlastEscape() {
           ref={canvasRef}
           width={960}
           height={600}
-          aria-label="A platform room with three timed bombs and an exit high above the floor"
+          aria-label={`${LEVELS[levelIndex].name}: ${LEVELS[levelIndex].subtitle}`}
         />
-        <div className="corner-label">ROOM 01 / TEST CHAMBER</div>
+        <div className="corner-label">{LEVELS[levelIndex].name} / {LEVELS[levelIndex].subtitle}</div>
         {status === 'escaped' && (
-          <button className="restart-overlay" onClick={restart} type="button">Ride again</button>
+          <button
+            className="restart-overlay"
+            onClick={() => levelIndex === 0 ? selectLevel(1) : restart()}
+            type="button"
+          >
+            {levelIndex === 0 ? 'Play Level 2' : 'Ride again'}
+          </button>
         )}
       </section>
 
@@ -440,7 +557,7 @@ export default function BlastEscape() {
         <div className="control-group"><span className="key">R</span><small>RESTART</small></div>
         <div className="control-group debug-control"><span className="key">G</span><small>{debug ? 'DEBUG ON' : 'DEBUG'}</small></div>
       </section>
-      <p className="hint">Get close. Pick a side. Let the blast do the jumping.</p>
+      <p className="hint">{LEVELS[levelIndex].hint}</p>
     </main>
   );
 }

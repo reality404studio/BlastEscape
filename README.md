@@ -26,6 +26,8 @@ Somewhere in its remaining control system, one directive is still active:
 
 > **Proceed to outbound.**
 
+It does not know what waits outside. It only knows that it has not yet been shipped.
+
 The original shipping route is no longer usable. The factory is broken, silent, and partially collapsed. Automated machinery still wakes up in places, continuing tests for machines that may never arrive.
 
 To reach outbound, the robot enters old mobility-test lines built for other kinds of robots — robots that could jump.

@@ -256,23 +256,24 @@ const LEVELS: Level[] = [
   {
     name: 'LEVEL 8',
     subtitle: 'AIR SLALOM',
-    hint: 'Build 5X: right B2, left B3, right B4, dip left into B5, then drive right.',
+    hint: 'Hold right into the launch post. Then reverse on every blast: right, left, right, left, right.',
     start: { x: 92, y: 514 },
     platforms: [
-      { x: 0, y: 550, w: 330, h: 50 },
+      { x: 0, y: 550, w: 484, h: 50 },
+      { x: 470, y: 508, w: 14, h: 42 },
       { x: 0, y: 0, w: 960, h: 18 },
       { x: 0, y: 0, w: 18, h: 600 },
       { x: 942, y: 0, w: 18, h: 600 },
     ],
     bombs: [
-      { x: 250, y: 532, delay: -2.6, label: 'B1' },
-      { x: 530, y: 440, delay: -2, label: 'B2', floating: true },
-      { x: 330, y: 410, delay: -1.65, label: 'B3', floating: true },
-      { x: 560, y: 260, delay: -1.05, label: 'B4', floating: true },
-      { x: 430, y: 280, delay: -0.8, label: 'B5', floating: true },
+      { x: 425, y: 532, delay: -2.6, label: 'B1' },
+      { x: 616, y: 398, delay: -2.18, label: 'B2', floating: true },
+      { x: 378, y: 265, delay: -1.76, label: 'B3', floating: true },
+      { x: 630, y: 163, delay: -1.34, label: 'B4', floating: true },
+      { x: 461, y: 147, delay: -0.92, label: 'B5', floating: true },
     ],
-    exit: { x: 520, y: 55, w: 90, h: 70 },
-    pit: { x: 330, y: 500, w: 630, h: 100 },
+    exit: { x: 518, y: 89, w: 76, h: 64 },
+    pit: { x: 484, y: 500, w: 476, h: 100 },
     requiredCombo: 5,
   },
 ];
@@ -550,14 +551,14 @@ export default function BlastEscape() {
         ...(movingAfter ? [{ rect: movingAfter.rect, moving: true }] : []),
       ];
       const keys = keysRef.current;
+      // Level 8 clean route: hold right into the launch post, then reverse on
+      // every blast. Switch points are the B2..B5 fuse times.
       const demoDirection =
-        levelElapsed < 0.7 ? 1
-          : levelElapsed < 2.12 ? 0
-            : levelElapsed < 2.8 ? 1
-              : levelElapsed < 3.15 ? -1
-                : levelElapsed < 3.75 ? 1
-                  : levelElapsed < 4 ? -1
-                    : 1;
+        levelElapsed < 2.62 ? 1
+          : levelElapsed < 3.04 ? -1
+            : levelElapsed < 3.46 ? 1
+              : levelElapsed < 3.88 ? -1
+                : 1;
       const direction = demoActive
         ? demoDirection
         : (keys.has('d') || keys.has('arrowright') ? 1 : 0) -
@@ -854,19 +855,20 @@ export default function BlastEscape() {
         ctx.fillRect(level.pit.x, level.pit.y, level.pit.w, 2);
       }
 
-      if (level.movingPlatform) {
-        const trackY = level.movingPlatform.y + level.movingPlatform.h / 2;
+      const track = level.movingPlatform;
+      if (track) {
+        const trackY = track.y + track.h / 2;
         ctx.strokeStyle = 'rgba(102, 242, 213, 0.16)';
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(level.movingPlatform.fromX + level.movingPlatform.w / 2, trackY);
-        ctx.lineTo(level.movingPlatform.toX + level.movingPlatform.w / 2, trackY);
+        ctx.moveTo(track.fromX + track.w / 2, trackY);
+        ctx.lineTo(track.toX + track.w / 2, trackY);
         ctx.stroke();
-        [level.movingPlatform.fromX, level.movingPlatform.toX].forEach((x) => {
+        [track.fromX, track.toX].forEach((x) => {
           ctx.fillStyle = VISUAL.structureDark;
-          ctx.fillRect(x + level.movingPlatform.w / 2 - 7, trackY - 8, 14, 16);
+          ctx.fillRect(x + track.w / 2 - 7, trackY - 8, 14, 16);
           ctx.fillStyle = 'rgba(102, 242, 213, 0.62)';
-          ctx.fillRect(x + level.movingPlatform.w / 2 - 2, trackY - 4, 4, 8);
+          ctx.fillRect(x + track.w / 2 - 2, trackY - 4, 4, 8);
         });
       }
 

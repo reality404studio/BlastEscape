@@ -6,6 +6,8 @@ import type {
   LevelDefinition,
   MovingPlatform,
   PlayerState,
+  Rect,
+  TraversalInteraction,
 } from './types.ts';
 
 export function playerHorizontalVelocity(player: PlayerState) {
@@ -40,6 +42,45 @@ export function movingPlatformAt(
   return {
     rect: { x, y: platform.y, w: platform.w, h: platform.h },
     velocityX: movingRight ? platform.speed : -platform.speed,
+  };
+}
+
+export function traversalInteractionResultAt(
+  interaction: TraversalInteraction,
+  time: number,
+): Rect | undefined {
+  return traversalInteractionMotionAt(interaction, time)?.rect;
+}
+
+export function traversalInteractionMotionAt(
+  interaction: TraversalInteraction,
+  time: number,
+) {
+  if (interaction.movingResult) return movingPlatformAt(interaction.movingResult, time);
+  return interaction.resultRect
+    ? { rect: interaction.resultRect, velocityX: 0 }
+    : undefined;
+}
+
+export function traversalInteractionContactAt(
+  interaction: TraversalInteraction,
+  time: number,
+): Rect {
+  const movingResult = interaction.movingResult
+    ? traversalInteractionMotionAt(interaction, time)?.rect
+    : undefined;
+  if (!movingResult) return interaction.rect;
+
+  const padding = interaction.movingCapturePadding ?? {
+    horizontal: 0,
+    above: 0,
+    below: 0,
+  };
+  return {
+    x: movingResult.x - padding.horizontal,
+    y: movingResult.y - padding.above,
+    w: movingResult.w + padding.horizontal * 2,
+    h: movingResult.h + padding.above + padding.below,
   };
 }
 

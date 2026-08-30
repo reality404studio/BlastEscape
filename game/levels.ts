@@ -1197,4 +1197,85 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-21',
+    name: 'LEVEL 21',
+    subtitle: 'SHIFT CARRIER',
+    hint: 'Read the carrier cycle. B1 catches it at the left dock; shift right once aboard, then ride to receiving.',
+    intent: {
+      primaryRoute: 'START -> induction coil -> magnetic state -> read the overhead carrier cycle -> prepared B1 -> moving capture -> shift right aboard -> ride to the receiving end -> automatic carrier-end release -> right deck -> EXIT',
+      launchJobs: [
+        { bomb: 'B1', job: 'Lift the magnetized player into the carrier as it reaches the left dock; the carrier owns the long crossing.' },
+      ],
+      landingWindows: [
+        { target: 'moving carrier capture band', kind: 'wide', description: 'The carrier has explicit horizontal and lower capture padding around the intended B1 apex.' },
+        { target: 'right receiving deck', kind: 'wide', description: 'One short rightward shift aboard places the player over the broad deck before automatic end release.' },
+      ],
+      timingWindows: [
+        { target: 'left-dock interception', kind: 'intercept', description: 'The carrier arrives at the launch lane on the prepared B1 cycle and repeats visibly if the player waits.' },
+        { target: 'carrier attachment', kind: 'expiring', description: 'Attachment covers one complete left-to-right trip but discharges if the player refuses the route.' },
+      ],
+      recovery: { kind: 'recoverable', description: 'The start floor is safe while reading the cycle; a missed airborne interception falls into the exposed water trench.' },
+      masteryShortcut: null,
+      newConcept: 'A bounded magnetic attachment can follow a moving rail, inheriting its displacement while preserving left/right positioning and automatic endpoint release.',
+      recombinedSkills: ['temporary magnetic state', 'prepared blast timing', 'moving-target interception', 'bounded rail traversal', 'release-point landing'],
+      targetFirstClearSeconds: { min: 100, max: 240 },
+    },
+    validation: {
+      requiredBlastHits: ['B1'],
+      requiredInteractions: ['shift-carrier'],
+      requiredStates: ['magnetic'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 120, samples: 100, minimumClearRate: 0.8 },
+      ],
+    },
+    start: { x: 72, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 320, h: 50 },
+      { x: 286, y: 508, w: 14, h: 42 },
+      { x: 720, y: 380, w: 222, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [{ x: 273, y: 532, delay: -1.8, label: 'B1' }],
+    exit: { x: 760, y: 316, w: 140, h: 64 },
+    pit: { x: 320, y: 380, w: 400, h: 220 },
+    traversalStateSources: [
+      {
+        id: 'carrier-coil',
+        rect: { x: 80, y: 500, w: 82, h: 50 },
+        grants: 'magnetic',
+        durationSeconds: 10,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'shift-carrier',
+        rect: { x: 210, y: 130, w: 610, h: 120 },
+        kind: 'magnetic-attach',
+        accepts: ['magnetic'],
+        activeSeconds: 5,
+        movingResult: {
+          fromX: 230,
+          toX: 600,
+          y: 155,
+          w: 200,
+          h: 16,
+          speed: 85,
+          phase: 5.2558823529,
+        },
+        movingCapturePadding: { horizontal: 20, above: 10, below: 85 },
+        releaseAtMovingEnd: 'to',
+      },
+    ],
+    waterHazards: [
+      {
+        id: 'carrier-trench',
+        rect: { x: 320, y: 380, w: 400, h: 220 },
+        frozenByInteractionId: 'no-freeze-route',
+      },
+    ],
+  },
 ];

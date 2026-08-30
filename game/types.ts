@@ -62,6 +62,13 @@ export type TraversalInteraction = {
   accepts: Array<Exclude<TraversalStateKind, 'neutral'>>;
   activeSeconds?: number;
   resultRect?: Rect;
+  movingResult?: MovingPlatform;
+  movingCapturePadding?: {
+    horizontal: number;
+    above: number;
+    below: number;
+  };
+  releaseAtMovingEnd?: 'from' | 'to';
   deactivatesInteractionId?: string;
 };
 

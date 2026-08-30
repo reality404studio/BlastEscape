@@ -112,6 +112,11 @@ export const LEVEL_20_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: 1 },
 ];
 
+export const LEVEL_21_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 3.64, direction: 1 },
+  { until: Number.POSITIVE_INFINITY, direction: 0 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -265,6 +270,15 @@ export const LEVEL_20_CLEAN_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_20_CLEAN_ROUTE,
 };
 
+export const LEVEL_21_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-21-shift-carrier-clean-route',
+  levelId: 'level-21',
+  description: 'Acquire magnetic charge, intercept the moving carrier with B1, shift right aboard, and ride to automatic receiving-end release.',
+  frameRate: 60,
+  maxDurationSeconds: 11,
+  keyframes: LEVEL_21_CLEAN_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
@@ -279,6 +293,7 @@ export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_18_CLEAN_REPLAY,
   LEVEL_19_CLEAN_REPLAY,
   LEVEL_20_CLEAN_REPLAY,
+  LEVEL_21_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

@@ -414,6 +414,20 @@ New concept, if any: A magnetic player entering a rail capture zone while rising
 What previous skills are recombined: temporary-state acquisition, prepared blast launch, horizontal steering, landing under a release point.
 ```
 
+### Level 21 — SHIFT CARRIER (accepted intent)
+
+```text
+LEVEL 21 — SHIFT CARRIER
+Primary route: START -> induction coil -> acquire magnetic state -> wait for the overhead carrier to enter the launch lane -> prepared B1 -> rise into the carrier capture band -> automatic attachment -> ride and steer with the moving carrier -> automatic release above the right receiving deck -> EXIT
+Launch job(s): B1 lifts the magnetized player into a moving capture target. Its timing is chosen from the carrier's visible cycle rather than a new input or hidden trigger.
+Landing window(s): The carrier capture padding is broad enough to accept a readable B1 apex. The receiving deck spans the carrier's right-side release region.
+Timing window(s): The carrier repeats a slow, visible horizontal cycle. Attachment lifetime covers a successful interception and crossing but expires if the player catches it and refuses to travel with it.
+Recovery state: Recoverable before launch, fatal after a missed interception. The start floor is stable while reading the cycle; missing the carrier falls into the clearly exposed water trench.
+Mastery shortcut: None. Intercepting and riding the moving magnetic carrier must be load-bearing.
+New concept, if any: The same bounded magnetic attachment may target a data-driven moving rail; while attached, authoritative movement inherits the rail's frame-to-frame displacement plus existing left/right control.
+What previous skills are recombined: temporary magnetic state, prepared blast timing, moving-platform interception, bounded rail traversal, automatic release-point landing.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

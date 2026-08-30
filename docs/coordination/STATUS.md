@@ -26,8 +26,10 @@ the fast primary route, while cold appears only after a missed B1 as the B2
 recovery branch. G9B is DONE. G3D
 and G9C now ship `LEVEL 20 — INDUCTION RAIL`: B1 captures a magnetized player on
 a bounded overhead rail, left/right traverses it, and its end or timer releases
-back to gravity. G3D and G9C are DONE. G10 is ACTIVE for Level 21's moving
-overhead carrier, followed by bounded synthesis and the canonical dispatch ending.
+back to gravity. G3D and G9C are DONE. G10 now ships `LEVEL 21 — SHIFT CARRIER`,
+where the same bounded attachment inherits one authoritative moving rail and
+releases at its receiving endpoint. G10 remains ACTIVE for Level 22 synthesis,
+followed by bounded escalation and the canonical dispatch ending.
 G8A blast replay coverage remains READY.
 
 ## Active / next goals
@@ -50,7 +52,7 @@ G8A blast replay coverage remains READY.
 | G9A Cold curriculum | DONE | G2 + G3B | Levels 10–14 accepted with route/dependency evidence |
 | G9B Heat levels | DONE | G2 + G3C | Levels 15–19 accepted with selective route hierarchy |
 | G9C Magnet introduction | DONE | G2 + G3D | Level 20 accepted |
-| G10 Synthesis / ending levels | ACTIVE | G2 + G3B–D + narrative | Level 21 moving carrier next; L21–25 and dispatch ending |
+| G10 Synthesis / ending levels | ACTIVE | G2 + G3B–D + narrative | Level 21 accepted; L22–25 and dispatch ending next |
 | G11 Final QA / release | PROPOSED | G4–G10 | full playthrough, save/pause/restart/build/perf |
 
 ## Open blockers
@@ -170,6 +172,13 @@ Expected first mandatory human call: protagonist base identity approval before m
   falls short; waiting on the rail discharges into the void. 77 tests, Levels
   8–20 validation, 30–144Hz replay checks, lint, build, and local HTTP 200 pass.
   Evidence: `docs/reports/G3D-MAGNETISM-LEVEL-20-001.md`.
+- G10 Level 21 extends that attachment through the existing moving-platform
+  authority: capture follows the current carrier rather than its swept path,
+  attached movement inherits carrier displacement, and the receiving endpoint
+  releases automatically. The route clears at 8.233s across 30–144Hz; removing
+  magnetism or carrier travel dies in the water trench; all constant-direction
+  policies fail; ±120ms noise clears 100/100. 86 tests and Levels 8–21 validation
+  pass. Evidence: `docs/reports/G10-SYNTHESIS-LEVEL-21-001.md`.
 
 ## Director update rule
 

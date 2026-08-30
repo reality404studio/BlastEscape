@@ -1,0 +1,111 @@
+{
+  "generatedBy": "npm run validate:levels",
+  "schemaVersion": 1,
+  "levelId": "level-21",
+  "levelName": "LEVEL 21 — SHIFT CARRIER",
+  "replayId": "level-21-shift-carrier-clean-route",
+  "status": "pass",
+  "evaluations": [
+    {
+      "evaluator": "reachability",
+      "id": "accepted-route-clears",
+      "status": "pass",
+      "summary": "Accepted replay clears in 8.233s.",
+      "metrics": {
+        "outcome": "cleared",
+        "elapsedSeconds": 8.233333333333343,
+        "maximumAirCombo": 1
+      }
+    },
+    {
+      "evaluator": "exploit",
+      "id": "simple-policy-bypass",
+      "status": "pass",
+      "summary": "No forbidden constant-direction policy clears the level.",
+      "metrics": {
+        "testedPolicies": [
+          "hold-left",
+          "neutral",
+          "hold-right"
+        ],
+        "bypassPolicies": []
+      }
+    },
+    {
+      "evaluator": "noisy-human",
+      "id": "timing-jitter-120ms",
+      "status": "pass",
+      "summary": "100/100 deterministic jittered replays cleared.",
+      "metrics": {
+        "jitterMilliseconds": 120,
+        "samples": 100,
+        "clears": 100,
+        "clearRate": 1,
+        "minimumClearRate": 0.8
+      }
+    },
+    {
+      "evaluator": "mechanic",
+      "id": "intended-mechanic-use",
+      "status": "pass",
+      "summary": "Accepted replay exercises the required blasts and combo.",
+      "metrics": {
+        "requiredBlastHits": [
+          "B1"
+        ],
+        "actualBlastHits": [
+          "B1"
+        ],
+        "missingBlastHits": [],
+        "requiredInteractions": [
+          "shift-carrier"
+        ],
+        "actualInteractions": [
+          "shift-carrier"
+        ],
+        "missingInteractions": [],
+        "requiredStates": [
+          "magnetic"
+        ],
+        "actualStates": [
+          "magnetic"
+        ],
+        "missingStates": [],
+        "minimumAirCombo": 0,
+        "actualMaximumAirCombo": 1
+      }
+    }
+  ],
+  "acceptedReplay": {
+    "replayId": "level-21-shift-carrier-clean-route",
+    "levelId": "level-21",
+    "outcome": "cleared",
+    "elapsedSeconds": 8.233333333333343,
+    "frames": 494,
+    "frameRate": 60,
+    "deathReason": null,
+    "blastExplosions": [
+      "B1"
+    ],
+    "blastHits": [
+      "B1"
+    ],
+    "acceptedInteractions": [
+      "shift-carrier"
+    ],
+    "acquiredStates": [
+      "magnetic"
+    ],
+    "landingCount": 0,
+    "maximumAirCombo": 1,
+    "highestPointY": 171,
+    "finalPlayer": {
+      "x": 755.7983852338581,
+      "y": 280.36851851851844,
+      "controlVx": 1.7544168083431344e-22,
+      "blastVx": 0,
+      "vy": 504.7777777777771
+    }
+  },
+  "caveat": "These evaluators reject broken or contract-violating routes; they do not prove fun."
+}

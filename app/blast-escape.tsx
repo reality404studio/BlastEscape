@@ -4,7 +4,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { CONFIG } from '@/game/config';
 import { bombIsPowered, createGameplayState, spikeTriangles, stepGameplay } from '@/game/core';
 import { LEVELS } from '@/game/levels';
-import { movingPlatformAt, playerHorizontalVelocity } from '@/game/physics';
+import {
+  movingPlatformAt,
+  playerHorizontalVelocity,
+  traversalInteractionResultAt,
+} from '@/game/physics';
 import { directionAtTime, LEVEL_8_CLEAN_ROUTE } from '@/game/replays';
 import type { GameplayEvent } from '@/game/core';
 import type { Direction } from '@/game/types';
@@ -701,10 +705,23 @@ export default function BlastEscape() {
       });
 
       level.traversalInteractions?.forEach((interaction) => {
-        if (interaction.kind !== 'magnetic-attach' || !interaction.resultRect) return;
+        if (interaction.kind !== 'magnetic-attach') return;
         const attached = player.magneticAttachment?.interactionId === interaction.id;
         const active = attached || (interactionStates[interaction.id]?.active ?? false);
-        const rail = interaction.resultRect;
+        const rail = traversalInteractionResultAt(interaction, levelElapsed);
+        if (!rail) return;
+        if (interaction.movingResult) {
+          const motion = interaction.movingResult;
+          ctx.strokeStyle = 'rgba(102, 242, 213, 0.24)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(motion.fromX, motion.y + motion.h / 2);
+          ctx.lineTo(motion.toX + motion.w, motion.y + motion.h / 2);
+          ctx.stroke();
+          ctx.fillStyle = 'rgba(102, 242, 213, 0.34)';
+          ctx.fillRect(motion.fromX - 4, motion.y - 6, 5, motion.h + 12);
+          ctx.fillRect(motion.toX + motion.w - 1, motion.y - 6, 5, motion.h + 12);
+        }
         ctx.fillStyle = '#20282a';
         ctx.fillRect(rail.x, rail.y, rail.w, rail.h);
         ctx.fillStyle = active ? VISUAL.mint : 'rgba(102, 242, 213, 0.3)';
@@ -720,7 +737,7 @@ export default function BlastEscape() {
         ctx.font = '700 8px ui-monospace, monospace';
         ctx.textAlign = 'center';
         ctx.fillText(
-          attached ? 'MAG LOCK' : 'INDUCTION RAIL',
+          attached ? 'MAG LOCK' : interaction.movingResult ? 'SHIFT CARRIER' : 'INDUCTION RAIL',
           rail.x + rail.w / 2,
           rail.y - 7,
         );

@@ -216,9 +216,12 @@ free flight.
 **Human gate:** ending meaning must remain cancellation -> no new objective -> player-controlled departure.
 **Done when:** synthesis levels are fair and the ending lands without dialogue/cutscene exposition.
 
-**Current slice:** Level 21 is next. Extend the shared bounded magnetic contract
-to one moving overhead carrier across a void or water hazard, author intent before
-geometry, and keep release timing readable without adding an input.
+**Current slice:** Level 21 is accepted with one shared moving-carrier extension.
+Level 22 is next: synthesize at least two established state/blast verbs without
+adding another traversal system, and author route hierarchy before geometry.
+
+**Evidence:** `docs/reports/G10-SYNTHESIS-LEVEL-21-001.md` and
+`artifacts/level-validation/level-21.json`.
 
 ### G11 — Final QA / Release
 

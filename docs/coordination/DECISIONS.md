@@ -130,3 +130,14 @@ and vertical motion is constrained. Reaching either rail end, attachment dischar
 or magnetic-state expiry releases into normal gravity. Capture only occurs while
 rising, preventing rail-end release from immediately reattaching. This preserves
 the no-new-input and no-free-flight contracts in runtime and replay.
+
+## D-019 — Moving magnetic carriers reuse the shared platform motion authority
+
+A `magnetic-attach` interaction may optionally define a `movingResult`, explicit
+capture padding, and one configured path end for automatic release. The existing
+`movingPlatformAt` function supplies the carrier rectangle and velocity to shared
+contact, attachment, replay, and rendering helpers. An attached player inherits
+the carrier's frame-to-frame displacement and may reposition only with existing
+left/right control. A direction change at the configured endpoint releases back
+to gravity. This extends D-018 without a second motion system, free flight, a new
+input, or a Level 21-only controller.

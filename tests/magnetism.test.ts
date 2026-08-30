@@ -107,3 +107,111 @@ test('Level 20 clean route clears across supported frame schedules', () => {
     assert.equal(result.outcome, 'cleared', `${frameRate}Hz should clear`);
   }
 });
+
+const movingCarrierLevel = {
+  ...level20,
+  id: 'moving-carrier-test',
+  traversalInteractions: [{
+    id: 'moving-carrier',
+    rect: { x: 250, y: 120, w: 300, h: 150 },
+    kind: 'magnetic-attach' as const,
+    accepts: ['magnetic' as const],
+    activeSeconds: 5,
+    movingResult: {
+      fromX: 300,
+      toX: 500,
+      y: 150,
+      w: 120,
+      h: 16,
+      speed: 50,
+      phase: 0,
+    },
+    movingCapturePadding: { horizontal: 16, above: 12, below: 80 },
+    releaseAtMovingEnd: 'to' as const,
+  }],
+};
+
+test('moving magnetic capture follows the carrier rather than its swept path', () => {
+  const capture = createGameplayState(movingCarrierLevel);
+  capture.player.x = 330;
+  capture.player.y = 205;
+  capture.player.vy = -300;
+  capture.player.grounded = false;
+  capture.player.traversalState = {
+    kind: 'magnetic',
+    remainingSeconds: 6,
+    sourceId: 'test-coil',
+  };
+  stepGameplay(capture, movingCarrierLevel, 0, 1 / 60);
+  assert.equal(capture.player.magneticAttachment?.interactionId, 'moving-carrier');
+
+  const miss = createGameplayState(movingCarrierLevel);
+  miss.player.x = 470;
+  miss.player.y = 205;
+  miss.player.vy = -300;
+  miss.player.grounded = false;
+  miss.player.traversalState = {
+    kind: 'magnetic',
+    remainingSeconds: 6,
+    sourceId: 'test-coil',
+  };
+  stepGameplay(miss, movingCarrierLevel, 0, 1 / 60);
+  assert.equal(miss.player.magneticAttachment, null);
+});
+
+test('an attached player inherits moving-carrier displacement', () => {
+  const state = createGameplayState(movingCarrierLevel);
+  state.player.x = 330;
+  state.player.y = 166;
+  state.player.grounded = false;
+  state.player.traversalState = {
+    kind: 'magnetic',
+    remainingSeconds: 6,
+    sourceId: 'test-coil',
+  };
+  state.player.magneticAttachment = {
+    interactionId: 'moving-carrier',
+    remainingSeconds: 5,
+  };
+
+  stepGameplay(state, movingCarrierLevel, 0, 0.1);
+  assert.ok(Math.abs(state.player.x - 335) < 0.001);
+  assert.equal(state.player.y, 166);
+  assert.equal(state.player.vy, 0);
+});
+
+test('a moving carrier releases automatically at its configured path end', () => {
+  const interaction = movingCarrierLevel.traversalInteractions[0];
+  const shortCarrierLevel = {
+    ...movingCarrierLevel,
+    traversalInteractions: [{
+      ...interaction,
+      movingResult: {
+        ...interaction.movingResult,
+        fromX: 300,
+        toX: 310,
+        speed: 10,
+        phase: 0.95,
+      },
+    }],
+  };
+  const state = createGameplayState(shortCarrierLevel);
+  state.player.x = 305;
+  state.player.y = 166;
+  state.player.grounded = false;
+  state.player.traversalState = {
+    kind: 'magnetic',
+    remainingSeconds: 6,
+    sourceId: 'test-coil',
+  };
+  state.player.magneticAttachment = {
+    interactionId: 'moving-carrier',
+    remainingSeconds: 5,
+  };
+
+  const events = stepGameplay(state, shortCarrierLevel, 0, 0.1);
+  assert.ok(events.some((event) =>
+    event.type === 'magnetic-released' && event.reason === 'carrier-end',
+  ));
+  assert.equal(state.player.magneticAttachment, null);
+});

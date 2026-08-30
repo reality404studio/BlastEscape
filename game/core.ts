@@ -4,6 +4,9 @@ import {
   freshBombs,
   integratePlayerVelocity,
   movingPlatformAt,
+  traversalInteractionContactAt,
+  traversalInteractionMotionAt,
+  traversalInteractionResultAt,
 } from './physics.ts';
 import type { BlastEvaluation } from './physics.ts';
 import type {
@@ -73,7 +76,7 @@ export type GameplayEvent =
   | {
       type: 'magnetic-released';
       interactionId: string;
-      reason: 'rail-end' | 'discharged' | 'state-expired' | 'missing-rail';
+      reason: 'rail-end' | 'carrier-end' | 'discharged' | 'state-expired' | 'missing-rail';
     };
 
 export function createGameplayState(level: LevelDefinition): GameplayState {
@@ -250,7 +253,8 @@ function applyTraversalContacts(
   }
 
   for (const interaction of level.traversalInteractions ?? []) {
-    if (seenInteractions.has(interaction.id) || !overlaps(rect, interaction.rect)) continue;
+    const contactRect = traversalInteractionContactAt(interaction, state.levelElapsed);
+    if (seenInteractions.has(interaction.id) || !overlaps(rect, contactRect)) continue;
     seenInteractions.add(interaction.id);
     const stateKind = state.player.traversalState.kind;
     events.push({
@@ -281,16 +285,17 @@ function applyTraversalContacts(
     if (
       interaction.kind === 'magnetic-attach' &&
       stateKind === 'magnetic' &&
-      interaction.resultRect &&
+      traversalInteractionResultAt(interaction, state.levelElapsed) &&
       interaction.activeSeconds &&
       !state.player.magneticAttachment &&
       state.player.vy < 0
     ) {
+      const rail = traversalInteractionResultAt(interaction, state.levelElapsed)!;
       state.player.magneticAttachment = {
         interactionId: interaction.id,
         remainingSeconds: interaction.activeSeconds,
       };
-      state.player.y = interaction.resultRect.y + interaction.resultRect.h;
+      state.player.y = rail.y + rail.h;
       state.player.vy = 0;
       state.player.grounded = false;
       state.player.onMovingPlatform = false;
@@ -339,21 +344,39 @@ function movePlayer(
     const interaction = level.traversalInteractions?.find(
       (candidate) => candidate.id === player.magneticAttachment?.interactionId,
     );
-    const rail = interaction?.resultRect;
-    if (!rail) {
+    const railBefore = interaction
+      ? traversalInteractionMotionAt(interaction, state.levelElapsed)
+      : undefined;
+    const railAfter = interaction
+      ? traversalInteractionMotionAt(interaction, state.levelElapsed + dt)
+      : undefined;
+    if (!railBefore || !railAfter) {
       const interactionId = player.magneticAttachment.interactionId;
       player.magneticAttachment = null;
       events.push({ type: 'magnetic-released', interactionId, reason: 'missing-rail' });
     } else {
       state.levelElapsed += dt;
       Object.assign(player, integratePlayerVelocity({ ...player, grounded: true }, direction, dt));
+      player.x += railAfter.rect.x - railBefore.rect.x;
       player.x += (player.controlVx + player.blastVx) * dt;
-      player.y = rail.y + rail.h;
+      player.y = railAfter.rect.y + railAfter.rect.h;
       player.vy = 0;
       player.grounded = false;
       player.onMovingPlatform = false;
       const centerX = player.x + CONFIG.playerWidth / 2;
-      if (centerX < rail.x || centerX > rail.x + rail.w) {
+      const reachedMovingEnd = interaction?.releaseAtMovingEnd === 'to'
+        ? railBefore.velocityX > 0 && railAfter.velocityX < 0
+        : interaction?.releaseAtMovingEnd === 'from'
+          ? railBefore.velocityX < 0 && railAfter.velocityX > 0
+          : false;
+      if (reachedMovingEnd) {
+        const interactionId = player.magneticAttachment.interactionId;
+        player.magneticAttachment = null;
+        events.push({ type: 'magnetic-released', interactionId, reason: 'carrier-end' });
+      } else if (
+        centerX < railAfter.rect.x ||
+        centerX > railAfter.rect.x + railAfter.rect.w
+      ) {
         const interactionId = player.magneticAttachment.interactionId;
         player.magneticAttachment = null;
         events.push({ type: 'magnetic-released', interactionId, reason: 'rail-end' });

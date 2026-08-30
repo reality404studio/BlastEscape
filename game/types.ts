@@ -20,10 +20,49 @@ export type MovingPlatform = {
   phase: number;
 };
 
+export type LandingWindowKind = 'none' | 'wide' | 'medium' | 'tight';
+export type TimingWindowKind = 'open' | 'commit' | 'intercept' | 'expiring';
+export type RecoveryKind = 'safe' | 'recoverable' | 'costly' | 'fatal';
+export type SimplePolicyId = 'hold-left' | 'neutral' | 'hold-right';
+
+export type LevelIntent = {
+  primaryRoute: string;
+  launchJobs: Array<{ bomb: string; job: string }>;
+  landingWindows: Array<{
+    target: string;
+    kind: LandingWindowKind;
+    description: string;
+  }>;
+  timingWindows: Array<{
+    target: string;
+    kind: TimingWindowKind;
+    description: string;
+  }>;
+  recovery: { kind: RecoveryKind; description: string };
+  masteryShortcut: string | null;
+  newConcept: string;
+  recombinedSkills: string[];
+  targetFirstClearSeconds: { min: number; max: number };
+};
+
+export type LevelValidationContract = {
+  requiredBlastHits?: string[];
+  minimumAirCombo?: number;
+  simplePoliciesMustFail?: SimplePolicyId[];
+  noisyHumanProfiles?: Array<{
+    jitterMilliseconds: number;
+    samples: number;
+    minimumClearRate: number;
+  }>;
+};
+
 export type LevelDefinition = {
+  id: string;
   name: string;
   subtitle: string;
   hint: string;
+  intent: LevelIntent;
+  validation: LevelValidationContract;
   start: { x: number; y: number };
   platforms: Rect[];
   bombs: BombDefinition[];

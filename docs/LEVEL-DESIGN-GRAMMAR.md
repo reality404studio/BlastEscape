@@ -241,6 +241,11 @@ Measured behaviour of the shipped geometry:
 | practical clear rate, +-80ms per-switch jitter | ~40% |
 | frame rates 144Hz / 120Hz / 60Hz / 50Hz / 30Hz | clears on all through the shared authoritative core |
 
+The repository's deterministic Level Lab currently reports 96% at ±30ms and
+51% at ±80ms over 100 seeded runs. That evaluator perturbs switch times around an
+otherwise ideal route; the earlier practical figures include broader execution
+error and remain a different measurement rather than a contradiction.
+
 Before implementation, write a short level intent using this template:
 
 ```text

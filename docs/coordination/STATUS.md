@@ -4,14 +4,18 @@ This file is the compact monitoring surface for Codex `/goal` work.
 
 ## Current phase
 
-**PHASE 2 — Level Lab and validation path**
+**PHASE 3 — traversal-state substrate**
 
 G0 contracts and the repository audit are complete. G1 extracted typed level
 data and the authoritative gameplay step without changing constants, coordinates,
 or the clamped-frame/three-substep order. Browser play and headless replay now
 share movement, collision, hazards, bombs, blast, combo, death, and exit logic.
-G2 is READY to add intent-bearing level data, replay/report formats, and multiple
-evaluators before level production begins.
+G2 now provides intent-bearing level data, accepted replay/report formats, and
+reachability, exploit, deterministic noisy-human, and mechanic-use evaluators.
+G3A is READY to establish the shared temporary-state and interaction substrate
+before cold, heat, or magnet-dependent levels begin. G8A is also READY for
+existing blast-curriculum replay coverage, but it does not block the mechanic
+substrate.
 
 ## Active / next goals
 
@@ -19,14 +23,14 @@ evaluators before level production begins.
 |---|---|---|---|
 | G0 Director / contracts | DONE | — | contracts and reality audit recorded |
 | G1 Runtime / physics | DONE | G0 | authoritative core and characterization evidence complete |
-| G2 Level Lab / simulation | READY | G1 | data-driven intent, replay, validators/evaluators |
-| G3A Traversal-state substrate | PROPOSED | G1 | shared temporary-state model and interaction hooks |
+| G2 Level Lab / simulation | DONE | G1 | data-driven intent, replay, validators/evaluators complete |
+| G3A Traversal-state substrate | READY | G1 | shared temporary-state model and interaction hooks |
 | G3B–D Cold / heat / magnetism | PROPOSED | G3A | implement bounded traversal states with tests |
 | G4 Art direction / protagonist | READY | G0 | pixel-art execution and identity candidates |
 | G5 Sprite pipeline | PROPOSED | G4 approval | SpriteGen integration and atlas/manifest pipeline |
 | G6 FX / game feel | READY | G0; preferably stable runtime events | mute-first feedback polish |
 | G7 Environmental story | READY | G0 | factory zones, signage, nonverbal narrative |
-| G8A Blast curriculum migration | PROPOSED | G2 | preserve/migrate L1–8 |
+| G8A Blast curriculum migration | READY | G2 | preserve/migrate L1–8 |
 | G8B/G9A Cold levels | PROPOSED | G2 + G3B | L9–14 |
 | G9B Heat levels | PROPOSED | G2 + G3C | L15–19 |
 | G9C Magnet introduction | PROPOSED | G2 + G3D | L20 |
@@ -69,6 +73,11 @@ Expected first mandatory human call: protagonist base identity approval before m
   checks into `stepGameplay`, shared by runtime and headless replay. Level 8
   clears at 5X across 30/50/60/120/144Hz; 10 tests, lint, and build pass.
   Evidence: `docs/reports/G1-AUTHORITATIVE-CORE-002.md`.
+- G2 attached explicit route intent to Levels 1–8 and added accepted replay,
+  reachability, exploit, deterministic timing-noise, mechanic-use, and JSON report
+  paths. Level 8 passes all evaluator contracts; 14 tests, lint, and build pass.
+  Evidence: `docs/reports/G2-LEVEL-LAB-001.md` and
+  `artifacts/level-validation/level-8.json`.
 
 ## Director update rule
 

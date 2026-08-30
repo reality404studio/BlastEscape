@@ -38,14 +38,21 @@ them; add deterministic characterization tests and frame-schedule evidence.
 
 ### G2 — Level Lab / Simulation
 
-**State:** READY
+**State:** DONE
 **Depends on:** G1 sufficiently stable.
 **Owns:** data-driven level schema, editor/lab, replay/script inputs, reachability/exploit/noisy-human/mechanic evaluators where practical.
 **Done when:** a new level can be authored/tuned without editing the giant gameplay component and can emit validation evidence.
 
+**Current slice:** add intent-bearing level definitions, a shared-core replay
+runner, reachability/exploit/noisy-human/mechanic evaluators, and machine-readable
+reports using Level 8 as the first complete reference fixture.
+
+**Evidence:** `docs/reports/G2-LEVEL-LAB-001.md` and
+`artifacts/level-validation/level-8.json`.
+
 ### G3A — Traversal-State Substrate
 
-**State:** PROPOSED
+**State:** READY
 **Depends on:** G1.
 **Owns:** temporary-state lifetime/transition model, interaction hooks, tests,
 debug visualization, and shared visual event boundaries.
@@ -111,7 +118,7 @@ input button.
 
 ### G8A — Blast Curriculum Migration / Preservation
 
-**State:** PROPOSED
+**State:** READY
 **Depends on:** G2.
 **Owns:** Levels 1–8 after schema migration, preserving known good feel/routes and
 locking regression evidence before tuning.

@@ -43,6 +43,11 @@ export type ActiveTraversalState = {
   sourceId: string | null;
 };
 
+export type MagneticAttachment = {
+  interactionId: string;
+  remainingSeconds: number;
+};
+
 export type TraversalStateSource = {
   id: string;
   rect: Rect;
@@ -143,6 +148,7 @@ export type PlayerState = {
   grounded: boolean;
   onMovingPlatform: boolean;
   traversalState: ActiveTraversalState;
+  magneticAttachment: MagneticAttachment | null;
 };
 
 export type Direction = -1 | 0 | 1;

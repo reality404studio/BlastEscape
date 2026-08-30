@@ -1133,4 +1133,68 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-20',
+    name: 'LEVEL 20',
+    subtitle: 'INDUCTION RAIL',
+    hint: 'Take the green charge. B1 can place you on the overhead rail; keep moving before the lock discharges.',
+    intent: {
+      primaryRoute: 'START -> induction coil -> magnetic state -> prepared B1 -> overhead rail capture -> automatic attachment -> move right along bounded rail -> automatic end release -> right exit platform -> EXIT',
+      launchJobs: [
+        { bomb: 'B1', job: 'Lift the magnetized player into the rail capture band; the rail carries the long horizontal crossing.' },
+      ],
+      landingWindows: [
+        { target: 'magnetic rail capture band', kind: 'wide', description: 'The capture zone surrounds the intended B1 apex and does not require a pixel-perfect touch.' },
+        { target: 'right exit platform', kind: 'wide', description: 'The platform sits directly beneath automatic rail-end release.' },
+      ],
+      timingWindows: [
+        { target: 'magnetic attachment', kind: 'expiring', description: 'Attachment comfortably covers one rightward crossing but expires if the player waits over the void.' },
+        { target: 'rail end', kind: 'open', description: 'Crossing the data-defined end releases automatically without another button.' },
+      ],
+      recovery: { kind: 'fatal', description: 'Missing capture or exhausting attachment over the central void drops out; the start platform is safe before B1.' },
+      masteryShortcut: null,
+      newConcept: 'A rising magnetic player automatically attaches to a bounded rail, moves along it with left/right, and releases at its end or on expiry.',
+      recombinedSkills: ['temporary-state acquisition', 'prepared blast launch', 'horizontal steering', 'release-point landing'],
+      targetFirstClearSeconds: { min: 80, max: 180 },
+    },
+    validation: {
+      requiredBlastHits: ['B1'],
+      requiredInteractions: ['induction-rail'],
+      requiredStates: ['magnetic'],
+      simplePoliciesMustFail: ['hold-left', 'neutral'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 80, samples: 100, minimumClearRate: 0.8 },
+      ],
+    },
+    start: { x: 72, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 320, h: 50 },
+      { x: 286, y: 508, w: 14, h: 42 },
+      { x: 760, y: 350, w: 182, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [{ x: 273, y: 532, delay: -1.8, label: 'B1' }],
+    exit: { x: 878, y: 286, w: 64, h: 64 },
+    pit: { x: 320, y: 350, w: 440, h: 250 },
+    traversalStateSources: [
+      {
+        id: 'induction-coil',
+        rect: { x: 80, y: 500, w: 82, h: 50 },
+        grants: 'magnetic',
+        durationSeconds: 8,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'induction-rail',
+        rect: { x: 230, y: 130, w: 590, h: 100 },
+        kind: 'magnetic-attach',
+        accepts: ['magnetic'],
+        activeSeconds: 4,
+        resultRect: { x: 250, y: 150, w: 550, h: 16 },
+      },
+    ],
+  },
 ];

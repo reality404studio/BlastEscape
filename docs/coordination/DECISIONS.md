@@ -120,3 +120,13 @@ emits a `deactivated` event before the next movement substep. Level 18 uses this
 generic link for heat to release a cold-created condensate span; the same contract
 can later release other frozen machinery without parallel level scripts. State
 replacement on the player remains governed by the single-slot D-011 contract.
+
+## D-018 — Magnetic attachment is automatic, bounded rail motion
+
+A rising player carrying the magnetic traversal state may attach automatically
+when entering a `magnetic-attach` interaction with a data-defined rail rectangle
+and lifetime. While attached, existing left/right control moves along that rail
+and vertical motion is constrained. Reaching either rail end, attachment discharge,
+or magnetic-state expiry releases into normal gravity. Capture only occurs while
+rising, preventing rail-end release from immediately reattaching. This preserves
+the no-new-input and no-free-flight contracts in runtime and replay.

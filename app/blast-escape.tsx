@@ -458,17 +458,24 @@ export default function BlastEscape() {
       for (let x = 238; x < 754; x += 96) ctx.fillRect(x, 116, 26, 2);
 
       level.traversalStateSources?.forEach((source) => {
-        if (source.grants !== 'cold' && source.grants !== 'heat') return;
+        if (
+          source.grants !== 'cold' &&
+          source.grants !== 'heat' &&
+          source.grants !== 'magnetic'
+        ) return;
         const isCold = source.grants === 'cold';
-        const sourceColor = isCold ? VISUAL.cold : VISUAL.hot;
-        ctx.fillStyle = isCold ? '#172a32' : '#321b18';
+        const isHeat = source.grants === 'heat';
+        const sourceColor = isCold ? VISUAL.cold : isHeat ? VISUAL.hot : VISUAL.mint;
+        ctx.fillStyle = isCold ? '#172a32' : isHeat ? '#321b18' : '#17302d';
         ctx.fillRect(source.rect.x, source.rect.y, source.rect.w, source.rect.h);
         ctx.strokeStyle = sourceColor;
         ctx.lineWidth = 2;
         ctx.strokeRect(source.rect.x, source.rect.y, source.rect.w, source.rect.h);
         ctx.fillStyle = isCold
           ? 'rgba(116, 217, 255, 0.28)'
-          : 'rgba(255, 81, 62, 0.32)';
+          : isHeat
+            ? 'rgba(255, 81, 62, 0.32)'
+            : 'rgba(102, 242, 213, 0.3)';
         for (let x = source.rect.x + 9; x < source.rect.x + source.rect.w; x += 18) {
           ctx.fillRect(x, source.rect.y + 7, 5, source.rect.h - 14);
         }
@@ -476,7 +483,7 @@ export default function BlastEscape() {
         ctx.font = '700 8px ui-monospace, monospace';
         ctx.textAlign = 'center';
         ctx.fillText(
-          isCold ? 'COOLANT' : 'FURNACE',
+          isCold ? 'COOLANT' : isHeat ? 'FURNACE' : 'INDUCTION',
           source.rect.x + source.rect.w / 2,
           source.rect.y - 7,
         );
@@ -690,6 +697,32 @@ export default function BlastEscape() {
           spanFrozen ? 'THAW CONTROL' : 'SPAN OPEN',
           interaction.rect.x + interaction.rect.w / 2,
           interaction.rect.y - 7,
+        );
+      });
+
+      level.traversalInteractions?.forEach((interaction) => {
+        if (interaction.kind !== 'magnetic-attach' || !interaction.resultRect) return;
+        const attached = player.magneticAttachment?.interactionId === interaction.id;
+        const active = attached || (interactionStates[interaction.id]?.active ?? false);
+        const rail = interaction.resultRect;
+        ctx.fillStyle = '#20282a';
+        ctx.fillRect(rail.x, rail.y, rail.w, rail.h);
+        ctx.fillStyle = active ? VISUAL.mint : 'rgba(102, 242, 213, 0.3)';
+        ctx.fillRect(rail.x + 4, rail.y + rail.h - 4, rail.w - 8, 3);
+        ctx.strokeStyle = active ? VISUAL.mint : 'rgba(102, 242, 213, 0.42)';
+        ctx.lineWidth = active ? 2 : 1;
+        ctx.strokeRect(rail.x, rail.y, rail.w, rail.h);
+        for (let x = rail.x + 18; x < rail.x + rail.w; x += 42) {
+          ctx.fillStyle = active ? '#b8fff0' : '#4a7770';
+          ctx.fillRect(x, rail.y + 4, 6, 4);
+        }
+        ctx.fillStyle = VISUAL.mint;
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          attached ? 'MAG LOCK' : 'INDUCTION RAIL',
+          rail.x + rail.w / 2,
+          rail.y - 7,
         );
       });
 
@@ -990,6 +1023,16 @@ export default function BlastEscape() {
         ctx.fillStyle = '#ffb05a';
         ctx.fillRect(3, 19, 3, 3);
         ctx.fillRect(20, 2, 2, 2);
+      }
+      if (player.traversalState.kind === 'magnetic') {
+        ctx.strokeStyle = `rgba(102, 242, 213, ${0.58 + Math.sin(time / 105) * 0.2})`;
+        ctx.lineWidth = 2;
+        roundedRect(ctx, -3, -3, CONFIG.playerWidth + 6, CONFIG.playerHeight + 6, 7);
+        ctx.stroke();
+        ctx.fillStyle = VISUAL.mint;
+        ctx.fillRect(3, 2, 3, 3);
+        ctx.fillRect(20, 19, 2, 2);
+        if (player.magneticAttachment) ctx.fillRect(8, -6, 10, 3);
       }
       ctx.restore();
 

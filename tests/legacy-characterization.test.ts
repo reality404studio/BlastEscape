@@ -22,6 +22,7 @@ const basePlayer = (overrides: Partial<PlayerState> = {}): PlayerState => ({
   grounded: true,
   onMovingPlatform: false,
   traversalState: { kind: 'neutral', remainingSeconds: 0, sourceId: null },
+  magneticAttachment: null,
   ...overrides,
 });
 

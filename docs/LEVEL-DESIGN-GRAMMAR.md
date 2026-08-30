@@ -400,6 +400,20 @@ New concept, if any: None; the heat primary route and cold recovery route synthe
 What previous skills are recombined: heat barrier melting, blast proximity, midair braking, cold acquisition, temporary ice, secondary blast recovery.
 ```
 
+### Level 20 — INDUCTION RAIL (accepted intent)
+
+```text
+LEVEL 20 — INDUCTION RAIL
+Primary route: START -> induction coil -> acquire magnetic state -> prepared B1 -> rise into overhead rail capture zone -> automatic magnetic attachment -> hold right along bounded rail -> automatic release at rail end -> right exit platform -> EXIT
+Launch job(s): B1 only lifts the magnetized player into the rail capture band; the rail, not continued blast flight, carries the long horizontal crossing.
+Landing window(s): The rail capture band is broad around the intended B1 apex. The right exit platform is wide beneath the automatic release point.
+Timing window(s): Magnetic state and attachment lifetime comfortably cover one crossing when the player moves right; waiting on the rail expires into the void.
+Recovery state: Fatal but readable. Missing the rail or exhausting attachment over the central void drops out of the level; the start platform is safe before B1.
+Mastery shortcut: None. Automatic capture, bounded rail traversal, and automatic release must remain load-bearing in the introduction.
+New concept, if any: A magnetic player entering a rail capture zone while rising attaches automatically for a fixed duration, moves only along that rail with existing left/right input, and releases at the rail end or on expiry.
+What previous skills are recombined: temporary-state acquisition, prepared blast launch, horizontal steering, landing under a release point.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

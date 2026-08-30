@@ -98,7 +98,7 @@ contract and authoring the level intent before geometry.
 
 ### G3D — Magnetism
 
-**State:** ACTIVE
+**State:** DONE
 **Depends on:** G3A.
 **Owns:** timed attachment/release/discharge on suitable metal infrastructure and
 tests.
@@ -108,6 +108,9 @@ input button.
 **Current slice:** define the smallest deterministic timed attachment/release
 contract, author Level 20 intent before geometry, and teach one readable overhead
 crossing while preserving left/right-only control.
+
+**Evidence:** `docs/reports/G3D-MAGNETISM-LEVEL-20-001.md` and
+`artifacts/level-validation/level-20.json`.
 
 ### G4 — Art Direction / Protagonist
 
@@ -197,19 +200,25 @@ is selective rather than an every-route checklist item.
 
 ### G9C — Magnet Introduction
 
-**State:** PROPOSED
+**State:** DONE
 **Depends on:** G2 + G3D.
 **Owns:** Level 20.
 **Done when:** timed overhead attachment/release is readable, bounded, and not
 free flight.
 
+**Evidence:** `docs/reports/G3D-MAGNETISM-LEVEL-20-001.md`.
+
 ### G10 — Synthesis / Ending
 
-**State:** PROPOSED
+**State:** ACTIVE
 **Depends on:** G2 + G3B + G3C + G3D + narrative contract.
 **Owns:** Levels 21–25, dispatch scanner sequence, cancellation reveal, open-door exit.
 **Human gate:** ending meaning must remain cancellation -> no new objective -> player-controlled departure.
 **Done when:** synthesis levels are fair and the ending lands without dialogue/cutscene exposition.
+
+**Current slice:** Level 21 is next. Extend the shared bounded magnetic contract
+to one moving overhead carrier across a void or water hazard, author intent before
+geometry, and keep release timing readable without adding an input.
 
 ### G11 — Final QA / Release
 

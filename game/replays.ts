@@ -108,6 +108,10 @@ export const LEVEL_19_RECOVERY_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: -1 },
 ];
 
+export const LEVEL_20_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: Number.POSITIVE_INFINITY, direction: 1 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -252,6 +256,15 @@ export const LEVEL_19_RECOVERY_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_19_RECOVERY_ROUTE,
 };
 
+export const LEVEL_20_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-20-induction-rail-clean-route',
+  levelId: 'level-20',
+  description: 'Acquire magnetic charge, take B1 into automatic rail capture, traverse right, and fall from the rail end into the exit.',
+  frameRate: 60,
+  maxDurationSeconds: 9,
+  keyframes: LEVEL_20_CLEAN_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
@@ -265,6 +278,7 @@ export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_17_CLEAN_REPLAY,
   LEVEL_18_CLEAN_REPLAY,
   LEVEL_19_CLEAN_REPLAY,
+  LEVEL_20_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

@@ -4,7 +4,7 @@ This file is the compact monitoring surface for Codex `/goal` work.
 
 ## Current phase
 
-**PHASE 7 — magnetism introduction**
+**PHASE 8 — synthesis and ending production**
 
 G0 contracts and the repository audit are complete. G1 extracted typed level
 data and the authoritative gameplay step without changing constants, coordinates,
@@ -24,8 +24,11 @@ makes heat lifetime load-bearing; Level 18 makes cold and heat oppose each other
 on one condensate span. `LEVEL 19 — THERMAL CATCH` closes the sequence: heat owns
 the fast primary route, while cold appears only after a missed B1 as the B2
 recovery branch. G9B is DONE. G3D
-Magnetism is ACTIVE for the shared timed attachment/release contract and Level 20
-introduction. G8A blast replay coverage remains READY.
+and G9C now ship `LEVEL 20 — INDUCTION RAIL`: B1 captures a magnetized player on
+a bounded overhead rail, left/right traverses it, and its end or timer releases
+back to gravity. G3D and G9C are DONE. G10 is ACTIVE for Level 21's moving
+overhead carrier, followed by bounded synthesis and the canonical dispatch ending.
+G8A blast replay coverage remains READY.
 
 ## Active / next goals
 
@@ -37,7 +40,7 @@ introduction. G8A blast replay coverage remains READY.
 | G3A Traversal-state substrate | DONE | G1 | shared temporary-state model and interaction hooks complete |
 | G3B Cold | DONE | G3A | cold source/effect contract and Level 9 complete |
 | G3C Heat | DONE | G3A + stable cold contract | heat acquisition, timed barrier melting, and Level 15 accepted |
-| G3D Magnetism | ACTIVE | G3A | timed attachment/release and Level 20 introduction |
+| G3D Magnetism | DONE | G3A | bounded timed attachment/release and Level 20 accepted |
 | G4 Art direction / protagonist | READY | G0 | pixel-art execution and identity candidates |
 | G5 Sprite pipeline | PROPOSED | G4 approval | SpriteGen integration and atlas/manifest pipeline |
 | G6 FX / game feel | READY | G0; preferably stable runtime events | mute-first feedback polish |
@@ -46,8 +49,8 @@ introduction. G8A blast replay coverage remains READY.
 | G8B Cold introduction | DONE | G2 + G3B | Level 9 complete |
 | G9A Cold curriculum | DONE | G2 + G3B | Levels 10–14 accepted with route/dependency evidence |
 | G9B Heat levels | DONE | G2 + G3C | Levels 15–19 accepted with selective route hierarchy |
-| G9C Magnet introduction | PROPOSED | G2 + G3D | L20 |
-| G10 Synthesis / ending levels | PROPOSED | G2 + G3B–D + narrative | L21–25 and dispatch ending |
+| G9C Magnet introduction | DONE | G2 + G3D | Level 20 accepted |
+| G10 Synthesis / ending levels | ACTIVE | G2 + G3B–D + narrative | Level 21 moving carrier next; L21–25 and dispatch ending |
 | G11 Final QA / release | PROPOSED | G4–G10 | full playthrough, save/pause/restart/build/perf |
 
 ## Open blockers
@@ -160,6 +163,13 @@ Expected first mandatory human call: protagonist base identity approval before m
   removing B2 prevents recovery. 71 tests, Levels 8–19 validation, lint, build,
   and local HTTP 200 pass. Evidence:
   `docs/reports/G9B-HEAT-LEVEL-19-001.md`.
+- G3D/G9C Level 20 adds rising-only automatic magnetic capture, bounded rail
+  motion with existing left/right input, and release on rail end, attachment
+  discharge, or traversal-state expiry. The accepted route attaches at 3.467s,
+  releases at the rail end at 5.167s, and clears at 5.550s. Without magnetism B1
+  falls short; waiting on the rail discharges into the void. 77 tests, Levels
+  8–20 validation, 30–144Hz replay checks, lint, build, and local HTTP 200 pass.
+  Evidence: `docs/reports/G3D-MAGNETISM-LEVEL-20-001.md`.
 
 ## Director update rule
 

@@ -64,6 +64,16 @@ export type GameplayEvent =
       active: boolean;
       remainingSeconds: number;
       reason: 'activated' | 'deactivated' | 'expired';
+    }
+  | {
+      type: 'magnetic-attached';
+      interactionId: string;
+      remainingSeconds: number;
+    }
+  | {
+      type: 'magnetic-released';
+      interactionId: string;
+      reason: 'rail-end' | 'discharged' | 'state-expired' | 'missing-rail';
     };
 
 export function createGameplayState(level: LevelDefinition): GameplayState {
@@ -78,6 +88,7 @@ export function createGameplayState(level: LevelDefinition): GameplayState {
       grounded: true,
       onMovingPlatform: false,
       traversalState: { kind: 'neutral', remainingSeconds: 0, sourceId: null },
+      magneticAttachment: null,
     },
     bombs: freshBombs(level),
     comboCount: 0,
@@ -174,6 +185,26 @@ function advanceTraversalState(state: GameplayState, dt: number): GameplayEvent[
   }];
 }
 
+function advanceMagneticAttachment(state: GameplayState, dt: number): GameplayEvent[] {
+  const attachment = state.player.magneticAttachment;
+  if (!attachment) return [];
+
+  attachment.remainingSeconds = Math.max(0, attachment.remainingSeconds - dt);
+  const reason = state.player.traversalState.kind !== 'magnetic'
+    ? 'state-expired'
+    : attachment.remainingSeconds <= 0
+      ? 'discharged'
+      : null;
+  if (!reason) return [];
+
+  state.player.magneticAttachment = null;
+  return [{
+    type: 'magnetic-released',
+    interactionId: attachment.interactionId,
+    reason,
+  }];
+}
+
 function advanceInteractionStates(state: GameplayState, dt: number): GameplayEvent[] {
   const events: GameplayEvent[] = [];
   for (const [interactionId, runtime] of Object.entries(state.interactionStates)) {
@@ -248,6 +279,28 @@ function applyTraversalContacts(
       }
     }
     if (
+      interaction.kind === 'magnetic-attach' &&
+      stateKind === 'magnetic' &&
+      interaction.resultRect &&
+      interaction.activeSeconds &&
+      !state.player.magneticAttachment &&
+      state.player.vy < 0
+    ) {
+      state.player.magneticAttachment = {
+        interactionId: interaction.id,
+        remainingSeconds: interaction.activeSeconds,
+      };
+      state.player.y = interaction.resultRect.y + interaction.resultRect.h;
+      state.player.vy = 0;
+      state.player.grounded = false;
+      state.player.onMovingPlatform = false;
+      events.push({
+        type: 'magnetic-attached',
+        interactionId: interaction.id,
+        remainingSeconds: interaction.activeSeconds,
+      });
+    }
+    if (
       stateKind !== 'neutral' &&
       interaction.accepts.includes(stateKind) &&
       interaction.activeSeconds
@@ -282,6 +335,33 @@ function movePlayer(
 ) {
   const events: GameplayEvent[] = [];
   const { player } = state;
+  if (player.magneticAttachment) {
+    const interaction = level.traversalInteractions?.find(
+      (candidate) => candidate.id === player.magneticAttachment?.interactionId,
+    );
+    const rail = interaction?.resultRect;
+    if (!rail) {
+      const interactionId = player.magneticAttachment.interactionId;
+      player.magneticAttachment = null;
+      events.push({ type: 'magnetic-released', interactionId, reason: 'missing-rail' });
+    } else {
+      state.levelElapsed += dt;
+      Object.assign(player, integratePlayerVelocity({ ...player, grounded: true }, direction, dt));
+      player.x += (player.controlVx + player.blastVx) * dt;
+      player.y = rail.y + rail.h;
+      player.vy = 0;
+      player.grounded = false;
+      player.onMovingPlatform = false;
+      const centerX = player.x + CONFIG.playerWidth / 2;
+      if (centerX < rail.x || centerX > rail.x + rail.w) {
+        const interactionId = player.magneticAttachment.interactionId;
+        player.magneticAttachment = null;
+        events.push({ type: 'magnetic-released', interactionId, reason: 'rail-end' });
+      }
+      events.push({ type: 'moved', dt, point: playerCenter(player), grounded: false });
+      return events;
+    }
+  }
   const wasGrounded = player.grounded;
   const stabilizerId = level.movingPlatform?.stabilizedByInteractionId;
   const movingPlatformStabilized = stabilizerId
@@ -376,6 +456,7 @@ export function stepGameplay(
 ) {
   const events: GameplayEvent[] = [
     ...advanceTraversalState(state, dt),
+    ...advanceMagneticAttachment(state, dt),
     ...advanceInteractionStates(state, dt),
   ];
   const seenInteractions = new Set<string>();

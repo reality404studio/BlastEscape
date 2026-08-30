@@ -156,12 +156,12 @@ dialogue or a new input.
 **Done when:** cold+blast develops through route/timing/recovery variations rather
 than five isolated gimmicks.
 
-**Current slice:** Level 10 is accepted with a shared timed `freeze-water` result,
-linked water hazard, clean/no-cold/expiry controls, and Level Lab evidence. Level
-11 is next and may add only the curriculum's cold machinery-stabilization concept.
+**Current slice:** Levels 10 and 11 are accepted. Level 12 is next and must
+recombine existing cold-created traversal with a genuinely expiring blast route;
+it should not add another cold interaction kind.
 
-**Evidence:** `docs/reports/G9A-COLD-LEVEL-10-001.md` and
-`artifacts/level-validation/level-10.json`.
+**Evidence:** `docs/reports/G9A-COLD-LEVEL-10-001.md`,
+`docs/reports/G9A-COLD-LEVEL-11-001.md`, and their Level Lab JSON artifacts.
 
 ### G9B — Heat Curriculum
 

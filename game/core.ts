@@ -259,12 +259,16 @@ function movePlayer(
   const events: GameplayEvent[] = [];
   const { player } = state;
   const wasGrounded = player.grounded;
+  const stabilizerId = level.movingPlatform?.stabilizedByInteractionId;
+  const movingPlatformStabilized = stabilizerId
+    ? state.interactionStates[stabilizerId]?.active ?? false
+    : false;
   const movingBefore = level.movingPlatform
-    ? movingPlatformAt(level.movingPlatform, state.levelElapsed)
+    ? movingPlatformAt(level.movingPlatform, state.levelElapsed, movingPlatformStabilized)
     : undefined;
   state.levelElapsed += dt;
   const movingAfter = level.movingPlatform
-    ? movingPlatformAt(level.movingPlatform, state.levelElapsed)
+    ? movingPlatformAt(level.movingPlatform, state.levelElapsed, movingPlatformStabilized)
     : undefined;
 
   if (player.grounded && player.onMovingPlatform && movingBefore && movingAfter) {

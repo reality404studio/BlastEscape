@@ -274,6 +274,20 @@ New concept, if any: Accepted cold contact freezes one water span into a tempora
 What previous skills are recombined: cold acquisition, blast proximity, midair steering.
 ```
 
+### Level 11 — COLD LOCK (active intent)
+
+```text
+LEVEL 11 — COLD LOCK
+Primary route: START -> coolant source -> stabilize transfer carriage -> B1 -> locked carriage -> right inspection deck -> EXIT
+Launch job(s): B1 launches from the left floor onto the carriage held at its marked dock.
+Landing window(s): The locked carriage is wide and directly adjoins the right deck; reading the machine state matters more than precision.
+Timing window(s): The lock is expiring but lasts through the prepared B1 launch and crossing; the unstabilized carriage continues its normal cycle.
+Recovery state: Missing the locked carriage falls into the machinery pit; the start floor remains safe before commitment.
+Mastery shortcut: None. The stabilized carriage must remain load-bearing in this introduction.
+New concept, if any: Accepted cold contact temporarily fixes one moving factory carriage at a data-defined docking position.
+What previous skills are recombined: cold acquisition, blast proximity, broad landing.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

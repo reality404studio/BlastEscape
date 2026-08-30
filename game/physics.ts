@@ -12,7 +12,23 @@ export function playerHorizontalVelocity(player: PlayerState) {
   return player.controlVx + player.blastVx;
 }
 
-export function movingPlatformAt(platform: MovingPlatform, time: number) {
+export function movingPlatformAt(
+  platform: MovingPlatform,
+  time: number,
+  stabilized = false,
+) {
+  if (stabilized && platform.stabilizedX !== undefined) {
+    return {
+      rect: {
+        x: platform.stabilizedX,
+        y: platform.y,
+        w: platform.w,
+        h: platform.h,
+      },
+      velocityX: 0,
+    };
+  }
+
   const travelTime = (platform.toX - platform.fromX) / platform.speed;
   const cycleTime = travelTime * 2;
   const cyclePosition = (time + platform.phase) % cycleTime;

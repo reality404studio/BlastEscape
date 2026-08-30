@@ -32,6 +32,12 @@ export const LEVEL_10_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: -1 },
 ];
 
+export const LEVEL_11_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 2.6, direction: 1 },
+  { until: 3.3, direction: 0 },
+  { until: Number.POSITIVE_INFINITY, direction: 1 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -59,10 +65,20 @@ export const LEVEL_10_CLEAN_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_10_CLEAN_ROUTE,
 };
 
+export const LEVEL_11_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-11-cold-lock-clean-route',
+  levelId: 'level-11',
+  description: 'Acquire cold, lock the transfer carriage at its dock, launch from B1, settle onto it, then cross the inspection deck to the exit.',
+  frameRate: 60,
+  maxDurationSeconds: 8,
+  keyframes: LEVEL_11_CLEAN_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
   LEVEL_10_CLEAN_REPLAY,
+  LEVEL_11_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

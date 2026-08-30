@@ -400,8 +400,16 @@ export default function BlastEscape() {
 
     const draw = (time: number) => {
       const level = LEVELS[activeLevelIndex];
+      const stabilizerId = level.movingPlatform?.stabilizedByInteractionId;
+      const movingPlatformStabilized = stabilizerId
+        ? interactionStates[stabilizerId]?.active ?? false
+        : false;
       const movingPlatform = level.movingPlatform
-        ? movingPlatformAt(level.movingPlatform, levelElapsed)
+        ? movingPlatformAt(
+          level.movingPlatform,
+          levelElapsed,
+          movingPlatformStabilized,
+        )
         : undefined;
       ctx.setTransform(canvas.width / CONFIG.worldWidth, 0, 0, canvas.height / CONFIG.worldHeight, 0, 0);
       ctx.clearRect(0, 0, CONFIG.worldWidth, CONFIG.worldHeight);
@@ -569,6 +577,16 @@ export default function BlastEscape() {
           ctx.fillStyle = 'rgba(102, 242, 213, 0.62)';
           ctx.fillRect(x + track.w / 2 - 2, trackY - 4, 4, 8);
         });
+        if (track.stabilizedX !== undefined) {
+          ctx.strokeStyle = 'rgba(116, 217, 255, 0.58)';
+          ctx.setLineDash([4, 3]);
+          ctx.strokeRect(track.stabilizedX, track.y - 5, track.w, track.h + 10);
+          ctx.setLineDash([]);
+          ctx.fillStyle = VISUAL.cold;
+          ctx.font = '700 8px ui-monospace, monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText('COLD DOCK', track.stabilizedX + track.w / 2, track.y - 10);
+        }
       }
 
       level.platforms.forEach((platform) => {
@@ -617,23 +635,32 @@ export default function BlastEscape() {
         const { rect, velocityX } = movingPlatform;
         ctx.fillStyle = '#252e31';
         ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
-        ctx.fillStyle = VISUAL.mint;
+        ctx.fillStyle = movingPlatformStabilized ? VISUAL.cold : VISUAL.mint;
         ctx.fillRect(rect.x + 4, rect.y, rect.w - 8, 3);
-        ctx.strokeStyle = 'rgba(102, 242, 213, 0.46)';
+        ctx.strokeStyle = movingPlatformStabilized
+          ? 'rgba(116, 217, 255, 0.72)'
+          : 'rgba(102, 242, 213, 0.46)';
         ctx.lineWidth = 1;
         ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
         ctx.fillStyle = '#12171a';
         ctx.fillRect(rect.x + 8, rect.y + 8, rect.w - 16, rect.h - 12);
 
-        const direction = Math.sign(velocityX);
-        ctx.strokeStyle = 'rgba(102, 242, 213, 0.68)';
-        ctx.lineWidth = 1.5;
-        for (let x = rect.x + 42; x <= rect.x + rect.w - 30; x += 32) {
-          ctx.beginPath();
-          ctx.moveTo(x - direction * 6, rect.y + 10);
-          ctx.lineTo(x, rect.y + 14);
-          ctx.lineTo(x - direction * 6, rect.y + 18);
-          ctx.stroke();
+        if (movingPlatformStabilized) {
+          ctx.fillStyle = VISUAL.cold;
+          ctx.font = '700 8px ui-monospace, monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText('CARRIAGE LOCKED', rect.x + rect.w / 2, rect.y + 17);
+        } else {
+          const direction = Math.sign(velocityX);
+          ctx.strokeStyle = 'rgba(102, 242, 213, 0.68)';
+          ctx.lineWidth = 1.5;
+          for (let x = rect.x + 42; x <= rect.x + rect.w - 30; x += 32) {
+            ctx.beginPath();
+            ctx.moveTo(x - direction * 6, rect.y + 10);
+            ctx.lineTo(x, rect.y + 14);
+            ctx.lineTo(x - direction * 6, rect.y + 18);
+            ctx.stroke();
+          }
         }
       }
 

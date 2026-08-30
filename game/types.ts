@@ -18,6 +18,8 @@ export type MovingPlatform = {
   h: number;
   speed: number;
   phase: number;
+  stabilizedByInteractionId?: string;
+  stabilizedX?: number;
 };
 
 export type LandingWindowKind = 'none' | 'wide' | 'medium' | 'tight';

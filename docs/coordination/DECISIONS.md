@@ -84,3 +84,12 @@ collision and suppresses only water hazards linked to the same interaction.
 Expiry removes both protections before the next movement substep; rendering only
 observes the result. This keeps runtime, replay, and later cold levels on one rule
 instead of encoding an ice platform privately in Level 10 presentation code.
+
+## D-014 — Cold stabilization reuses the authoritative moving-platform path
+
+A moving platform may name one controlling interaction and one docking x
+coordinate. While that interaction is active, `movingPlatformAt` returns the same
+platform geometry at the dock with zero velocity; after expiry it returns to its
+unchanged time-based cycle. Core collision, rider movement, replay, and rendering
+all call that function. This adds a temporary machine state without creating a
+Level 11-only platform implementation or changing Level 6 behaviour.

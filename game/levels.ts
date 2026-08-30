@@ -446,4 +446,77 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-11',
+    name: 'LEVEL 11',
+    subtitle: 'COLD LOCK',
+    hint: 'Chill the carriage control. Launch while the transfer deck is held at the blue dock.',
+    intent: {
+      primaryRoute: 'START -> coolant source -> stabilize transfer carriage -> B1 -> locked carriage -> right inspection deck -> EXIT',
+      launchJobs: [
+        { bomb: 'B1', job: 'Launch from the left floor onto the carriage held at its marked dock.' },
+      ],
+      landingWindows: [
+        { target: 'locked transfer carriage', kind: 'wide', description: 'The fixed carriage and adjoining inspection deck form a broad landing region.' },
+      ],
+      timingWindows: [
+        { target: 'carriage lock', kind: 'expiring', description: 'The cold lock lasts through the prepared launch and landing, then releases the normal cycle.' },
+        { target: 'B1 launch', kind: 'commit', description: 'The launch post fixes the takeoff position for the prepared blast.' },
+      ],
+      recovery: { kind: 'fatal', description: 'Missing the carriage falls into the machinery pit; the start floor is safe before launch.' },
+      masteryShortcut: null,
+      newConcept: 'Cold temporarily fixes a moving transfer carriage at its marked dock.',
+      recombinedSkills: ['cold acquisition', 'blast proximity', 'midair steering'],
+      targetFirstClearSeconds: { min: 70, max: 165 },
+    },
+    validation: {
+      requiredBlastHits: ['B1'],
+      requiredInteractions: ['carriage-lock'],
+      requiredStates: ['cold'],
+      simplePoliciesMustFail: ['hold-left', 'neutral'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 100, samples: 100, minimumClearRate: 0.75 },
+      ],
+    },
+    start: { x: 82, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 330, h: 50 },
+      { x: 316, y: 508, w: 14, h: 42 },
+      { x: 700, y: 450, w: 242, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [{ x: 250, y: 532, delay: -2.5, label: 'B1' }],
+    exit: { x: 716, y: 386, w: 64, h: 64 },
+    pit: { x: 330, y: 450, w: 370, h: 150 },
+    movingPlatform: {
+      fromX: 350,
+      toX: 700,
+      y: 450,
+      w: 370,
+      h: 22,
+      speed: 160,
+      phase: 0.4,
+      stabilizedByInteractionId: 'carriage-lock',
+      stabilizedX: 330,
+    },
+    traversalStateSources: [
+      {
+        id: 'coolant-gate',
+        rect: { x: 100, y: 500, w: 82, h: 50 },
+        grants: 'cold',
+        durationSeconds: 7,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'carriage-lock',
+        rect: { x: 190, y: 492, w: 82, h: 62 },
+        kind: 'stabilize-machine',
+        accepts: ['cold'],
+        activeSeconds: 5.5,
+      },
+    ],
+  },
 ];

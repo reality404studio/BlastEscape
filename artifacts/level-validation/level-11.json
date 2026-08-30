@@ -1,0 +1,110 @@
+{
+  "generatedBy": "npm run validate:levels",
+  "schemaVersion": 1,
+  "levelId": "level-11",
+  "levelName": "LEVEL 11 — COLD LOCK",
+  "replayId": "level-11-cold-lock-clean-route",
+  "status": "pass",
+  "evaluations": [
+    {
+      "evaluator": "reachability",
+      "id": "accepted-route-clears",
+      "status": "pass",
+      "summary": "Accepted replay clears in 4.483s.",
+      "metrics": {
+        "outcome": "cleared",
+        "elapsedSeconds": 4.483333333333319,
+        "maximumAirCombo": 1
+      }
+    },
+    {
+      "evaluator": "exploit",
+      "id": "simple-policy-bypass",
+      "status": "pass",
+      "summary": "No forbidden constant-direction policy clears the level.",
+      "metrics": {
+        "testedPolicies": [
+          "hold-left",
+          "neutral"
+        ],
+        "bypassPolicies": []
+      }
+    },
+    {
+      "evaluator": "noisy-human",
+      "id": "timing-jitter-100ms",
+      "status": "pass",
+      "summary": "100/100 deterministic jittered replays cleared.",
+      "metrics": {
+        "jitterMilliseconds": 100,
+        "samples": 100,
+        "clears": 100,
+        "clearRate": 1,
+        "minimumClearRate": 0.75
+      }
+    },
+    {
+      "evaluator": "mechanic",
+      "id": "intended-mechanic-use",
+      "status": "pass",
+      "summary": "Accepted replay exercises the required blasts and combo.",
+      "metrics": {
+        "requiredBlastHits": [
+          "B1"
+        ],
+        "actualBlastHits": [
+          "B1"
+        ],
+        "missingBlastHits": [],
+        "requiredInteractions": [
+          "carriage-lock"
+        ],
+        "actualInteractions": [
+          "carriage-lock"
+        ],
+        "missingInteractions": [],
+        "requiredStates": [
+          "cold"
+        ],
+        "actualStates": [
+          "cold"
+        ],
+        "missingStates": [],
+        "minimumAirCombo": 0,
+        "actualMaximumAirCombo": 1
+      }
+    }
+  ],
+  "acceptedReplay": {
+    "replayId": "level-11-cold-lock-clean-route",
+    "levelId": "level-11",
+    "outcome": "cleared",
+    "elapsedSeconds": 4.483333333333319,
+    "frames": 269,
+    "frameRate": 60,
+    "deathReason": null,
+    "blastExplosions": [
+      "B1"
+    ],
+    "blastHits": [
+      "B1"
+    ],
+    "acceptedInteractions": [
+      "carriage-lock"
+    ],
+    "acquiredStates": [
+      "cold"
+    ],
+    "landingCount": 1,
+    "maximumAirCombo": 1,
+    "highestPointY": 378.84590979300924,
+    "finalPlayer": {
+      "x": 691.3642171173741,
+      "y": 414,
+      "controlVx": 275,
+      "blastVx": 0,
+      "vy": 0
+    }
+  },
+  "caveat": "These evaluators reject broken or contract-violating routes; they do not prove fun."
+}

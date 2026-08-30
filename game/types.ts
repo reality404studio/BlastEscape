@@ -57,6 +57,7 @@ export type TraversalInteraction = {
   accepts: Array<Exclude<TraversalStateKind, 'neutral'>>;
   activeSeconds?: number;
   resultRect?: Rect;
+  deactivatesInteractionId?: string;
 };
 
 export type HotSurface = {

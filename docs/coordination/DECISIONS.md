@@ -111,3 +111,12 @@ continues the existing timer and expiry pauses it without resetting progress.
 Core, replay, and canvas query the same powered-state helper, so `DORMANT`, fuse
 display, and blast behavior cannot drift. This is a shared bomb-data rule rather
 than a Level 16 script.
+
+## D-017 — Accepted interactions may explicitly deactivate a linked world state
+
+A traversal interaction may name one other interaction state to deactivate.
+Accepted contact sets that target inactive, clears its remaining lifetime, and
+emits a `deactivated` event before the next movement substep. Level 18 uses this
+generic link for heat to release a cold-created condensate span; the same contract
+can later release other frozen machinery without parallel level scripts. State
+replacement on the player remains governed by the single-slot D-011 contract.

@@ -671,6 +671,28 @@ export default function BlastEscape() {
         );
       });
 
+      level.traversalInteractions?.forEach((interaction) => {
+        if (interaction.kind !== 'thaw-ice' || !interaction.deactivatesInteractionId) return;
+        const spanFrozen = interactionStates[interaction.deactivatesInteractionId]?.active ?? false;
+        ctx.fillStyle = '#321b18';
+        ctx.fillRect(interaction.rect.x, interaction.rect.y, interaction.rect.w, interaction.rect.h);
+        ctx.strokeStyle = VISUAL.hot;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(interaction.rect.x, interaction.rect.y, interaction.rect.w, interaction.rect.h);
+        ctx.fillStyle = spanFrozen ? 'rgba(255, 81, 62, 0.34)' : 'rgba(255, 176, 90, 0.5)';
+        for (let x = interaction.rect.x + 10; x < interaction.rect.x + interaction.rect.w; x += 18) {
+          ctx.fillRect(x, interaction.rect.y + 8, 5, interaction.rect.h - 16);
+        }
+        ctx.fillStyle = VISUAL.hot;
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          spanFrozen ? 'THAW CONTROL' : 'SPAN OPEN',
+          interaction.rect.x + interaction.rect.w / 2,
+          interaction.rect.y - 7,
+        );
+      });
+
       level.hotSurfaces?.forEach((surface) => {
         const cooled = interactionStates[surface.cooledByInteractionId]?.active ?? false;
         ctx.fillStyle = cooled ? 'rgba(116, 217, 255, 0.72)' : 'rgba(255, 81, 62, 0.86)';

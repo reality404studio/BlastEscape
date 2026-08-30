@@ -960,4 +960,82 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-18',
+    name: 'LEVEL 18',
+    subtitle: 'PHASE SHIFT',
+    hint: 'Blue makes the vapor span solid. Red opens the same span when you need the lower line.',
+    intent: {
+      primaryRoute: 'Upper-left start -> coolant -> freeze shared vapor span -> cross upper shaft -> furnace -> replace cold with heat -> thaw same span -> return left into right side of open shaft -> lower-right line -> B1 at divider -> upper-right exit -> EXIT',
+      launchJobs: [
+        { bomb: 'B1', job: 'Launch from the lower divider through the newly reopened span, then steer right to the upper exit.' },
+      ],
+      landingWindows: [
+        { target: 'condensed vapor bridge', kind: 'wide', description: 'Cold creates a full-width crossing between the upper decks.' },
+        { target: 'upper-right exit deck', kind: 'wide', description: 'B1 returns to the broad deck already read during the thermal route.' },
+      ],
+      timingWindows: [
+        { target: 'freeze and thaw controls', kind: 'open', description: 'Both state interactions last comfortably; order and spatial planning are the challenge.' },
+        { target: 'B1 launch', kind: 'commit', description: 'After the right-side drop, settle at the lower divider before the prepared blast.' },
+      ],
+      recovery: { kind: 'recoverable', description: 'Falling before condensation returns to blocked lower-left floor; keeping the bridge frozen leaves a safe upper route that exposes the missing heat step.' },
+      masteryShortcut: null,
+      newConcept: 'Heat explicitly deactivates the cold-created state of the same data-linked factory system.',
+      recombinedSkills: ['state replacement', 'temporary frozen collision', 'heat interaction', 'route-state planning', 'blast return'],
+      targetFirstClearSeconds: { min: 150, max: 260 },
+    },
+    validation: {
+      requiredBlastHits: ['B1'],
+      requiredInteractions: ['phase-span-freeze', 'phase-span-thaw'],
+      requiredStates: ['cold', 'heat'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 80, samples: 100, minimumClearRate: 0.7 },
+      ],
+    },
+    start: { x: 82, y: 314 },
+    platforms: [
+      { x: 0, y: 350, w: 300, h: 22 },
+      { x: 600, y: 350, w: 270, h: 22 },
+      { x: 620, y: 280, w: 250, h: 22 },
+      { x: 0, y: 550, w: 942, h: 50 },
+      { x: 480, y: 372, w: 40, h: 178 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [{ x: 533, y: 532, delay: 2.4, label: 'B1' }],
+    exit: { x: 700, y: 216, w: 64, h: 64 },
+    traversalStateSources: [
+      {
+        id: 'phase-coolant',
+        rect: { x: 100, y: 300, w: 92, h: 50 },
+        grants: 'cold',
+        durationSeconds: 9,
+      },
+      {
+        id: 'phase-furnace',
+        rect: { x: 650, y: 300, w: 92, h: 50 },
+        grants: 'heat',
+        durationSeconds: 8,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'phase-span-freeze',
+        rect: { x: 272, y: 292, w: 32, h: 62 },
+        kind: 'freeze-water',
+        accepts: ['cold'],
+        activeSeconds: 9,
+        resultRect: { x: 300, y: 350, w: 300, h: 18 },
+      },
+      {
+        id: 'phase-span-thaw',
+        rect: { x: 760, y: 296, w: 90, h: 58 },
+        kind: 'thaw-ice',
+        accepts: ['heat'],
+        deactivatesInteractionId: 'phase-span-freeze',
+      },
+    ],
+  },
 ];

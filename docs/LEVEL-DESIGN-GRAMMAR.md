@@ -372,6 +372,20 @@ New concept, if any: None; remaining heat lifetime becomes an explicit route-pla
 What previous skills are recombined: heat acquisition, timed barrier melting, prepared blast cycle, airborne reversal, safe reset routing.
 ```
 
+### Level 18 — PHASE SHIFT (accepted intent)
+
+```text
+LEVEL 18 — PHASE SHIFT
+Primary route: START on upper left -> coolant -> condense the shared vapor span into a bridge -> cross upper shaft -> furnace -> replace cold with heat -> thaw the same span -> step back into the now-open shaft on its right side -> lower right work line -> B1 -> upper right exit -> EXIT
+Launch job(s): B1 returns the player from the lower right work line to the upper exit after both thermal states have changed the shared span.
+Landing window(s): The condensed bridge and upper exit deck are wide. The central lower divider makes falling before versus after crossing produce clearly different destinations.
+Timing window(s): Both thermal interactions are open and generous; state ordering and spatial planning, not fuse precision, are the lesson. B1 remains a familiar prepared launch.
+Recovery state: Recoverable. Falling before condensation returns to the blocked lower-left start side; keeping the bridge frozen leaves a safe upper route. Both expose the missing state change without an invisible death.
+Mastery shortcut: None. Cold crossing followed by heat release must remain load-bearing.
+New concept, if any: Heat can explicitly deactivate the cold-created state of the same factory system through shared interaction data.
+What previous skills are recombined: state replacement, temporary frozen collision, heat interaction, route-state planning, blast return.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

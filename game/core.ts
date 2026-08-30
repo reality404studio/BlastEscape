@@ -63,7 +63,7 @@ export type GameplayEvent =
       interactionId: string;
       active: boolean;
       remainingSeconds: number;
-      reason: 'activated' | 'expired';
+      reason: 'activated' | 'deactivated' | 'expired';
     };
 
 export function createGameplayState(level: LevelDefinition): GameplayState {
@@ -229,6 +229,24 @@ function applyTraversalContacts(
       stateKind,
       accepted: stateKind !== 'neutral' && interaction.accepts.includes(stateKind),
     });
+    if (
+      stateKind !== 'neutral' &&
+      interaction.accepts.includes(stateKind) &&
+      interaction.deactivatesInteractionId
+    ) {
+      const target = state.interactionStates[interaction.deactivatesInteractionId];
+      if (target?.active) {
+        target.active = false;
+        target.remainingSeconds = 0;
+        events.push({
+          type: 'traversal-interaction-changed',
+          interactionId: interaction.deactivatesInteractionId,
+          active: false,
+          remainingSeconds: 0,
+          reason: 'deactivated',
+        });
+      }
+    }
     if (
       stateKind !== 'neutral' &&
       interaction.accepts.includes(stateKind) &&

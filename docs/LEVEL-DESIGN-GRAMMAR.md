@@ -386,6 +386,20 @@ New concept, if any: Heat can explicitly deactivate the cold-created state of th
 What previous skills are recombined: state replacement, temporary frozen collision, heat interaction, route-state planning, blast return.
 ```
 
+### Level 19 — THERMAL CATCH (accepted intent)
+
+```text
+LEVEL 19 — THERMAL CATCH
+Primary route: START -> furnace heat -> melt launch seal -> B1 from the prepared edge -> upper exit deck -> EXIT
+Launch job(s): B1 drives the fast heat route directly toward the upper exit; B2 relaunches only a missed B1 attempt from the lower cold recovery span.
+Landing window(s): The upper exit deck is medium-wide. A plausible short B1 arc enters a broad emergency coolant catch that freezes the lower basin before contact.
+Timing window(s): The heat-opened B1 route is prepared and generous. The recovery ice lasts for one readable B2 cycle rather than becoming a permanent alternate floor.
+Recovery state: Recoverable. Falling short replaces heat with cold in an emergency quench zone, freezes the basin, and exposes B2 as the slower route back to the same exit.
+Mastery shortcut: None. The clean heat route is faster; cold is selective recovery rather than a mandatory checklist step.
+New concept, if any: None; the heat primary route and cold recovery route synthesize existing state replacement, thermal collision, and blast hierarchy.
+What previous skills are recombined: heat barrier melting, blast proximity, midair braking, cold acquisition, temporary ice, secondary blast recovery.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

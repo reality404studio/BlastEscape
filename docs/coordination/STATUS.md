@@ -4,7 +4,7 @@ This file is the compact monitoring surface for Codex `/goal` work.
 
 ## Current phase
 
-**PHASE 6 — bounded heat curriculum production**
+**PHASE 7 — magnetism introduction**
 
 G0 contracts and the repository audit are complete. G1 extracted typed level
 data and the authoritative gameplay step without changing constants, coordinates,
@@ -19,12 +19,13 @@ a machine-verified B1 proximity shortcut. The bounded cold curriculum is DONE.
 G3C ships `LEVEL 15 — THERMAL SEAL`: heat acquisition removes one linked
 solid partition from authoritative collision for a timed interval, while neutral
 and cold contacts remain blocked. G9B now also ships `LEVEL 16 — REIGNITION`,
-where a heat-powered circuit advances a previously dormant B1 fuse, and
-`LEVEL 17 — HEAT WINDOW`, where delayed heat acquisition survives an upper B1
-route while immediate acquisition expires at its seal, and `LEVEL 18 — PHASE
-SHIFT`, where cold creates and heat removes the same condensate span. G9B remains
-ACTIVE for Level 19's bounded thermal synthesis. G3D Magnetism and G8A blast
-replay coverage remain READY.
+where a heat-powered circuit advances a previously dormant B1 fuse. Level 17
+makes heat lifetime load-bearing; Level 18 makes cold and heat oppose each other
+on one condensate span. `LEVEL 19 — THERMAL CATCH` closes the sequence: heat owns
+the fast primary route, while cold appears only after a missed B1 as the B2
+recovery branch. G9B is DONE. G3D
+Magnetism is ACTIVE for the shared timed attachment/release contract and Level 20
+introduction. G8A blast replay coverage remains READY.
 
 ## Active / next goals
 
@@ -36,7 +37,7 @@ replay coverage remain READY.
 | G3A Traversal-state substrate | DONE | G1 | shared temporary-state model and interaction hooks complete |
 | G3B Cold | DONE | G3A | cold source/effect contract and Level 9 complete |
 | G3C Heat | DONE | G3A + stable cold contract | heat acquisition, timed barrier melting, and Level 15 accepted |
-| G3D Magnetism | READY | G3A | timed attachment/release and Level 20 introduction |
+| G3D Magnetism | ACTIVE | G3A | timed attachment/release and Level 20 introduction |
 | G4 Art direction / protagonist | READY | G0 | pixel-art execution and identity candidates |
 | G5 Sprite pipeline | PROPOSED | G4 approval | SpriteGen integration and atlas/manifest pipeline |
 | G6 FX / game feel | READY | G0; preferably stable runtime events | mute-first feedback polish |
@@ -44,7 +45,7 @@ replay coverage remain READY.
 | G8A Blast curriculum migration | READY | G2 | preserve/migrate L1–8 |
 | G8B Cold introduction | DONE | G2 + G3B | Level 9 complete |
 | G9A Cold curriculum | DONE | G2 + G3B | Levels 10–14 accepted with route/dependency evidence |
-| G9B Heat levels | ACTIVE | G2 + G3C | Levels 15–18 accepted; Level 19 thermal synthesis next |
+| G9B Heat levels | DONE | G2 + G3C | Levels 15–19 accepted with selective route hierarchy |
 | G9C Magnet introduction | PROPOSED | G2 + G3D | L20 |
 | G10 Synthesis / ending levels | PROPOSED | G2 + G3B–D + narrative | L21–25 and dispatch ending |
 | G11 Final QA / release | PROPOSED | G4–G10 | full playthrough, save/pause/restart/build/perf |
@@ -152,6 +153,13 @@ Expected first mandatory human call: protagonist base identity approval before m
   link blocks the route. The accepted route clears at 8.100s; ±80ms noise clears
   100/100. 65 tests, Levels 8–18 validation, lint, build, and local HTTP 200 pass.
   Evidence: `docs/reports/G9B-HEAT-LEVEL-18-001.md`.
+- G9B Level 19 closes the heat curriculum with a 4.583s heat+B1 primary route
+  that remains unchanged without recovery coolant. A short B1 arc replaces heat
+  with cold, freezes the emergency basin, and clears through B2 at 8.133s.
+  Removing heat blocks the primary seal; removing recovery coolant dies in water;
+  removing B2 prevents recovery. 71 tests, Levels 8–19 validation, lint, build,
+  and local HTTP 200 pass. Evidence:
+  `docs/reports/G9B-HEAT-LEVEL-19-001.md`.
 
 ## Director update rule
 

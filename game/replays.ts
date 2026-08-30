@@ -97,6 +97,17 @@ export const LEVEL_18_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: 1 },
 ];
 
+export const LEVEL_19_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: Number.POSITIVE_INFINITY, direction: 1 },
+];
+
+export const LEVEL_19_RECOVERY_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 3.2, direction: 1 },
+  { until: 3.6, direction: -1 },
+  { until: 7.2, direction: 1 },
+  { until: Number.POSITIVE_INFINITY, direction: -1 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -223,6 +234,24 @@ export const LEVEL_18_CLEAN_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_18_CLEAN_ROUTE,
 };
 
+export const LEVEL_19_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-19-thermal-catch-clean-route',
+  levelId: 'level-19',
+  description: 'Acquire heat, melt the launch seal, then take clean B1 directly to the upper exit.',
+  frameRate: 60,
+  maxDurationSeconds: 8,
+  keyframes: LEVEL_19_CLEAN_ROUTE,
+};
+
+export const LEVEL_19_RECOVERY_REPLAY: ReplayDefinition = {
+  id: 'level-19-thermal-catch-recovery-route',
+  levelId: 'level-19',
+  description: 'Melt the launch seal, over-brake B1 into emergency coolant, freeze the basin, then recover through B2.',
+  frameRate: 60,
+  maxDurationSeconds: 10,
+  keyframes: LEVEL_19_RECOVERY_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
@@ -235,6 +264,7 @@ export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_16_CLEAN_REPLAY,
   LEVEL_17_CLEAN_REPLAY,
   LEVEL_18_CLEAN_REPLAY,
+  LEVEL_19_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

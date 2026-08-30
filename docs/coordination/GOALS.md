@@ -98,12 +98,16 @@ contract and authoring the level intent before geometry.
 
 ### G3D — Magnetism
 
-**State:** READY
+**State:** ACTIVE
 **Depends on:** G3A.
 **Owns:** timed attachment/release/discharge on suitable metal infrastructure and
 tests.
 **Done when:** Level 20 can teach overhead traversal without free flight or a new
 input button.
+
+**Current slice:** define the smallest deterministic timed attachment/release
+contract, author Level 20 intent before geometry, and teach one readable overhead
+crossing while preserving left/right-only control.
 
 ### G4 — Art Direction / Protagonist
 
@@ -175,20 +179,21 @@ direct-over-B1 mastery shortcut without new mechanics.
 
 ### G9B — Heat Curriculum
 
-**State:** ACTIVE
+**State:** DONE
 **Depends on:** G2 + G3C.
 **Owns:** Levels 15–19.
 **Done when:** heat is introduced and recombined with blast/cold without a
 checklist-like sequence.
 
-**Current slice:** Levels 15–18 are accepted. Level 19 is next and should close
-the heat curriculum with selective cold/heat/blast synthesis, a distinct route
-hierarchy, and no checklist requiring every prior interaction.
+**Current slice:** Levels 15–19 are accepted. Level 19 closes the heat curriculum
+with a fast heat+B1 primary route and a slower cold+B2 recovery branch, so cold
+is selective rather than an every-route checklist item.
 
 **Evidence:** `docs/reports/G3C-HEAT-LEVEL-15-001.md`,
 `docs/reports/G9B-HEAT-LEVEL-16-001.md`,
 `docs/reports/G9B-HEAT-LEVEL-17-001.md`,
-`docs/reports/G9B-HEAT-LEVEL-18-001.md`, and their Level Lab JSON artifacts.
+`docs/reports/G9B-HEAT-LEVEL-18-001.md`,
+`docs/reports/G9B-HEAT-LEVEL-19-001.md`, and their Level Lab JSON artifacts.
 
 ### G9C — Magnet Introduction
 

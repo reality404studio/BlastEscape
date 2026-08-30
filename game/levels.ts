@@ -1038,4 +1038,99 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-19',
+    name: 'LEVEL 19',
+    subtitle: 'THERMAL CATCH',
+    hint: 'Heat opens the fast launch. If B1 falls short, the emergency quench line can turn the basin into a second route.',
+    intent: {
+      primaryRoute: 'START -> furnace heat -> melt launch seal -> B1 from prepared edge -> upper exit deck -> EXIT',
+      launchJobs: [
+        { bomb: 'B1', job: 'Drive the fast heat route directly toward the upper exit deck.' },
+        { bomb: 'B2', job: 'Relaunch only a missed B1 attempt from the lower cold-created recovery span.' },
+      ],
+      landingWindows: [
+        { target: 'upper exit deck', kind: 'medium', description: 'The fast B1 route rewards a clean launch without making the target narrow.' },
+        { target: 'emergency coolant catch', kind: 'wide', description: 'A plausible short B1 arc enters a broad quench zone that freezes the basin before contact.' },
+      ],
+      timingWindows: [
+        { target: 'heat-opened B1', kind: 'commit', description: 'The launch seal stays open through the prepared first blast.' },
+        { target: 'cold B2 recovery', kind: 'expiring', description: 'Emergency ice covers one readable B2 cycle instead of becoming permanent floor.' },
+      ],
+      recovery: { kind: 'recoverable', description: 'Falling short replaces heat with cold, freezes the lower basin, and exposes B2 as a slower route to the same exit.' },
+      masteryShortcut: null,
+      newConcept: 'No new mechanic; heat owns the primary route while cold appears only on the recovery branch.',
+      recombinedSkills: ['heat barrier melting', 'blast proximity', 'midair braking', 'cold acquisition', 'temporary ice', 'secondary blast recovery'],
+      targetFirstClearSeconds: { min: 180, max: 300 },
+    },
+    validation: {
+      requiredBlastHits: ['B1'],
+      requiredInteractions: ['launch-seal-melt'],
+      requiredStates: ['heat'],
+      simplePoliciesMustFail: ['hold-left', 'neutral'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 30, samples: 100, minimumClearRate: 0.8 },
+      ],
+    },
+    start: { x: 72, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 300, h: 50 },
+      { x: 286, y: 508, w: 14, h: 42 },
+      { x: 900, y: 508, w: 14, h: 42 },
+      { x: 520, y: 350, w: 300, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [
+      { x: 273, y: 532, delay: -1.8, label: 'B1' },
+      { x: 887, y: 532, delay: 2, label: 'B2' },
+    ],
+    exit: { x: 650, y: 286, w: 64, h: 64 },
+    traversalStateSources: [
+      {
+        id: 'launch-furnace',
+        rect: { x: 80, y: 500, w: 82, h: 50 },
+        grants: 'heat',
+        durationSeconds: 8,
+      },
+      {
+        id: 'emergency-quench',
+        rect: { x: 300, y: 480, w: 220, h: 74 },
+        grants: 'cold',
+        durationSeconds: 8,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'launch-seal-melt',
+        rect: { x: 192, y: 396, w: 58, h: 158 },
+        kind: 'melt-barrier',
+        accepts: ['heat'],
+        activeSeconds: 8,
+      },
+      {
+        id: 'emergency-basin-freeze',
+        rect: { x: 300, y: 480, w: 230, h: 74 },
+        kind: 'freeze-water',
+        accepts: ['cold'],
+        activeSeconds: 5,
+        resultRect: { x: 300, y: 550, w: 600, h: 18 },
+      },
+    ],
+    meltableBarriers: [
+      {
+        id: 'launch-thermal-seal',
+        rect: { x: 220, y: 396, w: 30, h: 154 },
+        meltedByInteractionId: 'launch-seal-melt',
+      },
+    ],
+    waterHazards: [
+      {
+        id: 'emergency-basin',
+        rect: { x: 300, y: 550, w: 600, h: 50 },
+        frozenByInteractionId: 'emergency-basin-freeze',
+      },
+    ],
+  },
 ];

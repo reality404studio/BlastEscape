@@ -12,11 +12,11 @@ or the clamped-frame/three-substep order. Browser play and headless replay now
 share movement, collision, hazards, bombs, blast, combo, death, and exit logic.
 G2 now provides intent-bearing level data, accepted replay/report formats, and
 reachability, exploit, deterministic noisy-human, and mechanic-use evaluators.
-G3B and G8B ship `LEVEL 9 — COLD START`. G9A ships accepted Levels 10–12:
-`CONDENSATE GAP` creates timed ice, `COLD LOCK` fixes a moving carriage, and
-`THAW CLOCK` makes the ice lifetime load-bearing against a prepared first-cycle
-blast. The late control dies on thaw but clears on the repeat cycle when only the
-ice lifetime is extended. G9A remains ACTIVE with Level 13 recovery design next. G3C
+G3B and G8B ship `LEVEL 9 — COLD START`. G9A ships accepted Levels 10–13:
+timed ice, carriage locking, an expiring first-cycle blast route, and now
+`COLD CATCH`, where the same ice is both B1's approach and a wide B2 recovery
+state. Removing B2 makes the recovery input thaw into water. G9A remains ACTIVE
+with Level 14 cold synthesis and its intentional mastery shortcut next. G3C
 Heat, G3D Magnetism, and G8A blast replay coverage are also READY.
 
 ## Active / next goals
@@ -36,7 +36,7 @@ Heat, G3D Magnetism, and G8A blast replay coverage are also READY.
 | G7 Environmental story | READY | G0 | factory zones, signage, nonverbal narrative |
 | G8A Blast curriculum migration | READY | G2 | preserve/migrate L1–8 |
 | G8B Cold introduction | DONE | G2 + G3B | Level 9 complete |
-| G9A Cold curriculum | ACTIVE | G2 + G3B | Levels 10–12 accepted; Level 13 cold recovery next |
+| G9A Cold curriculum | ACTIVE | G2 + G3B | Levels 10–13 accepted; Level 14 synthesis next |
 | G9B Heat levels | PROPOSED | G2 + G3C | L15–19 |
 | G9C Magnet introduction | PROPOSED | G2 + G3D | L20 |
 | G10 Synthesis / ending levels | PROPOSED | G2 + G3B–D + narrative | L21–25 and dispatch ending |
@@ -109,6 +109,11 @@ Expected first mandatory human call: protagonist base identity approval before m
   is extended. ±80ms timing noise clears 100/100. 35 tests, Levels 8–12
   validation, lint, and build pass. Evidence:
   `docs/reports/G9A-COLD-LEVEL-12-001.md`.
+- G9A Level 13 reused one frozen basin as primary B1 approach and recovery catch.
+  The clean route clears at 3.967s; the over-braked route lands once on ice and
+  clears through B2 at 6.55s; removing B2 thaws that recovery into water. 40
+  tests, Levels 8–13 validation, lint, and build pass. Evidence:
+  `docs/reports/G9A-COLD-LEVEL-13-001.md`.
 
 ## Director update rule
 

@@ -43,6 +43,17 @@ export const LEVEL_12_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: -1 },
 ];
 
+export const LEVEL_13_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 3.92, direction: 1 },
+  { until: Number.POSITIVE_INFINITY, direction: 0 },
+];
+
+export const LEVEL_13_RECOVERY_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 3.1, direction: 1 },
+  { until: 4.2, direction: -1 },
+  { until: Number.POSITIVE_INFINITY, direction: 1 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -88,12 +99,31 @@ export const LEVEL_12_CLEAN_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_12_CLEAN_ROUTE,
 };
 
+export const LEVEL_13_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-13-cold-catch-clean-route',
+  levelId: 'level-13',
+  description: 'Freeze the basin, launch from B1, then brake left onto the upper exit deck.',
+  frameRate: 60,
+  maxDurationSeconds: 8,
+  keyframes: LEVEL_13_CLEAN_ROUTE,
+};
+
+export const LEVEL_13_RECOVERY_REPLAY: ReplayDefinition = {
+  id: 'level-13-cold-catch-recovery-route',
+  levelId: 'level-13',
+  description: 'Over-brake B1 onto the frozen basin, then recover right through B2 into the exit.',
+  frameRate: 60,
+  maxDurationSeconds: 9,
+  keyframes: LEVEL_13_RECOVERY_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
   LEVEL_10_CLEAN_REPLAY,
   LEVEL_11_CLEAN_REPLAY,
   LEVEL_12_CLEAN_REPLAY,
+  LEVEL_13_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

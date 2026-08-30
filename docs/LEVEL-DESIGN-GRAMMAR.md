@@ -302,6 +302,20 @@ New concept, if any: None; this makes the existing freeze-water lifetime consequ
 What previous skills are recombined: cold acquisition, temporary ice, prepared blast timing, midair reversal.
 ```
 
+### Level 13 — COLD CATCH (accepted intent)
+
+```text
+LEVEL 13 — COLD CATCH
+Primary route: START -> coolant source -> freeze catch basin -> B1 -> upper exit deck -> EXIT
+Launch job(s): B1 launches from the frozen approach directly to the exit deck; B2 relaunches an over-braked B1 attempt from the lower ice recovery route.
+Landing window(s): The upper exit deck is medium-wide; the frozen basin is a wide catch for a plausible short arc.
+Timing window(s): B1 is a prepared commit. The ice lasts long enough for one B2 recovery attempt instead of turning every miss into immediate death.
+Recovery state: An over-braked B1 arc lands on the same cold-created surface used for approach, then routes through B2 to the exit deck.
+Mastery shortcut: None. A clean B1 route is simply faster; recovery remains intentional rather than secret.
+New concept, if any: None; existing frozen geometry now supports both the primary route and a distinct recovery route.
+What previous skills are recombined: temporary ice, blast landing control, secondary blast recovery, midair steering.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

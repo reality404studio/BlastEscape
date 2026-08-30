@@ -156,13 +156,14 @@ dialogue or a new input.
 **Done when:** cold+blast develops through route/timing/recovery variations rather
 than five isolated gimmicks.
 
-**Current slice:** Levels 10–12 are accepted. Level 13 is next and must make a
-cold-created surface provide a deliberate recovery route as well as support the
-primary route; it should reuse the existing shared cold contracts.
+**Current slice:** Levels 10–13 are accepted. Level 14 is next and closes the
+cold curriculum with a cold+blast synthesis route plus one intentional mastery
+shortcut; it should reuse the existing cold contracts.
 
 **Evidence:** `docs/reports/G9A-COLD-LEVEL-10-001.md`,
 `docs/reports/G9A-COLD-LEVEL-11-001.md`,
-`docs/reports/G9A-COLD-LEVEL-12-001.md`, and their Level Lab JSON artifacts.
+`docs/reports/G9A-COLD-LEVEL-12-001.md`,
+`docs/reports/G9A-COLD-LEVEL-13-001.md`, and their Level Lab JSON artifacts.
 
 ### G9B — Heat Curriculum
 

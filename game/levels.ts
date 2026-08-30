@@ -589,4 +589,78 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-13',
+    name: 'LEVEL 13',
+    subtitle: 'COLD CATCH',
+    hint: 'Freeze the basin. A clean B1 arc exits; a short arc can recover through B2.',
+    intent: {
+      primaryRoute: 'START -> coolant source -> freeze catch basin -> B1 -> upper exit deck -> EXIT',
+      launchJobs: [
+        { bomb: 'B1', job: 'Launch from the frozen approach directly to the upper exit deck.' },
+        { bomb: 'B2', job: 'Relaunch an over-braked B1 attempt from the lower frozen recovery route.' },
+      ],
+      landingWindows: [
+        { target: 'upper exit deck', kind: 'medium', description: 'The clean B1 arc needs readable braking but not a tight landing.' },
+        { target: 'frozen catch basin', kind: 'wide', description: 'A plausible short B1 arc survives on the lower cold-created surface.' },
+      ],
+      timingWindows: [
+        { target: 'B1 launch', kind: 'commit', description: 'The first prepared blast starts either the clean or recovery route.' },
+        { target: 'B2 recovery', kind: 'expiring', description: 'The ice remains long enough for one recovery launch before thawing.' },
+      ],
+      recovery: { kind: 'recoverable', description: 'An over-braked B1 arc lands on frozen water, then routes right through B2.' },
+      masteryShortcut: null,
+      newConcept: 'Existing frozen geometry supports both a primary approach and a distinct recovery state.',
+      recombinedSkills: ['temporary ice', 'blast landing control', 'secondary blast recovery', 'midair steering'],
+      targetFirstClearSeconds: { min: 90, max: 210 },
+    },
+    validation: {
+      requiredBlastHits: ['B1'],
+      requiredInteractions: ['catch-basin-freeze'],
+      requiredStates: ['cold'],
+      simplePoliciesMustFail: ['hold-left', 'neutral'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 30, samples: 100, minimumClearRate: 0.8 },
+      ],
+    },
+    start: { x: 72, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 300, h: 50 },
+      { x: 600, y: 508, w: 14, h: 42 },
+      { x: 700, y: 350, w: 200, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [
+      { x: 550, y: 532, delay: -1.8, label: 'B1' },
+      { x: 585, y: 532, delay: 0.6, label: 'B2' },
+    ],
+    exit: { x: 790, y: 286, w: 64, h: 64 },
+    traversalStateSources: [
+      {
+        id: 'coolant-gate',
+        rect: { x: 100, y: 500, w: 82, h: 50 },
+        grants: 'cold',
+        durationSeconds: 8,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'catch-basin-freeze',
+        rect: { x: 272, y: 492, w: 32, h: 62 },
+        kind: 'freeze-water',
+        accepts: ['cold'],
+        activeSeconds: 7,
+        resultRect: { x: 300, y: 550, w: 600, h: 18 },
+      },
+    ],
+    waterHazards: [
+      {
+        id: 'catch-basin-pool',
+        rect: { x: 300, y: 550, w: 600, h: 50 },
+        frozenByInteractionId: 'catch-basin-freeze',
+      },
+    ],
+  },
 ];

@@ -83,11 +83,15 @@ the curriculum does not introduce two cold applications at once.
 
 ### G3C — Heat
 
-**State:** READY
+**State:** ACTIVE
 **Depends on:** G3A; cold interaction contract sufficiently stable.
 **Owns:** heat acquisition, expiry, melt/thaw/reactivation interactions, and tests.
 **Done when:** Level 15 can teach heat with blast still present and heat/cold
 opposition is deterministic and readable.
+
+**Current slice:** define and implement the smallest shared heat interaction path
+needed for a safe Level 15 introduction, preserving the one-slot traversal-state
+contract and authoring the level intent before geometry.
 
 ### G3D — Magnetism
 
@@ -150,20 +154,21 @@ dialogue or a new input.
 
 ### G9A — Cold Curriculum
 
-**State:** ACTIVE
+**State:** DONE
 **Depends on:** G2 + G3B.
 **Owns:** Levels 10–14.
 **Done when:** cold+blast develops through route/timing/recovery variations rather
 than five isolated gimmicks.
 
-**Current slice:** Levels 10–13 are accepted. Level 14 is next and closes the
-cold curriculum with a cold+blast synthesis route plus one intentional mastery
-shortcut; it should reuse the existing cold contracts.
+**Current slice:** Levels 10–14 are accepted. Level 14 closes the cold curriculum
+by combining ice, carriage stabilization, B1/B2 route planning, and a precise
+direct-over-B1 mastery shortcut without new mechanics.
 
 **Evidence:** `docs/reports/G9A-COLD-LEVEL-10-001.md`,
 `docs/reports/G9A-COLD-LEVEL-11-001.md`,
 `docs/reports/G9A-COLD-LEVEL-12-001.md`,
-`docs/reports/G9A-COLD-LEVEL-13-001.md`, and their Level Lab JSON artifacts.
+`docs/reports/G9A-COLD-LEVEL-13-001.md`,
+`docs/reports/G9A-COLD-LEVEL-14-001.md`, and their Level Lab JSON artifacts.
 
 ### G9B — Heat Curriculum
 

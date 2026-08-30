@@ -316,6 +316,20 @@ New concept, if any: None; existing frozen geometry now supports both the primar
 What previous skills are recombined: temporary ice, blast landing control, secondary blast recovery, midair steering.
 ```
 
+### Level 14 — BLUE CIRCUIT (accepted intent)
+
+```text
+LEVEL 14 — BLUE CIRCUIT
+Primary route: START -> coolant -> freeze intake gap -> lock transfer carriage -> B1 from primary stop -> locked carriage -> B2 -> upper exit deck -> EXIT
+Launch job(s): B1's offset launch reaches the stabilized carriage; B2 launches from the right stop into the upper deck.
+Landing window(s): The locked carriage is wide enough for a correct B1 setup; the upper deck is medium and rewards B2 steering.
+Timing window(s): Ice and carriage lock are expiring but cover one prepared B1-to-B2 sequence.
+Recovery state: The locked carriage catches a slightly imperfect primary B1; missing it or B2 falls into the machinery basin.
+Mastery shortcut: Stop directly over B1 instead of at the primary stop. The stronger vertical launch can reach the upper exit deck without the carriage or B2.
+New concept, if any: None; the finale synthesizes ice, machinery stabilization, blast distance, and a readable mastery bypass.
+What previous skills are recombined: temporary ice, cold machinery lock, proximity strength, air steering, chained route planning.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

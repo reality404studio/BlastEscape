@@ -4,7 +4,7 @@ This file is the compact monitoring surface for Codex `/goal` work.
 
 ## Current phase
 
-**PHASE 5 — bounded cold curriculum production**
+**PHASE 6 — heat mechanic introduction**
 
 G0 contracts and the repository audit are complete. G1 extracted typed level
 data and the authoritative gameplay step without changing constants, coordinates,
@@ -12,12 +12,12 @@ or the clamped-frame/three-substep order. Browser play and headless replay now
 share movement, collision, hazards, bombs, blast, combo, death, and exit logic.
 G2 now provides intent-bearing level data, accepted replay/report formats, and
 reachability, exploit, deterministic noisy-human, and mechanic-use evaluators.
-G3B and G8B ship `LEVEL 9 — COLD START`. G9A ships accepted Levels 10–13:
-timed ice, carriage locking, an expiring first-cycle blast route, and now
-`COLD CATCH`, where the same ice is both B1's approach and a wide B2 recovery
-state. Removing B2 makes the recovery input thaw into water. G9A remains ACTIVE
-with Level 14 cold synthesis and its intentional mastery shortcut next. G3C
-Heat, G3D Magnetism, and G8A blast replay coverage are also READY.
+G3B and G8B ship `LEVEL 9 — COLD START`. G9A now ships accepted Levels 10–14:
+timed ice, carriage locking, an expiring first-cycle blast route, a cold-created
+recovery route, and `BLUE CIRCUIT`, which synthesizes both cold interactions with
+a machine-verified B1 proximity shortcut. The bounded cold curriculum is DONE.
+G3C Heat is now ACTIVE for the smallest shared heat interaction and Level 15
+introduction. G3D Magnetism and G8A blast replay coverage remain READY.
 
 ## Active / next goals
 
@@ -28,7 +28,7 @@ Heat, G3D Magnetism, and G8A blast replay coverage are also READY.
 | G2 Level Lab / simulation | DONE | G1 | data-driven intent, replay, validators/evaluators complete |
 | G3A Traversal-state substrate | DONE | G1 | shared temporary-state model and interaction hooks complete |
 | G3B Cold | DONE | G3A | cold source/effect contract and Level 9 complete |
-| G3C Heat | READY | G3A + stable cold contract | heat interactions and Level 15 introduction |
+| G3C Heat | ACTIVE | G3A + stable cold contract | heat interactions and Level 15 introduction |
 | G3D Magnetism | READY | G3A | timed attachment/release and Level 20 introduction |
 | G4 Art direction / protagonist | READY | G0 | pixel-art execution and identity candidates |
 | G5 Sprite pipeline | PROPOSED | G4 approval | SpriteGen integration and atlas/manifest pipeline |
@@ -36,7 +36,7 @@ Heat, G3D Magnetism, and G8A blast replay coverage are also READY.
 | G7 Environmental story | READY | G0 | factory zones, signage, nonverbal narrative |
 | G8A Blast curriculum migration | READY | G2 | preserve/migrate L1–8 |
 | G8B Cold introduction | DONE | G2 + G3B | Level 9 complete |
-| G9A Cold curriculum | ACTIVE | G2 + G3B | Levels 10–13 accepted; Level 14 synthesis next |
+| G9A Cold curriculum | DONE | G2 + G3B | Levels 10–14 accepted with route/dependency evidence |
 | G9B Heat levels | PROPOSED | G2 + G3C | L15–19 |
 | G9C Magnet introduction | PROPOSED | G2 + G3D | L20 |
 | G10 Synthesis / ending levels | PROPOSED | G2 + G3B–D + narrative | L21–25 and dispatch ending |
@@ -114,6 +114,13 @@ Expected first mandatory human call: protagonist base identity approval before m
   clears through B2 at 6.55s; removing B2 thaws that recovery into water. 40
   tests, Levels 8–13 validation, lint, and build pass. Evidence:
   `docs/reports/G9A-COLD-LEVEL-13-001.md`.
+- G9A Level 14 synthesizes temporary ice and carriage stabilization in a required
+  B1-to-B2 primary route, while a closer B1 setup creates a faster direct mastery
+  clear. The primary route clears at 6.583s; mastery clears at 4.317s using B1
+  only; removing coolant, the carriage lock, or primary-route B2 blocks progress.
+  ±80ms primary-route timing noise clears 100/100. 45 tests, Levels 8–14
+  validation, lint, build, and local HTTP 200 pass. Evidence:
+  `docs/reports/G9A-COLD-LEVEL-14-001.md`.
 
 ## Director update rule
 

@@ -54,6 +54,18 @@ export const LEVEL_13_RECOVERY_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: 1 },
 ];
 
+export const LEVEL_14_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 5.95, direction: 1 },
+  { until: Number.POSITIVE_INFINITY, direction: -1 },
+];
+
+export const LEVEL_14_MASTERY_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 1.75, direction: 1 },
+  { until: 1.9, direction: -1 },
+  { until: 3.2, direction: 0 },
+  { until: Number.POSITIVE_INFINITY, direction: 1 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -117,6 +129,24 @@ export const LEVEL_13_RECOVERY_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_13_RECOVERY_ROUTE,
 };
 
+export const LEVEL_14_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-14-blue-circuit-clean-route',
+  levelId: 'level-14',
+  description: 'Freeze the intake, lock the carriage, take offset B1 to the carriage, then B2 left into the exit.',
+  frameRate: 60,
+  maxDurationSeconds: 9,
+  keyframes: LEVEL_14_CLEAN_ROUTE,
+};
+
+export const LEVEL_14_MASTERY_REPLAY: ReplayDefinition = {
+  id: 'level-14-blue-circuit-mastery-route',
+  levelId: 'level-14',
+  description: 'Brake directly over B1, then use its stronger vertical launch to bypass the carriage and B2.',
+  frameRate: 60,
+  maxDurationSeconds: 7,
+  keyframes: LEVEL_14_MASTERY_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
@@ -124,6 +154,7 @@ export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_11_CLEAN_REPLAY,
   LEVEL_12_CLEAN_REPLAY,
   LEVEL_13_CLEAN_REPLAY,
+  LEVEL_14_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

@@ -519,4 +519,74 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-12',
+    name: 'LEVEL 12',
+    subtitle: 'THAW CLOCK',
+    hint: 'Freeze the trench and commit. Reach the far charge before the blue route thaws.',
+    intent: {
+      primaryRoute: 'START -> coolant source -> freeze long condensate trench -> cross to launch stop -> B1 before thaw -> steer left -> upper exit deck -> EXIT',
+      launchJobs: [
+        { bomb: 'B1', job: 'Launch from the far end of the expiring ice on its first fuse, then reverse left into the exit deck.' },
+      ],
+      landingWindows: [
+        { target: 'frozen condensate trench', kind: 'wide', description: 'The full route freezes; speed rather than foot precision matters.' },
+        { target: 'upper exit deck', kind: 'wide', description: 'A correct first-cycle launch has a broad returning landing.' },
+      ],
+      timingWindows: [
+        { target: 'frozen trench', kind: 'expiring', description: 'The ice thaws just after the useful first B1 fuse and cannot survive to the repeat cycle.' },
+        { target: 'B1 launch', kind: 'commit', description: 'Cross immediately and use the prepared blast before the route disappears.' },
+      ],
+      recovery: { kind: 'fatal', description: 'The start floor is safe before commitment; a late crossing or missed first blast falls into water.' },
+      masteryShortcut: null,
+      newConcept: 'No new mechanic; existing temporary ice becomes a load-bearing blast timer.',
+      recombinedSkills: ['cold acquisition', 'temporary ice', 'prepared blast timing', 'midair reversal'],
+      targetFirstClearSeconds: { min: 80, max: 185 },
+    },
+    validation: {
+      requiredBlastHits: ['B1'],
+      requiredInteractions: ['thaw-clock-freeze'],
+      requiredStates: ['cold'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 80, samples: 100, minimumClearRate: 0.7 },
+      ],
+    },
+    start: { x: 72, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 300, h: 50 },
+      { x: 900, y: 508, w: 14, h: 42 },
+      { x: 610, y: 350, w: 260, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [{ x: 850, y: 532, delay: -0.8, label: 'B1' }],
+    exit: { x: 690, y: 286, w: 64, h: 64 },
+    traversalStateSources: [
+      {
+        id: 'coolant-gate',
+        rect: { x: 100, y: 500, w: 82, h: 50 },
+        grants: 'cold',
+        durationSeconds: 7,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'thaw-clock-freeze',
+        rect: { x: 272, y: 492, w: 58, h: 62 },
+        kind: 'freeze-water',
+        accepts: ['cold'],
+        activeSeconds: 3.35,
+        resultRect: { x: 300, y: 550, w: 600, h: 18 },
+      },
+    ],
+    waterHazards: [
+      {
+        id: 'thaw-clock-pool',
+        rect: { x: 300, y: 550, w: 600, h: 50 },
+        frozenByInteractionId: 'thaw-clock-freeze',
+      },
+    ],
+  },
 ];

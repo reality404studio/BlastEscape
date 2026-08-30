@@ -38,6 +38,11 @@ export const LEVEL_11_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: 1 },
 ];
 
+export const LEVEL_12_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 4.2, direction: 1 },
+  { until: Number.POSITIVE_INFINITY, direction: -1 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -74,11 +79,21 @@ export const LEVEL_11_CLEAN_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_11_CLEAN_ROUTE,
 };
 
+export const LEVEL_12_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-12-thaw-clock-clean-route',
+  levelId: 'level-12',
+  description: 'Acquire cold, freeze and race across the trench, use B1 on its first fuse, then steer left into the exit.',
+  frameRate: 60,
+  maxDurationSeconds: 8,
+  keyframes: LEVEL_12_CLEAN_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
   LEVEL_10_CLEAN_REPLAY,
   LEVEL_11_CLEAN_REPLAY,
+  LEVEL_12_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

@@ -274,7 +274,7 @@ New concept, if any: Accepted cold contact freezes one water span into a tempora
 What previous skills are recombined: cold acquisition, blast proximity, midair steering.
 ```
 
-### Level 11 — COLD LOCK (active intent)
+### Level 11 — COLD LOCK (accepted intent)
 
 ```text
 LEVEL 11 — COLD LOCK
@@ -286,6 +286,20 @@ Recovery state: Missing the locked carriage falls into the machinery pit; the st
 Mastery shortcut: None. The stabilized carriage must remain load-bearing in this introduction.
 New concept, if any: Accepted cold contact temporarily fixes one moving factory carriage at a data-defined docking position.
 What previous skills are recombined: cold acquisition, blast proximity, broad landing.
+```
+
+### Level 12 — THAW CLOCK (accepted intent)
+
+```text
+LEVEL 12 — THAW CLOCK
+Primary route: START -> coolant source -> freeze long condensate trench -> cross to launch stop -> B1 before thaw -> steer left -> upper exit deck -> EXIT
+Launch job(s): B1 launches from the far end of the frozen route after the player commits to the expiring surface.
+Landing window(s): The frozen crossing and upper exit deck are wide; urgency, not narrow geometry, is the challenge.
+Timing window(s): The ice is genuinely expiring relative to B1's first fuse. A late approach misses that blast and thaws before the next cycle.
+Recovery state: The start floor is safe before freezing; once committed, missing B1 or lingering on the trench is fatal.
+Mastery shortcut: None. The first-cycle blast and frozen route remain load-bearing.
+New concept, if any: None; this makes the existing freeze-water lifetime consequential during a blast route.
+What previous skills are recombined: cold acquisition, temporary ice, prepared blast timing, midair reversal.
 ```
 
 Then implement the smallest geometry that realizes that contract.

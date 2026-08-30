@@ -12,11 +12,11 @@ or the clamped-frame/three-substep order. Browser play and headless replay now
 share movement, collision, hazards, bombs, blast, combo, death, and exit logic.
 G2 now provides intent-bearing level data, accepted replay/report formats, and
 reachability, exploit, deterministic noisy-human, and mechanic-use evaluators.
-G3B and G8B ship `LEVEL 9 — COLD START`. G9A ships accepted Levels 10 and 11:
-`CONDENSATE GAP` creates timed ice collision, while `COLD LOCK` fixes the existing
-moving carriage at a marked dock long enough for one broad blast route. Both use
-the authoritative interaction lifetime and fail their same-input no-cold
-controls. G9A remains ACTIVE with Level 12's expiring cold/blast route next. G3C
+G3B and G8B ship `LEVEL 9 — COLD START`. G9A ships accepted Levels 10–12:
+`CONDENSATE GAP` creates timed ice, `COLD LOCK` fixes a moving carriage, and
+`THAW CLOCK` makes the ice lifetime load-bearing against a prepared first-cycle
+blast. The late control dies on thaw but clears on the repeat cycle when only the
+ice lifetime is extended. G9A remains ACTIVE with Level 13 recovery design next. G3C
 Heat, G3D Magnetism, and G8A blast replay coverage are also READY.
 
 ## Active / next goals
@@ -36,7 +36,7 @@ Heat, G3D Magnetism, and G8A blast replay coverage are also READY.
 | G7 Environmental story | READY | G0 | factory zones, signage, nonverbal narrative |
 | G8A Blast curriculum migration | READY | G2 | preserve/migrate L1–8 |
 | G8B Cold introduction | DONE | G2 + G3B | Level 9 complete |
-| G9A Cold curriculum | ACTIVE | G2 + G3B | Levels 10–11 accepted; Level 12 expiring route next |
+| G9A Cold curriculum | ACTIVE | G2 + G3B | Levels 10–12 accepted; Level 13 cold recovery next |
 | G9B Heat levels | PROPOSED | G2 + G3C | L15–19 |
 | G9C Magnet introduction | PROPOSED | G2 + G3D | L20 |
 | G10 Synthesis / ending levels | PROPOSED | G2 + G3B–D + narrative | L21–25 and dispatch ending |
@@ -103,6 +103,12 @@ Expected first mandatory human call: protagonist base identity approval before m
   cycling carriage; lock expiry restores its normal path. ±100ms timing noise
   clears 100/100. 30 tests, Levels 8–11 validation, lint, and build pass.
   Evidence: `docs/reports/G9A-COLD-LEVEL-11-001.md`.
+- G9A Level 12 reused timed ice and the unchanged bomb cycle for a genuinely
+  expiring route. The accepted route clears at 5.0s across 30–144Hz; a delayed
+  control dies on thaw but clears using the second blast when only ice lifetime
+  is extended. ±80ms timing noise clears 100/100. 35 tests, Levels 8–12
+  validation, lint, and build pass. Evidence:
+  `docs/reports/G9A-COLD-LEVEL-12-001.md`.
 
 ## Director update rule
 

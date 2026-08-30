@@ -344,6 +344,20 @@ New concept, if any: A temporary heat state melts one unmistakable solid factory
 What previous skills are recombined: temporary-state acquisition, blast proximity, midair steering.
 ```
 
+### Level 16 — REIGNITION (accepted intent)
+
+```text
+LEVEL 16 — REIGNITION
+Primary route: START -> furnace duct -> acquire heat -> touch ignition terminal -> power dormant B1 -> reach the right launch wall -> wait for the newly running fuse -> B1 -> steer left -> upper exit deck -> EXIT
+Launch job(s): Reactivated B1 performs one familiar right-wall launch after its paused fuse visibly starts.
+Landing window(s): The upper exit deck is wide; understanding that heat started the charge matters more than landing precision.
+Timing window(s): The ignition interval comfortably covers B1's first powered fuse. The player has time to reach the marked wall and prepare before detonation.
+Recovery state: Safe. A charge that was not powered simply stays dormant, leaving the player on stable floor beside readable machinery.
+Mastery shortcut: None. B1 reactivation must remain load-bearing in this introduction.
+New concept, if any: Heat powers a linked dormant blast charge, allowing its authoritative fuse to advance only while the ignition circuit is active.
+What previous skills are recombined: heat acquisition, prepared blast timing, blast proximity, midair steering.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

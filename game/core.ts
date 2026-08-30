@@ -90,6 +90,12 @@ export function createGameplayState(level: LevelDefinition): GameplayState {
   };
 }
 
+export const bombIsPowered = (
+  bomb: Pick<BombState, 'reactivatedByInteractionId'>,
+  interactionStates: GameplayState['interactionStates'],
+) => !bomb.reactivatedByInteractionId ||
+  (interactionStates[bomb.reactivatedByInteractionId]?.active ?? false);
+
 export const overlaps = (a: Rect, b: Rect) =>
   a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 
@@ -385,6 +391,7 @@ export function stepGameplay(
   }
 
   for (const bomb of state.bombs) {
+    if (!bombIsPowered(bomb, state.interactionStates)) continue;
     bomb.timer -= dt;
     if (bomb.timer > 0) continue;
 

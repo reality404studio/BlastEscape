@@ -71,6 +71,11 @@ export const LEVEL_15_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: -1 },
 ];
 
+export const LEVEL_16_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 4.5, direction: 1 },
+  { until: Number.POSITIVE_INFINITY, direction: -1 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -161,6 +166,15 @@ export const LEVEL_15_CLEAN_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_15_CLEAN_ROUTE,
 };
 
+export const LEVEL_16_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-16-reignition-clean-route',
+  levelId: 'level-16',
+  description: 'Acquire heat, power the ignition terminal, wait at the right wall for B1, then steer left into the exit.',
+  frameRate: 60,
+  maxDurationSeconds: 8,
+  keyframes: LEVEL_16_CLEAN_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
@@ -170,6 +184,7 @@ export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_13_CLEAN_REPLAY,
   LEVEL_14_CLEAN_REPLAY,
   LEVEL_15_CLEAN_REPLAY,
+  LEVEL_16_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

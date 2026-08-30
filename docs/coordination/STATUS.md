@@ -16,11 +16,12 @@ G3B and G8B ship `LEVEL 9 — COLD START`. G9A now ships accepted Levels 10–14
 timed ice, carriage locking, an expiring first-cycle blast route, a cold-created
 recovery route, and `BLUE CIRCUIT`, which synthesizes both cold interactions with
 a machine-verified B1 proximity shortcut. The bounded cold curriculum is DONE.
-G3C now ships `LEVEL 15 — THERMAL SEAL`: heat acquisition removes one linked
+G3C ships `LEVEL 15 — THERMAL SEAL`: heat acquisition removes one linked
 solid partition from authoritative collision for a timed interval, while neutral
-and cold contacts remain blocked. G3C is DONE and G9B is ACTIVE for Level 16's
-shared dormant-charge or machinery reactivation path. G3D Magnetism and G8A
-blast replay coverage remain READY.
+and cold contacts remain blocked. G9B now also ships `LEVEL 16 — REIGNITION`,
+where a heat-powered circuit advances a previously dormant B1 fuse. G9B remains
+ACTIVE for Level 17's heat-lifetime route choice. G3D Magnetism and G8A blast
+replay coverage remain READY.
 
 ## Active / next goals
 
@@ -40,7 +41,7 @@ blast replay coverage remain READY.
 | G8A Blast curriculum migration | READY | G2 | preserve/migrate L1–8 |
 | G8B Cold introduction | DONE | G2 + G3B | Level 9 complete |
 | G9A Cold curriculum | DONE | G2 + G3B | Levels 10–14 accepted with route/dependency evidence |
-| G9B Heat levels | ACTIVE | G2 + G3C | Level 15 accepted; Level 16 shared reactivation next |
+| G9B Heat levels | ACTIVE | G2 + G3C | Levels 15–16 accepted; Level 17 heat-lifetime planning next |
 | G9C Magnet introduction | PROPOSED | G2 + G3D | L20 |
 | G10 Synthesis / ending levels | PROPOSED | G2 + G3B–D + narrative | L21–25 and dispatch ending |
 | G11 Final QA / release | PROPOSED | G4–G10 | full playthrough, save/pause/restart/build/perf |
@@ -130,6 +131,12 @@ Expected first mandatory human call: protagonist base identity approval before m
   before movement; ±100ms timing noise clears 100/100. 50 tests, Levels 8–15
   validation, lint, build, and local HTTP 200 pass. Evidence:
   `docs/reports/G3C-HEAT-LEVEL-15-001.md`.
+- G9B Level 16 adds data-linked dormant charges. B1's fuse pauses while its
+  ignition interaction is inactive, continues while powered, and pauses without
+  reset on expiry. The accepted route clears at 5.250s; neutral and cold controls
+  produce zero explosions; ±100ms timing noise clears 100/100. 55 tests, Levels
+  8–16 validation, lint, build, and local HTTP 200 pass. Evidence:
+  `docs/reports/G9B-HEAT-LEVEL-16-001.md`.
 
 ## Director update rule
 

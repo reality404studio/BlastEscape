@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CONFIG } from '@/game/config';
-import { createGameplayState, spikeTriangles, stepGameplay } from '@/game/core';
+import { bombIsPowered, createGameplayState, spikeTriangles, stepGameplay } from '@/game/core';
 import { LEVELS } from '@/game/levels';
 import { movingPlatformAt, playerHorizontalVelocity } from '@/game/physics';
 import { directionAtTime, LEVEL_8_CLEAN_ROUTE } from '@/game/replays';
@@ -649,6 +649,28 @@ export default function BlastEscape() {
         ctx.fillText('THERMAL SEAL', barrier.rect.x + barrier.rect.w / 2, barrier.rect.y - 7);
       });
 
+      level.traversalInteractions?.forEach((interaction) => {
+        if (interaction.kind !== 'reactivate-charge') return;
+        const active = interactionStates[interaction.id]?.active ?? false;
+        ctx.fillStyle = active ? '#3b201d' : '#242126';
+        ctx.fillRect(interaction.rect.x, interaction.rect.y, interaction.rect.w, interaction.rect.h);
+        ctx.strokeStyle = active ? VISUAL.hot : '#756b76';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(interaction.rect.x, interaction.rect.y, interaction.rect.w, interaction.rect.h);
+        ctx.fillStyle = active ? '#ffb05a' : '#756b76';
+        for (let x = interaction.rect.x + 10; x < interaction.rect.x + interaction.rect.w; x += 18) {
+          ctx.fillRect(x, interaction.rect.y + 8, 5, interaction.rect.h - 16);
+        }
+        ctx.fillStyle = active ? VISUAL.hot : '#8f838d';
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          active ? 'CHARGE ONLINE' : 'IGNITION',
+          interaction.rect.x + interaction.rect.w / 2,
+          interaction.rect.y - 7,
+        );
+      });
+
       level.hotSurfaces?.forEach((surface) => {
         const cooled = interactionStates[surface.cooledByInteractionId]?.active ?? false;
         ctx.fillStyle = cooled ? 'rgba(116, 217, 255, 0.72)' : 'rgba(255, 81, 62, 0.86)';
@@ -773,6 +795,7 @@ export default function BlastEscape() {
       );
 
       bombs.forEach((bomb) => {
+        const powered = bombIsPowered(bomb, interactionStates);
         const visibleTimer = Math.max(0, bomb.timer);
         const fraction = Math.min(1, visibleTimer / CONFIG.bombFuseDuration);
         const urgency = 1 - fraction;
@@ -816,16 +839,18 @@ export default function BlastEscape() {
         ctx.stroke();
         ctx.fillStyle = '#e7ded0';
         ctx.fillRect(-11, -8, 22, 3);
-        ctx.fillStyle = VISUAL.hot;
+        ctx.fillStyle = powered ? VISUAL.hot : '#625963';
         ctx.fillRect(-15, -2, 30, 7);
         ctx.fillStyle = '#4b2c2d';
         ctx.fillRect(-10, 0, 20, 3);
         ctx.fillStyle = '#171419';
         ctx.fillRect(-4, -16, 8, 5);
-        ctx.fillStyle = urgency > 0.72 ? '#fff1dc' : VISUAL.amber;
+        ctx.fillStyle = powered
+          ? (urgency > 0.72 ? '#fff1dc' : VISUAL.amber)
+          : '#77717f';
         ctx.fillRect(-2, -15, 4, 3);
         ctx.restore();
-        ctx.strokeStyle = VISUAL.amber;
+        ctx.strokeStyle = powered ? VISUAL.amber : '#625963';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.arc(bomb.x, bomb.y, 21, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - fraction));
@@ -833,7 +858,12 @@ export default function BlastEscape() {
         ctx.fillStyle = '#f4f0e8';
         ctx.font = '700 11px ui-monospace, monospace';
         ctx.textAlign = 'center';
-        ctx.fillText(visibleTimer.toFixed(1), bomb.x, bomb.y - 29);
+        ctx.fillText(powered ? visibleTimer.toFixed(1) : '--', bomb.x, bomb.y - 29);
+        if (!powered) {
+          ctx.fillStyle = '#8f838d';
+          ctx.font = '700 8px ui-monospace, monospace';
+          ctx.fillText('DORMANT', bomb.x, bomb.y + 43);
+        }
         ctx.fillStyle = 'rgba(244, 240, 232, 0.62)';
         ctx.font = '700 8px ui-monospace, monospace';
         ctx.fillText(bomb.label, bomb.x, bomb.y + 31);

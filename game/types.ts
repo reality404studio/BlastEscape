@@ -6,6 +6,7 @@ export type BombDefinition = {
   delay: number;
   label: string;
   floating?: boolean;
+  reactivatedByInteractionId?: string;
 };
 
 export type BombState = BombDefinition & { timer: number };

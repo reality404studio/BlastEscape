@@ -825,4 +825,72 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-16',
+    name: 'LEVEL 16',
+    subtitle: 'REIGNITION',
+    hint: 'Carry furnace heat into the ignition terminal. When the dormant charge wakes, take position.',
+    intent: {
+      primaryRoute: 'START -> furnace duct -> acquire heat -> ignition terminal -> power dormant B1 -> right launch wall -> wait for powered fuse -> B1 -> steer left -> upper exit deck -> EXIT',
+      launchJobs: [
+        { bomb: 'B1', job: 'After reactivation, perform a familiar right-wall launch and return left into the broad upper deck.' },
+      ],
+      landingWindows: [
+        { target: 'upper exit deck', kind: 'wide', description: 'Charge reactivation is the new lesson; landing remains deliberately forgiving.' },
+      ],
+      timingWindows: [
+        { target: 'powered B1 fuse', kind: 'open', description: 'The ignition interval covers the full first fuse and gives ample setup time at the wall.' },
+        { target: 'B1 launch', kind: 'commit', description: 'Wait at the right wall, then reverse left as the newly powered charge fires.' },
+      ],
+      recovery: { kind: 'safe', description: 'Without power the charge remains visibly dormant beside stable floor; no blind hazard is introduced.' },
+      masteryShortcut: null,
+      newConcept: 'Heat powers a linked dormant blast charge so its authoritative fuse advances only while the ignition circuit is active.',
+      recombinedSkills: ['heat acquisition', 'prepared blast timing', 'blast proximity', 'midair steering'],
+      targetFirstClearSeconds: { min: 70, max: 160 },
+    },
+    validation: {
+      requiredBlastHits: ['B1'],
+      requiredInteractions: ['charge-ignition'],
+      requiredStates: ['heat'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 100, samples: 100, minimumClearRate: 0.8 },
+      ],
+    },
+    start: { x: 82, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 942, h: 50 },
+      { x: 620, y: 350, w: 250, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [
+      {
+        x: 900,
+        y: 532,
+        delay: -1.4,
+        label: 'B1',
+        reactivatedByInteractionId: 'charge-ignition',
+      },
+    ],
+    exit: { x: 700, y: 286, w: 64, h: 64 },
+    traversalStateSources: [
+      {
+        id: 'furnace-duct',
+        rect: { x: 150, y: 500, w: 92, h: 50 },
+        grants: 'heat',
+        durationSeconds: 7,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'charge-ignition',
+        rect: { x: 340, y: 500, w: 90, h: 54 },
+        kind: 'reactivate-charge',
+        accepts: ['heat'],
+        activeSeconds: 10,
+      },
+    ],
+  },
 ];

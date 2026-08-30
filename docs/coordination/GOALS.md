@@ -181,9 +181,12 @@ direct-over-B1 mastery shortcut without new mechanics.
 **Done when:** heat is introduced and recombined with blast/cold without a
 checklist-like sequence.
 
-**Current slice:** Level 15 is accepted. Level 16 is next and should use heat to
-reactivate one dormant charge or machine through a shared-engine rule, with its
-route intent authored before geometry and no one-off level controller.
+**Current slice:** Levels 15–16 are accepted. Level 17 is next and should make the remaining heat
+lifetime a visible route-planning resource without introducing a new input or
+silently consuming state.
+
+**Evidence:** `docs/reports/G3C-HEAT-LEVEL-15-001.md`,
+`docs/reports/G9B-HEAT-LEVEL-16-001.md`, and their Level Lab JSON artifacts.
 
 ### G9C — Magnet Introduction
 

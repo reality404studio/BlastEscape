@@ -102,3 +102,12 @@ barriers from collision; expiry restores them before the next movement substep.
 Rendering observes the same interaction state. Neutral and cold contacts do not
 activate the melt, preserving the mutually exclusive traversal-state contract
 without adding a Level 15-only controller.
+
+## D-016 — Dormant charge fuses advance only while their linked circuit is active
+
+A bomb may reference one `reactivate-charge` interaction. Its authoritative fuse
+does not decrement or explode while that interaction is inactive; activation
+continues the existing timer and expiry pauses it without resetting progress.
+Core, replay, and canvas query the same powered-state helper, so `DORMANT`, fuse
+display, and blast behavior cannot drift. This is a shared bomb-data rule rather
+than a Level 16 script.

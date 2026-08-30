@@ -4,30 +4,40 @@ This file is the compact monitoring surface for Codex `/goal` work.
 
 ## Current phase
 
-**PHASE 0 — orchestration bootstrap**
+**PHASE 1 — hand-feel characterization and shared-core extraction**
 
-The repository is still a compact prototype. Gameplay, level data, rendering, effects, and debug tooling currently live primarily in `app/blast-escape.tsx`. Levels 1–8 exist. The next major milestone is not "make more levels"; it is to establish stable contracts, reusable core/runtime boundaries, and Level Lab tooling without changing the existing hand-feel.
+The orchestration contract is reconciled with the current feature branch and G0
+contracts are now explicit. The repository remains a compact eight-level
+prototype: gameplay, level data, rendering, effects, and debug/demo tooling live
+primarily in `app/blast-escape.tsx`. G1 is extracting testable authoritative
+logic incrementally without changing established constants, coordinates, or
+update order.
 
 ## Active / next goals
 
 | Goal | State | Depends on | Purpose |
 |---|---|---|---|
-| G0 Director / contracts | READY | — | reconcile game bible, acceptance criteria, goal graph |
-| G1 Runtime / physics | PROPOSED | G0 | characterize and extract reusable deterministic gameplay core |
+| G0 Director / contracts | DONE | — | contracts and reality audit recorded |
+| G1 Runtime / physics | ACTIVE | G0 | characterize and extract reusable deterministic gameplay core |
 | G2 Level Lab / simulation | PROPOSED | G1 | data-driven levels, replay, validators/evaluators |
-| G3 Cold / heat / magnet mechanics | PROPOSED | G1 | implement new traversal states with tests |
-| G4 Art direction / protagonist | PROPOSED | G0 | pixel-art bible and protagonist identity candidates |
+| G3A Traversal-state substrate | PROPOSED | G1 | shared temporary-state model and interaction hooks |
+| G3B–D Cold / heat / magnetism | PROPOSED | G3A | implement bounded traversal states with tests |
+| G4 Art direction / protagonist | READY | G0 | pixel-art execution and identity candidates |
 | G5 Sprite pipeline | PROPOSED | G4 approval | SpriteGen integration and atlas/manifest pipeline |
-| G6 FX / game feel | PROPOSED | G0; preferably stable runtime events | mute-first feedback polish |
-| G7 Environmental story | PROPOSED | G0 | factory zones, signage, nonverbal narrative |
-| G8 Early level production | PROPOSED | G2 + relevant G3 | L1–9 curriculum polish/introduction |
-| G9 Mid level production | PROPOSED | G2 + relevant G3 | L10–20 production |
-| G10 Synthesis / ending levels | PROPOSED | G2 + G3 + narrative contract | L21–25 and dispatch ending |
+| G6 FX / game feel | READY | G0; preferably stable runtime events | mute-first feedback polish |
+| G7 Environmental story | READY | G0 | factory zones, signage, nonverbal narrative |
+| G8A Blast curriculum migration | PROPOSED | G2 | preserve/migrate L1–8 |
+| G8B/G9A Cold levels | PROPOSED | G2 + G3B | L9–14 |
+| G9B Heat levels | PROPOSED | G2 + G3C | L15–19 |
+| G9C Magnet introduction | PROPOSED | G2 + G3D | L20 |
+| G10 Synthesis / ending levels | PROPOSED | G2 + G3B–D + narrative | L21–25 and dispatch ending |
 | G11 Final QA / release | PROPOSED | G4–G10 | full playthrough, save/pause/restart/build/perf |
 
 ## Open blockers
 
-None at orchestration bootstrap.
+- Interactive browser capture is unavailable in the current environment. This
+  does not block pure-core tests/build work; playable visual evidence remains a
+  later verification item.
 
 ## Open human calls
 
@@ -41,6 +51,15 @@ Expected first mandatory human call: protagonist base identity approval before m
 - Existing physical hand-feel is a compatibility constraint.
 - Shared runtime and simulation should not diverge into separate physics implementations.
 - Human calls are for judgment/taste/external choices, not routine implementation permission.
+- Baseline lint and production build pass at audit commit
+  `5c02443795bca2db31e8faf02235a2bdc21a1c5b`.
+- The current final-clear overlay is explicitly noncanonical; the ending must be
+  rebuilt around cancellation, an open door, and retained player control.
+- G1 slice 001 extracted all eight level definitions, compatibility constants,
+  movement/blast formulas, moving-platform math, and the Level 8 clean replay.
+  Runtime imports the extracted modules; 7 characterization tests, lint, build,
+  exact level-data comparison, and local HTTP rendering pass. Evidence:
+  `docs/reports/G1-CHARACTERIZATION-001.md`.
 
 ## Director update rule
 

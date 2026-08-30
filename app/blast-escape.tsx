@@ -1,39 +1,18 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { CONFIG } from '@/game/config';
+import { LEVELS } from '@/game/levels';
+import {
+  evaluateBlast,
+  freshBombs,
+  integratePlayerVelocity,
+  movingPlatformAt,
+  playerHorizontalVelocity,
+} from '@/game/physics';
+import { directionAtTime, LEVEL_8_CLEAN_ROUTE } from '@/game/replays';
+import type { BombState as Bomb, Direction, PlayerState, Rect } from '@/game/types';
 
-const CONFIG = {
-  worldWidth: 960,
-  worldHeight: 600,
-  playerWidth: 26,
-  playerHeight: 36,
-  runAcceleration: 1900,
-  airAcceleration: 760,
-  maxRunSpeed: 275,
-  groundFriction: 0.8,
-  blastAirRetention: 0.985,
-  blastGroundRetention: 0.68,
-  gravity: 1180,
-  maxFallSpeed: 920,
-  explosionRadius: 154,
-  explosionImpulse: 830,
-  explosionMinImpulse: 370,
-  explosionMaxImpulse: 900,
-  explosionVerticalBias: 58,
-  bombFuseDuration: 4.8,
-  bombRepeatInterval: 5.6,
-  screenShake: 10,
-} as const;
-
-type Rect = { x: number; y: number; w: number; h: number };
-type Bomb = {
-  x: number;
-  y: number;
-  timer: number;
-  delay: number;
-  label: string;
-  floating?: boolean;
-};
 type Particle = { x: number; y: number; vx: number; vy: number; life: number };
 type ContactParticle = {
   x: number;
@@ -55,30 +34,6 @@ type TrajectoryTrace = {
   sampleElapsed: number;
   active: boolean;
 };
-type MovingPlatform = {
-  fromX: number;
-  toX: number;
-  y: number;
-  w: number;
-  h: number;
-  speed: number;
-  phase: number;
-};
-type Level = {
-  name: string;
-  subtitle: string;
-  hint: string;
-  start: { x: number; y: number };
-  platforms: Rect[];
-  bombs: Array<{ x: number; y: number; delay: number; label: string; floating?: boolean }>;
-  exit: Rect;
-  opening?: Rect;
-  spikes?: Rect[];
-  pit?: Rect;
-  movingPlatform?: MovingPlatform;
-  requiredCombo?: number;
-};
-
 // How long the clear overlay holds before the next level loads.
 const LEVEL_ADVANCE_DELAY = 1600;
 const MAX_RECENT_TRAJECTORIES = 5;
@@ -103,204 +58,6 @@ const VISUAL = {
   mint: '#66f2d5',
   gold: '#ffc44f',
 } as const;
-
-const LEVELS: Level[] = [
-  {
-    name: 'LEVEL 1',
-    subtitle: 'TEST CHAMBER',
-    hint: 'Get close. Pick a side. Let the blast do the jumping.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 960, h: 50 },
-      { x: 396, y: 402, w: 224, h: 22 },
-      { x: 704, y: 238, w: 210, h: 22 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [
-      { x: 304, y: 532, delay: 0, label: 'B1' },
-      { x: 535, y: 384, delay: 1.7, label: 'B2' },
-      { x: 754, y: 220, delay: 3.2, label: 'B3' },
-    ],
-    exit: { x: 822, y: 174, w: 54, h: 64 },
-  },
-  {
-    name: 'LEVEL 2',
-    subtitle: 'TRAJECTORY TEST',
-    hint: 'Choose your launch line. Steer through the opening while airborne.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 960, h: 50 },
-      { x: 18, y: 330, w: 477, h: 28 },
-      { x: 610, y: 330, w: 332, h: 28 },
-      { x: 0, y: 0, w: 960, h: 18 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [{ x: 460, y: 532, delay: 0, label: 'B1' }],
-    exit: { x: 838, y: 266, w: 54, h: 64 },
-    opening: { x: 495, y: 330, w: 115, h: 28 },
-  },
-  {
-    name: 'LEVEL 3',
-    subtitle: 'TIGHT POCKET',
-    hint: 'Thread the slot. Brake in midair. Land in the pocket.',
-    start: { x: 92, y: 464 },
-    platforms: [
-      { x: 0, y: 500, w: 390, h: 22 },
-      { x: 18, y: 300, w: 372, h: 22 },
-      { x: 490, y: 300, w: 30, h: 22 },
-      { x: 560, y: 360, w: 110, h: 22 },
-      { x: 520, y: 170, w: 180, h: 22 },
-      { x: 700, y: 170, w: 28, h: 330 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [{ x: 350, y: 482, delay: 0, label: 'B1' }],
-    exit: { x: 588, y: 296, w: 54, h: 64 },
-    opening: { x: 390, y: 300, w: 100, h: 22 },
-  },
-  {
-    name: 'LEVEL 4',
-    subtitle: 'AIR COMBO',
-    hint: 'First blast starts the chain. Meet the floating bomb before you touch down.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 960, h: 50 },
-      { x: 18, y: 350, w: 432, h: 22 },
-      { x: 580, y: 350, w: 140, h: 22 },
-      { x: 750, y: 190, w: 192, h: 22 },
-      { x: 0, y: 0, w: 960, h: 18 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [
-      { x: 400, y: 532, delay: 0, label: 'B1' },
-      { x: 625, y: 260, delay: 0.7, label: 'B2', floating: true },
-    ],
-    exit: { x: 842, y: 126, w: 54, h: 64 },
-    opening: { x: 450, y: 350, w: 130, h: 22 },
-  },
-  {
-    name: 'LEVEL 5',
-    subtitle: 'SYNTHESIS I',
-    hint: 'Find the line between the void and the teeth.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 300, h: 50 },
-      { x: 370, y: 500, w: 160, h: 22 },
-      { x: 600, y: 360, w: 342, h: 22 },
-      { x: 300, y: 200, w: 130, h: 20 },
-      { x: 0, y: 0, w: 960, h: 18 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [
-      { x: 190, y: 532, delay: 0, label: 'B1' },
-      { x: 455, y: 470, delay: 0.75, label: 'B2', floating: true },
-    ],
-    exit: { x: 842, y: 296, w: 54, h: 64 },
-    spikes: [{ x: 300, y: 220, w: 130, h: 65 }],
-    pit: { x: 300, y: 500, w: 300, h: 100 },
-  },
-  {
-    name: 'LEVEL 6',
-    subtitle: 'INTERCEPT',
-    hint: 'Launch for where the platform will be. Close blast, fast exit. Wide blast, safer ride.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 330, h: 50 },
-      { x: 840, y: 450, w: 102, h: 22 },
-      { x: 0, y: 0, w: 960, h: 18 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [{ x: 250, y: 532, delay: -2.8, label: 'B1' }],
-    exit: { x: 876, y: 386, w: 54, h: 64 },
-    pit: { x: 330, y: 450, w: 510, h: 150 },
-    movingPlatform: {
-      fromX: 440,
-      toX: 700,
-      y: 450,
-      w: 140,
-      h: 22,
-      speed: 140,
-      phase: 2.14,
-    },
-  },
-  {
-    name: 'LEVEL 7',
-    subtitle: 'RETURN ARC',
-    hint: 'Clear the hanging teeth after B1. Return left with B2, then launch from the left side of B3.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 330, h: 50 },
-      { x: 40, y: 140, w: 210, h: 22 },
-      { x: 250, y: 300, w: 250, h: 22 },
-      { x: 400, y: 470, w: 390, h: 22 },
-      { x: 360, y: 70, w: 140, h: 20 },
-      { x: 0, y: 0, w: 960, h: 18 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [
-      { x: 250, y: 532, delay: -2.5, label: 'B1' },
-      { x: 680, y: 452, delay: -0.2, label: 'B2' },
-      { x: 400, y: 282, delay: 1.9, label: 'B3' },
-    ],
-    exit: { x: 120, y: 76, w: 54, h: 64 },
-    spikes: [
-      { x: 250, y: 322, w: 70, h: 58 },
-      { x: 360, y: 90, w: 140, h: 70 },
-    ],
-    pit: { x: 330, y: 470, w: 630, h: 130 },
-  },
-  {
-    name: 'LEVEL 8',
-    subtitle: 'AIR SLALOM',
-    hint: 'Hold right into the launch post. B1 lifts off, then flip direction on every blast: left, right, left, right.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 484, h: 50 },
-      { x: 470, y: 508, w: 14, h: 42 },
-      { x: 0, y: 0, w: 960, h: 18 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [
-      { x: 410, y: 532, delay: -2.4, label: 'B1' },
-      { x: 590, y: 452, delay: -1.9, label: 'B2', floating: true },
-      { x: 445, y: 346, delay: -1.5, label: 'B3', floating: true },
-      { x: 656, y: 213, delay: -1.1, label: 'B4', floating: true },
-      { x: 491, y: 135, delay: -0.7, label: 'B5', floating: true },
-    ],
-    exit: { x: 550, y: 97, w: 86, h: 70 },
-    pit: { x: 484, y: 500, w: 476, h: 100 },
-    requiredCombo: 5,
-  },
-];
-
-function movingPlatformAt(platform: MovingPlatform, time: number) {
-  const travelTime = (platform.toX - platform.fromX) / platform.speed;
-  const cycleTime = travelTime * 2;
-  const cyclePosition = (time + platform.phase) % cycleTime;
-  const movingRight = cyclePosition < travelTime;
-  const x = movingRight
-    ? platform.fromX + cyclePosition * platform.speed
-    : platform.toX - (cyclePosition - travelTime) * platform.speed;
-
-  return {
-    rect: { x, y: platform.y, w: platform.w, h: platform.h },
-    velocityX: movingRight ? platform.speed : -platform.speed,
-  };
-}
-
-function freshBombs(level: Level): Bomb[] {
-  return level.bombs.map((bomb) => ({
-    ...bomb,
-    timer: CONFIG.bombFuseDuration + bomb.delay,
-  }));
-}
 
 function roundedRect(
   ctx: CanvasRenderingContext2D,
@@ -393,7 +150,7 @@ export default function BlastEscape() {
     let levelElapsed = 0;
     let demoActive = false;
     let bombs = freshBombs(LEVELS[activeLevelIndex]);
-    const player = {
+    const player: PlayerState = {
       x: LEVELS[activeLevelIndex].start.x,
       y: LEVELS[activeLevelIndex].start.y,
       controlVx: 0,
@@ -403,7 +160,7 @@ export default function BlastEscape() {
       onMovingPlatform: false,
     };
 
-    const horizontalVelocity = () => player.controlVx + player.blastVx;
+    const horizontalVelocity = () => playerHorizontalVelocity(player);
     const playerCenter = (): TrajectoryPoint => ({
       x: player.x + CONFIG.playerWidth / 2,
       y: player.y + CONFIG.playerHeight / 2,
@@ -554,33 +311,11 @@ export default function BlastEscape() {
         ...(movingAfter ? [{ rect: movingAfter.rect, moving: true }] : []),
       ];
       const keys = keysRef.current;
-      // Level 8 clean route: hold right into the launch post, then reverse on
-      // every blast. Switch points are the B2..B5 fuse times.
-      const demoDirection =
-        levelElapsed < 2.90 ? 1
-          : levelElapsed < 3.30 ? -1
-            : levelElapsed < 3.70 ? 1
-              : levelElapsed < 4.10 ? -1
-                : 1;
-      const direction = demoActive
-        ? demoDirection
-        : (keys.has('d') || keys.has('arrowright') ? 1 : 0) -
-          (keys.has('a') || keys.has('arrowleft') ? 1 : 0);
-      const acceleration = player.grounded ? CONFIG.runAcceleration : CONFIG.airAcceleration;
-      if (direction !== 0) player.controlVx += direction * acceleration * dt;
-      else if (player.grounded) {
-        player.controlVx *= Math.pow(CONFIG.groundFriction, dt * 60);
-      }
-      player.controlVx = Math.max(
-        -CONFIG.maxRunSpeed,
-        Math.min(CONFIG.maxRunSpeed, player.controlVx),
-      );
-      const blastRetention = player.grounded
-        ? CONFIG.blastGroundRetention
-        : CONFIG.blastAirRetention;
-      player.blastVx *= Math.pow(blastRetention, dt * 60);
-      if (Math.abs(player.blastVx) < 0.5) player.blastVx = 0;
-      player.vy = Math.min(CONFIG.maxFallSpeed, player.vy + CONFIG.gravity * dt);
+      const direction: Direction = demoActive
+        ? directionAtTime(LEVEL_8_CLEAN_ROUTE, levelElapsed)
+        : ((keys.has('d') || keys.has('arrowright') ? 1 : 0) -
+          (keys.has('a') || keys.has('arrowleft') ? 1 : 0)) as Direction;
+      Object.assign(player, integratePlayerVelocity(player, direction, dt));
 
       const oldX = player.x;
       const totalVx = horizontalVelocity();
@@ -654,53 +389,37 @@ export default function BlastEscape() {
         });
       }
 
-      const centerX = player.x + CONFIG.playerWidth / 2;
-      const centerY = player.y + CONFIG.playerHeight / 2;
-      const rawX = centerX - bomb.x;
-      const rawY = centerY - bomb.y;
-      const distance = Math.hypot(rawX, rawY);
+      const blast = evaluateBlast(player, bomb);
       if (demoActive) {
         console.info('[LEVEL8_DEMO]', bomb.label, JSON.stringify({
           time: levelElapsed.toFixed(2),
-          x: centerX.toFixed(1),
-          y: centerY.toFixed(1),
-          distance: distance.toFixed(1),
+          x: blast.centerX.toFixed(1),
+          y: blast.centerY.toFixed(1),
+          distance: blast.distance.toFixed(1),
           controlVx: player.controlVx.toFixed(1),
           blastVx: player.blastVx.toFixed(1),
           vy: player.vy.toFixed(1),
           comboCount,
         }));
       }
-      if (distance > CONFIG.explosionRadius) return;
+      if (!blast.hit) return;
 
-      const biasedY = rawY - CONFIG.explosionVerticalBias;
-      const length = Math.max(1, Math.hypot(rawX, biasedY));
-      const falloff = 1 - distance / CONFIG.explosionRadius;
-      const impulse = Math.min(
-        CONFIG.explosionMaxImpulse,
-        Math.max(
-          CONFIG.explosionMinImpulse,
-          CONFIG.explosionImpulse * (0.35 + falloff * 0.88),
-        ),
-      );
-      const impulseX = (rawX / length) * impulse;
-      const impulseY = (biasedY / length) * impulse;
       const continuesAirChain = !player.grounded && comboCount > 0;
       comboCount = continuesAirChain ? comboCount + 1 : 1;
       if (continuesAirChain) {
         comboFlashCount = comboCount;
         comboFlashLife = 1.5;
       }
-      player.blastVx += impulseX;
-      player.vy += impulseY;
+      player.blastVx += blast.impulseX;
+      player.vy += blast.impulseY;
       player.grounded = false;
       player.onMovingPlatform = false;
       shake = CONFIG.screenShake;
       launchVectors.push({
-        x: centerX,
-        y: centerY,
-        vx: impulseX,
-        vy: impulseY,
+        x: blast.centerX,
+        y: blast.centerY,
+        vx: blast.impulseX,
+        vy: blast.impulseY,
         life: 1.15,
         label: bomb.label,
       });

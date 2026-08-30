@@ -25,3 +25,27 @@ After the final scanner reveals that the order was cancelled, do not introduce a
 ## D-006 — SpriteGen is an external production pipeline
 
 Use `aldegad/sprite-gen` through its own skill/CLI contract where available. Do not vendor its whole implementation into Blast Escape without a specific technical reason. Approve protagonist identity before generating the complete state set.
+
+## D-007 — Split mechanics and level production at real dependency seams
+
+The original combined G3 and broad G8/G9 goals hid useful readiness boundaries.
+Track a shared traversal-state substrate separately from cold, heat, and magnetism,
+and track Levels 1–8, 9, 10–14, 15–19, and 20 separately. This lets existing blast
+levels migrate once Level Lab is ready without waiting for all three later
+mechanics, while still preventing mechanic-dependent level work from starting
+early. Evidence: `docs/PROTOTYPE-AUDIT.md` and `docs/LEVEL-CURRICULUM.md`.
+
+## D-008 — Extract existing time semantics before adopting fixed timestep
+
+The prototype clamps each rendered frame to 34 ms, performs three movement and
+collision substeps, then advances bomb timers once. Replacing this immediately
+with a fixed-step accumulator could alter launch and fuse relationships. G1 will
+first extract and test the current order, then compare candidate fixed/replay
+scheduling against golden routes before changing runtime timing.
+
+## D-009 — Preserve the existing restrained industrial visual language
+
+The current palette, key art, and canvas pass already establish a coherent
+graphite/violet factory with off-white protagonist, hot danger, mint powered
+machinery, and gold outbound accents. G4 should formalize and pixelize this
+direction, not restart it. Protagonist identity remains subject to HC-ART-001.

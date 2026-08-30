@@ -67,3 +67,11 @@ refreshes state; touching a different source replaces it. This preserves the
 small input vocabulary, prevents combinatorial simultaneous-state rules, and
 gives all later mechanics one observable event/debug contract. World effects
 remain owned by their mechanic goals rather than presentation code.
+
+## D-012 — Level 9 teaches cold through one safe hot-surface application
+
+Level 9 does not pull water freezing forward from the curriculum. It teaches an
+unavoidable cold-source pickup and a broad, temporarily cooled floor plate, then
+returns to one familiar blast launch. Water freezing remains Level 10. This keeps
+the cold introduction observable and avoids asking the first cold level to teach
+both state acquisition and temporary platform creation.

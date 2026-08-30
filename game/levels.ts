@@ -309,4 +309,71 @@ export const LEVELS: readonly LevelDefinition[] = [
     pit: { x: 484, y: 500, w: 476, h: 100 },
     requiredCombo: 5,
   },
+  {
+    id: 'level-9',
+    name: 'LEVEL 9',
+    subtitle: 'COLD START',
+    hint: 'Pass through coolant. Carry the blue state across the hot plate, then use the charge.',
+    intent: {
+      primaryRoute: 'START -> coolant source -> cool HOT PLATE -> cross safely -> pass B1 -> blast into upper shaft -> steer left -> EXIT',
+      launchJobs: [
+        { bomb: 'B1', job: 'Launch from the right wall up the open shaft, then allow a leftward landing on the exit deck.' },
+      ],
+      landingWindows: [{ target: 'upper exit deck', kind: 'wide', description: 'Cold is the new lesson; the returning landing is intentionally broad.' }],
+      timingWindows: [
+        { target: 'cooled hot plate', kind: 'open', description: 'The coolant source is unavoidable and refreshable before crossing.' },
+        { target: 'B1 launch', kind: 'commit', description: 'Reach the right launch wall for the prepared blast, then steer left above the deck.' },
+      ],
+      recovery: { kind: 'safe', description: 'The cooled plate and right floor are stable; incorrect neutral contact resets immediately and readably.' },
+      masteryShortcut: null,
+      newConcept: 'A temporary cold state makes one visibly overheated factory surface safe.',
+      recombinedSkills: ['blast proximity', 'midair steering'],
+      targetFirstClearSeconds: { min: 55, max: 140 },
+    },
+    validation: {
+      requiredBlastHits: ['B1'],
+      requiredInteractions: ['hot-plate-cooling'],
+      requiredStates: ['cold'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 100, samples: 100, minimumClearRate: 0.8 },
+      ],
+    },
+    start: { x: 82, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 360, h: 50 },
+      { x: 360, y: 550, w: 270, h: 50 },
+      { x: 630, y: 550, w: 312, h: 50 },
+      { x: 620, y: 350, w: 250, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [{ x: 900, y: 532, delay: -1.5, label: 'B1' }],
+    exit: { x: 700, y: 286, w: 64, h: 64 },
+    traversalStateSources: [
+      {
+        id: 'coolant-gate',
+        rect: { x: 150, y: 500, w: 92, h: 50 },
+        grants: 'cold',
+        durationSeconds: 7,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'hot-plate-cooling',
+        rect: { x: 344, y: 500, w: 302, h: 54 },
+        kind: 'cool-surface',
+        accepts: ['cold'],
+        activeSeconds: 5,
+      },
+    ],
+    hotSurfaces: [
+      {
+        id: 'hot-plate',
+        rect: { x: 360, y: 542, w: 270, h: 12 },
+        cooledByInteractionId: 'hot-plate-cooling',
+      },
+    ],
+  },
 ];

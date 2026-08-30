@@ -67,16 +67,23 @@ and runtime debug visibility without changing existing level behavior.
 
 ### G3B — Cold
 
-**State:** READY
+**State:** DONE
 **Depends on:** G3A.
 **Owns:** cold acquisition, expiry, readable effects on water/steam/machinery/hot
 surfaces, and tests.
 **Done when:** Level 9 can teach one unmistakable cold interaction and later levels
 can reuse it through the shared substrate.
 
+**Current slice:** Level 9 teaches source acquisition and a safe `cool-surface`
+application before reusing blast locomotion. Water freezing remains Level 10 so
+the curriculum does not introduce two cold applications at once.
+
+**Evidence:** `docs/reports/G3B-COLD-LEVEL-9-001.md` and
+`artifacts/level-validation/level-9.json`.
+
 ### G3C — Heat
 
-**State:** PROPOSED
+**State:** READY
 **Depends on:** G3A; cold interaction contract sufficiently stable.
 **Owns:** heat acquisition, expiry, melt/thaw/reactivation interactions, and tests.
 **Done when:** Level 15 can teach heat with blast still present and heat/cold
@@ -133,15 +140,17 @@ accepted route has replay/validator evidence.
 
 ### G8B — Cold Introduction
 
-**State:** PROPOSED
+**State:** DONE
 **Depends on:** G2 + G3B.
 **Owns:** Level 9.
 **Done when:** cold is introduced safely and readably in the real runtime without
 dialogue or a new input.
 
+**Evidence:** `docs/reports/G3B-COLD-LEVEL-9-001.md`.
+
 ### G9A — Cold Curriculum
 
-**State:** PROPOSED
+**State:** READY
 **Depends on:** G2 + G3B.
 **Owns:** Levels 10–14.
 **Done when:** cold+blast develops through route/timing/recovery variations rather

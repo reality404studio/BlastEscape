@@ -21,6 +21,7 @@ export type GameplayState = {
   player: PlayerState;
   bombs: BombState[];
   comboCount: number;
+  interactionStates: Record<string, { active: boolean; remainingSeconds: number }>;
 };
 
 export type DirectionSource = Direction | ((levelElapsed: number) => Direction);
@@ -42,7 +43,7 @@ export type GameplayEvent =
       continuesAirChain: boolean;
       comboCount: number;
     }
-  | { type: 'died'; reason: 'spikes' | 'fall' }
+  | { type: 'died'; reason: 'spikes' | 'fall' | 'hot-surface' }
   | { type: 'cleared' }
   | {
       type: 'traversal-state-changed';
@@ -56,6 +57,13 @@ export type GameplayEvent =
       interactionKind: string;
       stateKind: TraversalStateKind;
       accepted: boolean;
+    }
+  | {
+      type: 'traversal-interaction-changed';
+      interactionId: string;
+      active: boolean;
+      remainingSeconds: number;
+      reason: 'activated' | 'expired';
     };
 
 export function createGameplayState(level: LevelDefinition): GameplayState {
@@ -73,6 +81,12 @@ export function createGameplayState(level: LevelDefinition): GameplayState {
     },
     bombs: freshBombs(level),
     comboCount: 0,
+    interactionStates: Object.fromEntries(
+      (level.traversalInteractions ?? []).map((interaction) => [
+        interaction.id,
+        { active: false, remainingSeconds: 0 },
+      ]),
+    ),
   };
 }
 
@@ -154,6 +168,24 @@ function advanceTraversalState(state: GameplayState, dt: number): GameplayEvent[
   }];
 }
 
+function advanceInteractionStates(state: GameplayState, dt: number): GameplayEvent[] {
+  const events: GameplayEvent[] = [];
+  for (const [interactionId, runtime] of Object.entries(state.interactionStates)) {
+    if (!runtime.active) continue;
+    runtime.remainingSeconds = Math.max(0, runtime.remainingSeconds - dt);
+    if (runtime.remainingSeconds > 0) continue;
+    runtime.active = false;
+    events.push({
+      type: 'traversal-interaction-changed',
+      interactionId,
+      active: false,
+      remainingSeconds: 0,
+      reason: 'expired',
+    });
+  }
+  return events;
+}
+
 function applyTraversalContacts(
   state: GameplayState,
   level: LevelDefinition,
@@ -191,6 +223,29 @@ function applyTraversalContacts(
       stateKind,
       accepted: stateKind !== 'neutral' && interaction.accepts.includes(stateKind),
     });
+    if (
+      stateKind !== 'neutral' &&
+      interaction.accepts.includes(stateKind) &&
+      interaction.activeSeconds
+    ) {
+      const runtime = state.interactionStates[interaction.id] ?? {
+        active: false,
+        remainingSeconds: 0,
+      };
+      const wasActive = runtime.active;
+      runtime.active = true;
+      runtime.remainingSeconds = interaction.activeSeconds;
+      state.interactionStates[interaction.id] = runtime;
+      if (!wasActive) {
+        events.push({
+          type: 'traversal-interaction-changed',
+          interactionId: interaction.id,
+          active: true,
+          remainingSeconds: runtime.remainingSeconds,
+          reason: 'activated',
+        });
+      }
+    }
   }
   return events;
 }
@@ -279,7 +334,10 @@ export function stepGameplay(
   directionSource: DirectionSource,
   dt: number,
 ) {
-  const events: GameplayEvent[] = [...advanceTraversalState(state, dt)];
+  const events: GameplayEvent[] = [
+    ...advanceTraversalState(state, dt),
+    ...advanceInteractionStates(state, dt),
+  ];
   const seenInteractions = new Set<string>();
 
   for (let index = 0; index < 3; index += 1) {
@@ -292,6 +350,14 @@ export function stepGameplay(
       return events;
     }
     events.push(...applyTraversalContacts(state, level, seenInteractions));
+    const hotSurface = level.hotSurfaces?.find((surface) =>
+      overlaps(playerRect(state.player), surface.rect) &&
+      !state.interactionStates[surface.cooledByInteractionId]?.active,
+    );
+    if (hotSurface) {
+      events.push({ type: 'died', reason: 'hot-surface' });
+      return events;
+    }
   }
 
   for (const bomb of state.bombs) {

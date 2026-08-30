@@ -12,9 +12,11 @@ export type ReplayResult = {
   elapsedSeconds: number;
   frames: number;
   frameRate: number;
-  deathReason: 'spikes' | 'fall' | null;
+  deathReason: 'spikes' | 'fall' | 'hot-surface' | null;
   blastExplosions: string[];
   blastHits: string[];
+  acceptedInteractions: string[];
+  acquiredStates: string[];
   landingCount: number;
   maximumAirCombo: number;
   highestPointY: number;
@@ -40,6 +42,8 @@ export function runReplay(
   const frameLimit = Math.ceil(replay.maxDurationSeconds / dt);
   const blastExplosions: string[] = [];
   const blastHits: string[] = [];
+  const acceptedInteractions: string[] = [];
+  const acquiredStates: string[] = [];
   let landingCount = 0;
   let maximumAirCombo = 0;
   let highestPointY = state.player.y;
@@ -59,6 +63,14 @@ export function runReplay(
 
     for (const event of events) {
       if (event.type === 'landed') landingCount += 1;
+      if (event.type === 'traversal-state-changed' && event.reason !== 'expired') {
+        if (!acquiredStates.includes(event.current.kind)) acquiredStates.push(event.current.kind);
+      }
+      if (event.type === 'traversal-interaction-contact' && event.accepted) {
+        if (!acceptedInteractions.includes(event.interactionId)) {
+          acceptedInteractions.push(event.interactionId);
+        }
+      }
       if (event.type === 'bomb-exploded') {
         blastExplosions.push(event.bomb.label);
         if (event.blast.hit) blastHits.push(event.bomb.label);
@@ -83,6 +95,8 @@ export function runReplay(
     deathReason,
     blastExplosions,
     blastHits,
+    acceptedInteractions,
+    acquiredStates,
     landingCount,
     maximumAirCombo,
     highestPointY,

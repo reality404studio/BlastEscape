@@ -4,7 +4,7 @@ This file is the compact monitoring surface for Codex `/goal` work.
 
 ## Current phase
 
-**PHASE 4 — cold mechanic vertical slice**
+**PHASE 5 — bounded cold curriculum production**
 
 G0 contracts and the repository audit are complete. G1 extracted typed level
 data and the authoritative gameplay step without changing constants, coordinates,
@@ -12,11 +12,11 @@ or the clamped-frame/three-substep order. Browser play and headless replay now
 share movement, collision, hazards, bombs, blast, combo, death, and exit logic.
 G2 now provides intent-bearing level data, accepted replay/report formats, and
 reachability, exploit, deterministic noisy-human, and mechanic-use evaluators.
-G3A now provides one authoritative temporary state slot, typed factory sources,
-typed interaction contacts, lifecycle events, tests, and debug bounds without new
-inputs. G3B Cold is READY for the first mechanic vertical slice and Level 9
-introduction. G3D Magnetism and G8A blast replay coverage are also READY but are
-not the next dependency-critical work.
+G3B and G8B now ship `LEVEL 9 — COLD START`: an unavoidable coolant pickup cools
+one hot plate before a familiar blast exit. The same replay without coolant dies,
+while the accepted route passes all four evaluator families. G9A is READY for
+bounded Levels 10–14 production, beginning with water freezing in Level 10. G3C
+Heat, G3D Magnetism, and G8A blast replay coverage are also READY.
 
 ## Active / next goals
 
@@ -26,15 +26,16 @@ not the next dependency-critical work.
 | G1 Runtime / physics | DONE | G0 | authoritative core and characterization evidence complete |
 | G2 Level Lab / simulation | DONE | G1 | data-driven intent, replay, validators/evaluators complete |
 | G3A Traversal-state substrate | DONE | G1 | shared temporary-state model and interaction hooks complete |
-| G3B Cold | READY | G3A | first state mechanic and Level 9 introduction |
-| G3C Heat | PROPOSED | G3A + stable cold contract | heat interactions and Level 15 introduction |
+| G3B Cold | DONE | G3A | cold source/effect contract and Level 9 complete |
+| G3C Heat | READY | G3A + stable cold contract | heat interactions and Level 15 introduction |
 | G3D Magnetism | READY | G3A | timed attachment/release and Level 20 introduction |
 | G4 Art direction / protagonist | READY | G0 | pixel-art execution and identity candidates |
 | G5 Sprite pipeline | PROPOSED | G4 approval | SpriteGen integration and atlas/manifest pipeline |
 | G6 FX / game feel | READY | G0; preferably stable runtime events | mute-first feedback polish |
 | G7 Environmental story | READY | G0 | factory zones, signage, nonverbal narrative |
 | G8A Blast curriculum migration | READY | G2 | preserve/migrate L1–8 |
-| G8B/G9A Cold levels | PROPOSED | G2 + G3B | L9–14 |
+| G8B Cold introduction | DONE | G2 + G3B | Level 9 complete |
+| G9A Cold curriculum | READY | G2 + G3B | Levels 10–14 in bounded slices |
 | G9B Heat levels | PROPOSED | G2 + G3C | L15–19 |
 | G9C Magnet introduction | PROPOSED | G2 + G3D | L20 |
 | G10 Synthesis / ending levels | PROPOSED | G2 + G3B–D + narrative | L21–25 and dispatch ending |
@@ -86,6 +87,11 @@ Expected first mandatory human call: protagonist base identity approval before m
   contact events, and runtime debug visibility. 18 tests, Level 8 validation,
   lint, and build pass. Evidence:
   `docs/reports/G3A-TRAVERSAL-STATE-SUBSTRATE-001.md`.
+- G3B/G8B added `LEVEL 9 — COLD START`, timed cooled-surface state, hot-surface
+  hazard, cold/source/plate/player feedback, and a clean replay. Accepted route
+  clears at 4.35s; no-cold control dies; ±100ms timing noise clears 100/100.
+  21 tests, Levels 8–9 validation, lint, and build pass. Evidence:
+  `docs/reports/G3B-COLD-LEVEL-9-001.md`.
 
 ## Director update rule
 

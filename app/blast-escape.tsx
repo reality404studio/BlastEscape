@@ -52,6 +52,7 @@ const VISUAL = {
   hot: '#ff513e',
   amber: '#ffad37',
   mint: '#66f2d5',
+  cold: '#74d9ff',
   gold: '#ffc44f',
 } as const;
 
@@ -108,6 +109,7 @@ export default function BlastEscape() {
     let levelElapsed = initialGameplay.levelElapsed;
     let demoActive = false;
     let bombs = initialGameplay.bombs;
+    let interactionStates = initialGameplay.interactionStates;
     const player = initialGameplay.player;
 
     const horizontalVelocity = () => playerHorizontalVelocity(player);
@@ -184,6 +186,7 @@ export default function BlastEscape() {
       levelElapsed = freshGameplay.levelElapsed;
       demoActive = false;
       bombs = freshGameplay.bombs;
+      interactionStates = freshGameplay.interactionStates;
       particles = [];
       contactParticles = [];
       waves = [];
@@ -205,7 +208,7 @@ export default function BlastEscape() {
     };
     changeLevelRef.current = goToLevel;
     demoRef.current = () => {
-      activeLevelIndex = LEVELS.length - 1;
+      activeLevelIndex = LEVELS.findIndex((level) => level.id === 'level-8');
       setLevelIndex(activeLevelIndex);
       reset();
       demoActive = true;
@@ -300,7 +303,7 @@ export default function BlastEscape() {
         const keys = keysRef.current;
         const manualDirection = ((keys.has('d') || keys.has('arrowright') ? 1 : 0) -
           (keys.has('a') || keys.has('arrowleft') ? 1 : 0)) as Direction;
-        const gameplay = { levelElapsed, player, bombs, comboCount };
+        const gameplay = { levelElapsed, player, bombs, comboCount, interactionStates };
         const events = stepGameplay(
           gameplay,
           level,
@@ -312,6 +315,7 @@ export default function BlastEscape() {
         levelElapsed = gameplay.levelElapsed;
         bombs = gameplay.bombs;
         comboCount = gameplay.comboCount;
+        interactionStates = gameplay.interactionStates;
 
         for (const event of events) {
           if (event.type === 'moved') {
@@ -445,6 +449,23 @@ export default function BlastEscape() {
       ctx.fillStyle = 'rgba(255, 173, 55, 0.07)';
       for (let x = 238; x < 754; x += 96) ctx.fillRect(x, 116, 26, 2);
 
+      level.traversalStateSources?.forEach((source) => {
+        if (source.grants !== 'cold') return;
+        ctx.fillStyle = '#172a32';
+        ctx.fillRect(source.rect.x, source.rect.y, source.rect.w, source.rect.h);
+        ctx.strokeStyle = VISUAL.cold;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(source.rect.x, source.rect.y, source.rect.w, source.rect.h);
+        ctx.fillStyle = 'rgba(116, 217, 255, 0.28)';
+        for (let x = source.rect.x + 9; x < source.rect.x + source.rect.w; x += 18) {
+          ctx.fillRect(x, source.rect.y + 7, 5, source.rect.h - 14);
+        }
+        ctx.fillStyle = VISUAL.cold;
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('COOLANT', source.rect.x + source.rect.w / 2, source.rect.y - 7);
+      });
+
       if (debugEnabled) {
         const stateColors = {
           cold: '#74d9ff',
@@ -529,6 +550,24 @@ export default function BlastEscape() {
             ctx.fillRect(boltX, platform.y + 7, 2, 2);
           }
         }
+      });
+
+      level.hotSurfaces?.forEach((surface) => {
+        const cooled = interactionStates[surface.cooledByInteractionId]?.active ?? false;
+        ctx.fillStyle = cooled ? 'rgba(116, 217, 255, 0.72)' : 'rgba(255, 81, 62, 0.86)';
+        ctx.fillRect(surface.rect.x, surface.rect.y, surface.rect.w, surface.rect.h);
+        ctx.fillStyle = cooled ? '#d8f7ff' : '#ffb05a';
+        for (let x = surface.rect.x + 8; x < surface.rect.x + surface.rect.w; x += 22) {
+          ctx.fillRect(x, surface.rect.y + 2, 10, 2);
+        }
+        ctx.fillStyle = cooled ? VISUAL.cold : VISUAL.hot;
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          cooled ? 'PLATE COOLED' : 'OVERHEAT',
+          surface.rect.x + surface.rect.w / 2,
+          surface.rect.y - 7,
+        );
       });
 
       if (movingPlatform) {
@@ -776,6 +815,15 @@ export default function BlastEscape() {
       ctx.font = '700 6px ui-monospace, monospace';
       ctx.textAlign = 'center';
       ctx.fillText('U-07', 13, 31);
+      if (player.traversalState.kind === 'cold') {
+        ctx.strokeStyle = `rgba(116, 217, 255, ${0.55 + Math.sin(time / 120) * 0.18})`;
+        ctx.lineWidth = 2;
+        roundedRect(ctx, -3, -3, CONFIG.playerWidth + 6, CONFIG.playerHeight + 6, 7);
+        ctx.stroke();
+        ctx.fillStyle = VISUAL.cold;
+        ctx.fillRect(3, 2, 3, 3);
+        ctx.fillRect(20, 19, 2, 2);
+      }
       ctx.restore();
 
       if (activeLevelIndex === 3 && comboCount === 1 && !player.grounded) {

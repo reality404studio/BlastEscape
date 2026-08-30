@@ -52,6 +52,13 @@ export type TraversalInteraction = {
   rect: Rect;
   kind: TraversalInteractionKind;
   accepts: Array<Exclude<TraversalStateKind, 'neutral'>>;
+  activeSeconds?: number;
+};
+
+export type HotSurface = {
+  id: string;
+  rect: Rect;
+  cooledByInteractionId: string;
 };
 
 export type LevelIntent = {
@@ -76,6 +83,8 @@ export type LevelIntent = {
 
 export type LevelValidationContract = {
   requiredBlastHits?: string[];
+  requiredInteractions?: string[];
+  requiredStates?: Array<Exclude<TraversalStateKind, 'neutral'>>;
   minimumAirCombo?: number;
   simplePoliciesMustFail?: SimplePolicyId[];
   noisyHumanProfiles?: Array<{
@@ -103,6 +112,7 @@ export type LevelDefinition = {
   requiredCombo?: number;
   traversalStateSources?: TraversalStateSource[];
   traversalInteractions?: TraversalInteraction[];
+  hotSurfaces?: HotSurface[];
 };
 
 export type PlayerState = {

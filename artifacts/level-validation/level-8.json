@@ -78,6 +78,12 @@
           "B5"
         ],
         "missingBlastHits": [],
+        "requiredInteractions": [],
+        "actualInteractions": [],
+        "missingInteractions": [],
+        "requiredStates": [],
+        "actualStates": [],
+        "missingStates": [],
         "minimumAirCombo": 5,
         "actualMaximumAirCombo": 5
       }
@@ -105,6 +111,8 @@
       "B4",
       "B5"
     ],
+    "acceptedInteractions": [],
+    "acquiredStates": [],
     "landingCount": 0,
     "maximumAirCombo": 5,
     "highestPointY": 18,

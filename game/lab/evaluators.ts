@@ -140,21 +140,43 @@ export function evaluateMechanicUse(
   result: ReplayResult,
 ): EvaluationResult {
   const requiredHits = level.validation.requiredBlastHits ?? [];
+  const requiredInteractions = level.validation.requiredInteractions ?? [];
+  const requiredStates = level.validation.requiredStates ?? [];
   const requiredCombo = level.validation.minimumAirCombo ?? 0;
-  if (requiredHits.length === 0 && requiredCombo === 0) {
+  if (
+    requiredHits.length === 0 &&
+    requiredInteractions.length === 0 &&
+    requiredStates.length === 0 &&
+    requiredCombo === 0
+  ) {
     return {
       evaluator: 'mechanic',
       id: 'intended-mechanic-use',
       status: 'warn',
       summary: 'No machine-checkable mechanic-use contract is defined for this level.',
-      metrics: { requiredBlastHits: [], minimumAirCombo: 0 },
+      metrics: {
+        requiredBlastHits: [],
+        requiredInteractions: [],
+        requiredStates: [],
+        minimumAirCombo: 0,
+      },
     };
   }
 
   const actualHits = [...new Set(result.blastHits)];
+  const actualInteractions = [...new Set(result.acceptedInteractions)];
+  const actualStates = [...new Set(result.acquiredStates)];
   const missingHits = requiredHits.filter((label) => !actualHits.includes(label));
+  const missingInteractions = requiredInteractions.filter(
+    (id) => !actualInteractions.includes(id),
+  );
+  const missingStates = requiredStates.filter((state) => !actualStates.includes(state));
   const comboPassed = result.maximumAirCombo >= requiredCombo;
-  const passed = missingHits.length === 0 && comboPassed;
+  const passed =
+    missingHits.length === 0 &&
+    missingInteractions.length === 0 &&
+    missingStates.length === 0 &&
+    comboPassed;
   return {
     evaluator: 'mechanic',
     id: 'intended-mechanic-use',
@@ -166,6 +188,12 @@ export function evaluateMechanicUse(
       requiredBlastHits: requiredHits,
       actualBlastHits: actualHits,
       missingBlastHits: missingHits,
+      requiredInteractions,
+      actualInteractions,
+      missingInteractions,
+      requiredStates,
+      actualStates,
+      missingStates,
       minimumAirCombo: requiredCombo,
       actualMaximumAirCombo: result.maximumAirCombo,
     },

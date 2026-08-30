@@ -49,3 +49,12 @@ The current palette, key art, and canvas pass already establish a coherent
 graphite/violet factory with off-white protagonist, hot danger, mint powered
 machinery, and gold outbound accents. G4 should formalize and pixelize this
 direction, not restart it. Protagonist identity remains subject to HC-ART-001.
+
+## D-010 — Gameplay emits events; presentation owns nondeterminism
+
+The shared core owns movement, collision, hazards, bombs, blast response, combo,
+death, and exit decisions, then emits ordered gameplay events. Canvas/React code
+may turn those events into random particles, shake, flashes, and UI changes, but
+presentation state cannot feed back into `stepGameplay`. This makes browser play
+and headless replay share one authority without forcing visual effects into test
+state.

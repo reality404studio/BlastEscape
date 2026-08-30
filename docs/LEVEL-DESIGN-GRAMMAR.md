@@ -233,13 +233,13 @@ Measured behaviour of the shipped geometry:
 
 | property | value |
 | --- | --- |
-| clean route | clears at 5X, 4.20s |
+| clean route | clears at 5X; enters the exit at ~4.40–4.43s across measured frame schedules |
 | holding one direction throughout | fails (right falls, left never opens the exit) |
 | flipping any single steering decision | fails — all five inputs are load-bearing |
 | uniform reaction lag tolerance | clears up to +150ms |
 | practical clear rate, +-30ms per-switch jitter | ~70% |
 | practical clear rate, +-80ms per-switch jitter | ~40% |
-| frame rates 144Hz / 120Hz / 60Hz / 50Hz / 30Hz | clears on all |
+| frame rates 144Hz / 120Hz / 60Hz / 50Hz / 30Hz | clears on all through the shared authoritative core |
 
 Before implementation, write a short level intent using this template:
 

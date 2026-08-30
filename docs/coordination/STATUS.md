@@ -4,22 +4,22 @@ This file is the compact monitoring surface for Codex `/goal` work.
 
 ## Current phase
 
-**PHASE 1 — hand-feel characterization and shared-core extraction**
+**PHASE 2 — Level Lab and validation path**
 
-The orchestration contract is reconciled with the current feature branch and G0
-contracts are now explicit. The repository remains a compact eight-level
-prototype: gameplay, level data, rendering, effects, and debug/demo tooling live
-primarily in `app/blast-escape.tsx`. G1 is extracting testable authoritative
-logic incrementally without changing established constants, coordinates, or
-update order.
+G0 contracts and the repository audit are complete. G1 extracted typed level
+data and the authoritative gameplay step without changing constants, coordinates,
+or the clamped-frame/three-substep order. Browser play and headless replay now
+share movement, collision, hazards, bombs, blast, combo, death, and exit logic.
+G2 is READY to add intent-bearing level data, replay/report formats, and multiple
+evaluators before level production begins.
 
 ## Active / next goals
 
 | Goal | State | Depends on | Purpose |
 |---|---|---|---|
 | G0 Director / contracts | DONE | — | contracts and reality audit recorded |
-| G1 Runtime / physics | ACTIVE | G0 | characterize and extract reusable deterministic gameplay core |
-| G2 Level Lab / simulation | PROPOSED | G1 | data-driven levels, replay, validators/evaluators |
+| G1 Runtime / physics | DONE | G0 | authoritative core and characterization evidence complete |
+| G2 Level Lab / simulation | READY | G1 | data-driven intent, replay, validators/evaluators |
 | G3A Traversal-state substrate | PROPOSED | G1 | shared temporary-state model and interaction hooks |
 | G3B–D Cold / heat / magnetism | PROPOSED | G3A | implement bounded traversal states with tests |
 | G4 Art direction / protagonist | READY | G0 | pixel-art execution and identity candidates |
@@ -60,6 +60,10 @@ Expected first mandatory human call: protagonist base identity approval before m
   Runtime imports the extracted modules; 7 characterization tests, lint, build,
   exact level-data comparison, and local HTTP rendering pass. Evidence:
   `docs/reports/G1-CHARACTERIZATION-001.md`.
+- G1 slice 002 moved collision, hazards, bomb stepping, combo, death, and exit
+  checks into `stepGameplay`, shared by runtime and headless replay. Level 8
+  clears at 5X across 30/50/60/120/144Hz; 10 tests, lint, and build pass.
+  Evidence: `docs/reports/G1-AUTHORITATIVE-CORE-002.md`.
 
 ## Director update rule
 

@@ -23,7 +23,7 @@ This is the durable goal graph for Codex `/goal` sessions. The Director may revi
 
 ### G1 — Runtime / Physics
 
-**State:** ACTIVE
+**State:** DONE
 **Depends on:** G0.
 **Owns:** shared gameplay core, fixed-step/replay characteristics, movement/blast characterization tests.
 **Hard constraint:** do not change hand-feel merely to make architecture cleaner.
@@ -33,9 +33,12 @@ This is the durable goal graph for Codex `/goal` sessions. The Director may revi
 changing constants, coordinates, or update order; make the browser runtime consume
 them; add deterministic characterization tests and frame-schedule evidence.
 
+**Evidence:** `docs/reports/G1-CHARACTERIZATION-001.md` and
+`docs/reports/G1-AUTHORITATIVE-CORE-002.md`.
+
 ### G2 — Level Lab / Simulation
 
-**State:** PROPOSED
+**State:** READY
 **Depends on:** G1 sufficiently stable.
 **Owns:** data-driven level schema, editor/lab, replay/script inputs, reachability/exploit/noisy-human/mechanic evaluators where practical.
 **Done when:** a new level can be authored/tuned without editing the giant gameplay component and can emit validation evidence.

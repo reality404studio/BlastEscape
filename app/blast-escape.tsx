@@ -2,16 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CONFIG } from '@/game/config';
+import { createGameplayState, spikeTriangles, stepGameplay } from '@/game/core';
 import { LEVELS } from '@/game/levels';
-import {
-  evaluateBlast,
-  freshBombs,
-  integratePlayerVelocity,
-  movingPlatformAt,
-  playerHorizontalVelocity,
-} from '@/game/physics';
+import { movingPlatformAt, playerHorizontalVelocity } from '@/game/physics';
 import { directionAtTime, LEVEL_8_CLEAN_ROUTE } from '@/game/replays';
-import type { BombState as Bomb, Direction, PlayerState, Rect } from '@/game/types';
+import type { GameplayEvent } from '@/game/core';
+import type { Direction } from '@/game/types';
 
 type Particle = { x: number; y: number; vx: number; vy: number; life: number };
 type ContactParticle = {
@@ -71,45 +67,6 @@ function roundedRect(
   ctx.roundRect(x, y, w, h, radius);
 }
 
-function spikeTriangles(strip: Rect) {
-  const toothCount = Math.max(1, Math.round(strip.w / 24));
-  const toothWidth = strip.w / toothCount;
-  return Array.from({ length: toothCount }, (_, index) => {
-    const left = strip.x + toothWidth * index;
-    return [
-      { x: left, y: strip.y },
-      { x: left + toothWidth, y: strip.y },
-      { x: left + toothWidth / 2, y: strip.y + strip.h },
-    ];
-  });
-}
-
-function triangleOverlapsRect(triangle: Array<{ x: number; y: number }>, rect: Rect) {
-  const rectPoints = [
-    { x: rect.x, y: rect.y },
-    { x: rect.x + rect.w, y: rect.y },
-    { x: rect.x + rect.w, y: rect.y + rect.h },
-    { x: rect.x, y: rect.y + rect.h },
-  ];
-  const axes = [
-    { x: 1, y: 0 },
-    { x: 0, y: 1 },
-    ...triangle.map((point, index) => {
-      const next = triangle[(index + 1) % triangle.length];
-      return { x: -(next.y - point.y), y: next.x - point.x };
-    }),
-  ];
-
-  return axes.every((axis) => {
-    const triangleProjection = triangle.map((point) => point.x * axis.x + point.y * axis.y);
-    const rectProjection = rectPoints.map((point) => point.x * axis.x + point.y * axis.y);
-    return (
-      Math.max(...triangleProjection) >= Math.min(...rectProjection) &&
-      Math.max(...rectProjection) >= Math.min(...triangleProjection)
-    );
-  });
-}
-
 export default function BlastEscape() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const keysRef = useRef(new Set<string>());
@@ -143,30 +100,26 @@ export default function BlastEscape() {
     let launchVectors: LaunchVector[] = [];
     let trajectoryTraces: TrajectoryTrace[] = [];
     let activeTrace: TrajectoryTrace | undefined;
-    let comboCount = 0;
+    const initialGameplay = createGameplayState(LEVELS[0]);
+    let comboCount = initialGameplay.comboCount;
     let comboFlashCount = 0;
     let comboFlashLife = 0;
     let activeLevelIndex = 0;
-    let levelElapsed = 0;
+    let levelElapsed = initialGameplay.levelElapsed;
     let demoActive = false;
-    let bombs = freshBombs(LEVELS[activeLevelIndex]);
-    const player: PlayerState = {
-      x: LEVELS[activeLevelIndex].start.x,
-      y: LEVELS[activeLevelIndex].start.y,
-      controlVx: 0,
-      blastVx: 0,
-      vy: 0,
-      grounded: true,
-      onMovingPlatform: false,
-    };
+    let bombs = initialGameplay.bombs;
+    const player = initialGameplay.player;
 
     const horizontalVelocity = () => playerHorizontalVelocity(player);
     const playerCenter = (): TrajectoryPoint => ({
       x: player.x + CONFIG.playerWidth / 2,
       y: player.y + CONFIG.playerHeight / 2,
     });
-    const recordTracePoint = (trace: TrajectoryTrace, force = false) => {
-      const point = playerCenter();
+    const recordTracePoint = (
+      trace: TrajectoryTrace,
+      force = false,
+      point = playerCenter(),
+    ) => {
       const previous = trace.points.at(-1);
       if (force || !previous || Math.hypot(point.x - previous.x, point.y - previous.y) >= 2) {
         trace.points.push(point);
@@ -193,18 +146,22 @@ export default function BlastEscape() {
       ];
       activeTrace = trace;
     };
-    const sampleActiveTrace = (dt: number) => {
+    const sampleActiveTrace = (
+      dt: number,
+      point = playerCenter(),
+      grounded = player.grounded,
+    ) => {
       if (!activeTrace) return;
       activeTrace.elapsed += dt;
       activeTrace.sampleElapsed += dt;
-      if (player.grounded) {
-        recordTracePoint(activeTrace, true);
+      if (grounded) {
+        recordTracePoint(activeTrace, true, point);
         finishActiveTrace();
         return;
       }
       if (activeTrace.sampleElapsed >= TRAJECTORY_SAMPLE_INTERVAL) {
         activeTrace.sampleElapsed %= TRAJECTORY_SAMPLE_INTERVAL;
-        recordTracePoint(activeTrace);
+        recordTracePoint(activeTrace, false, point);
       }
       if (
         activeTrace.elapsed >= MAX_TRAJECTORY_DURATION ||
@@ -222,25 +179,18 @@ export default function BlastEscape() {
       } else {
         finishActiveTrace();
       }
-      Object.assign(player, {
-        x: level.start.x,
-        y: level.start.y,
-        controlVx: 0,
-        blastVx: 0,
-        vy: 0,
-        grounded: true,
-        onMovingPlatform: false,
-      });
-      levelElapsed = 0;
+      const freshGameplay = createGameplayState(level);
+      Object.assign(player, freshGameplay.player);
+      levelElapsed = freshGameplay.levelElapsed;
       demoActive = false;
-      bombs = freshBombs(level);
+      bombs = freshGameplay.bombs;
       particles = [];
       contactParticles = [];
       waves = [];
       blastFlashes = [];
       landingSquash = 0;
       launchVectors = [];
-      comboCount = 0;
+      comboCount = freshGameplay.comboCount;
       comboFlashCount = 0;
       comboFlashLife = 0;
       shake = 0;
@@ -278,107 +228,32 @@ export default function BlastEscape() {
     window.addEventListener('keyup', onKeyUp);
     window.addEventListener('blur', onBlur);
 
-    const playerRect = (): Rect => ({
-      x: player.x,
-      y: player.y,
-      w: CONFIG.playerWidth,
-      h: CONFIG.playerHeight,
-    });
-    const overlaps = (a: Rect, b: Rect) =>
-      a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
-    const touchesSpikes = (rect: Rect, spikes: Rect[] = []) =>
-      spikes.some((strip) =>
-        spikeTriangles(strip).some((triangle) => triangleOverlapsRect(triangle, rect)),
-      );
-
-    const movePlayer = (dt: number) => {
-      const level = LEVELS[activeLevelIndex];
-      const wasGrounded = player.grounded;
-      const movingBefore = level.movingPlatform
-        ? movingPlatformAt(level.movingPlatform, levelElapsed)
-        : undefined;
-      levelElapsed += dt;
-      const movingAfter = level.movingPlatform
-        ? movingPlatformAt(level.movingPlatform, levelElapsed)
-        : undefined;
-
-      if (player.grounded && player.onMovingPlatform && movingBefore && movingAfter) {
-        player.x += movingAfter.rect.x - movingBefore.rect.x;
+    const addLandingEffects = (
+      event: Extract<GameplayEvent, { type: 'landed' }>,
+    ) => {
+      landingSquash = Math.min(1, (event.impactVelocity - 250) / 430 + 0.32);
+      for (let index = 0; index < 4; index += 1) {
+        const direction = index < 2 ? -1 : 1;
+        contactParticles.push({
+          x: event.x + CONFIG.playerWidth / 2 + direction * (4 + Math.random() * 7),
+          y: event.footY - 2,
+          vx: direction * (32 + Math.random() * 64),
+          vy: -(24 + Math.random() * 66),
+          life: 0.18 + Math.random() * 0.12,
+          size: 2 + Math.random() * 2,
+          color: index === 0 || index === 3 ? '#d5c9b7' : '#8d8791',
+        });
       }
-
-      const collisionPlatforms = [
-        ...level.platforms.map((rect) => ({ rect, moving: false })),
-        ...(movingAfter ? [{ rect: movingAfter.rect, moving: true }] : []),
-      ];
-      const keys = keysRef.current;
-      const direction: Direction = demoActive
-        ? directionAtTime(LEVEL_8_CLEAN_ROUTE, levelElapsed)
-        : ((keys.has('d') || keys.has('arrowright') ? 1 : 0) -
-          (keys.has('a') || keys.has('arrowleft') ? 1 : 0)) as Direction;
-      Object.assign(player, integratePlayerVelocity(player, direction, dt));
-
-      const oldX = player.x;
-      const totalVx = horizontalVelocity();
-      player.x += totalVx * dt;
-      for (const platform of collisionPlatforms) {
-        if (!overlaps(playerRect(), platform.rect)) continue;
-        let collidedHorizontally = false;
-        if (totalVx > 0 && oldX + CONFIG.playerWidth <= platform.rect.x + 2) {
-          player.x = platform.rect.x - CONFIG.playerWidth;
-          collidedHorizontally = true;
-        } else if (totalVx < 0 && oldX >= platform.rect.x + platform.rect.w - 2) {
-          player.x = platform.rect.x + platform.rect.w;
-          collidedHorizontally = true;
-        }
-        if (collidedHorizontally) {
-          player.controlVx = 0;
-          player.blastVx = 0;
-          break;
-        }
-      }
-
-      const oldY = player.y;
-      player.y += player.vy * dt;
-      const impactVelocity = player.vy;
-      player.grounded = false;
-      player.onMovingPlatform = false;
-      for (const platform of collisionPlatforms) {
-        if (!overlaps(playerRect(), platform.rect)) continue;
-        if (player.vy >= 0 && oldY + CONFIG.playerHeight <= platform.rect.y + 4) {
-          player.y = platform.rect.y - CONFIG.playerHeight;
-          player.vy = 0;
-          player.grounded = true;
-          player.onMovingPlatform = platform.moving;
-        } else if (player.vy < 0 && oldY >= platform.rect.y + platform.rect.h - 4) {
-          player.y = platform.rect.y + platform.rect.h;
-          player.vy = 0;
-        }
-      }
-      if (!wasGrounded && player.grounded && impactVelocity > 250) {
-        landingSquash = Math.min(1, (impactVelocity - 250) / 430 + 0.32);
-        const footY = player.y + CONFIG.playerHeight;
-        for (let index = 0; index < 4; index += 1) {
-          const direction = index < 2 ? -1 : 1;
-          contactParticles.push({
-            x: player.x + CONFIG.playerWidth / 2 + direction * (4 + Math.random() * 7),
-            y: footY - 2,
-            vx: direction * (32 + Math.random() * 64),
-            vy: -(24 + Math.random() * 66),
-            life: 0.18 + Math.random() * 0.12,
-            size: 2 + Math.random() * 2,
-            color: index === 0 || index === 3 ? '#d5c9b7' : '#8d8791',
-          });
-        }
-      }
-      if (player.grounded) comboCount = 0;
-      sampleActiveTrace(dt);
     };
 
-    const explode = (bomb: Bomb) => {
+    const addBombEffects = (
+      event: Extract<GameplayEvent, { type: 'bomb-exploded' }>,
+    ) => {
+      const { bomb, blast } = event;
       waves.push({ x: bomb.x, y: bomb.y, radius: 8, life: 1 });
       blastFlashes.push({ x: bomb.x, y: bomb.y, life: 1 });
-      for (let i = 0; i < 18; i += 1) {
-        const angle = (Math.PI * 2 * i) / 18 + Math.random() * 0.25;
+      for (let index = 0; index < 18; index += 1) {
+        const angle = (Math.PI * 2 * index) / 18 + Math.random() * 0.25;
         const speed = 100 + Math.random() * 270;
         particles.push({
           x: bomb.x,
@@ -389,31 +264,24 @@ export default function BlastEscape() {
         });
       }
 
-      const blast = evaluateBlast(player, bomb);
       if (demoActive) {
         console.info('[LEVEL8_DEMO]', bomb.label, JSON.stringify({
           time: levelElapsed.toFixed(2),
           x: blast.centerX.toFixed(1),
           y: blast.centerY.toFixed(1),
           distance: blast.distance.toFixed(1),
-          controlVx: player.controlVx.toFixed(1),
-          blastVx: player.blastVx.toFixed(1),
-          vy: player.vy.toFixed(1),
-          comboCount,
+          controlVx: event.playerBefore.controlVx.toFixed(1),
+          blastVx: event.playerBefore.blastVx.toFixed(1),
+          vy: event.playerBefore.vy.toFixed(1),
+          comboCount: event.comboBefore,
         }));
       }
       if (!blast.hit) return;
 
-      const continuesAirChain = !player.grounded && comboCount > 0;
-      comboCount = continuesAirChain ? comboCount + 1 : 1;
-      if (continuesAirChain) {
-        comboFlashCount = comboCount;
+      if (event.continuesAirChain) {
+        comboFlashCount = event.comboCount;
         comboFlashLife = 1.5;
       }
-      player.blastVx += blast.impulseX;
-      player.vy += blast.impulseY;
-      player.grounded = false;
-      player.onMovingPlatform = false;
       shake = CONFIG.screenShake;
       launchVectors.push({
         x: blast.centerX,
@@ -429,35 +297,44 @@ export default function BlastEscape() {
     const update = (dt: number, time: number) => {
       if (escapedAt === 0) {
         const level = LEVELS[activeLevelIndex];
-        for (let i = 0; i < 3; i += 1) {
-          movePlayer(dt / 3);
-          if (touchesSpikes(playerRect(), level.spikes)) {
+        const keys = keysRef.current;
+        const manualDirection = ((keys.has('d') || keys.has('arrowright') ? 1 : 0) -
+          (keys.has('a') || keys.has('arrowleft') ? 1 : 0)) as Direction;
+        const gameplay = { levelElapsed, player, bombs, comboCount };
+        const events = stepGameplay(
+          gameplay,
+          level,
+          demoActive
+            ? (elapsed) => directionAtTime(LEVEL_8_CLEAN_ROUTE, elapsed)
+            : manualDirection,
+          dt,
+        );
+        levelElapsed = gameplay.levelElapsed;
+        bombs = gameplay.bombs;
+        comboCount = gameplay.comboCount;
+
+        for (const event of events) {
+          if (event.type === 'moved') {
+            sampleActiveTrace(event.dt, event.point, event.grounded);
+          } else if (event.type === 'landed') {
+            addLandingEffects(event);
+          } else if (event.type === 'bomb-exploded') {
+            addBombEffects(event);
+          } else if (event.type === 'cleared') {
+            escapedAt = time;
+            finishActiveTrace();
+            setStatus('escaped');
+            const clearedIndex = activeLevelIndex;
+            setClearedLevels((previous) =>
+              previous.includes(clearedIndex) ? previous : [...previous, clearedIndex],
+            );
+          } else if (event.type === 'died') {
+            if (demoActive && event.reason === 'fall') {
+              console.info('[LEVEL8_DEMO] fell', JSON.stringify({ time: levelElapsed.toFixed(2) }));
+            }
             reset(false);
             return;
           }
-        }
-        for (const bomb of bombs) {
-          bomb.timer -= dt;
-          if (bomb.timer <= 0) {
-            explode(bomb);
-            bomb.timer += CONFIG.bombRepeatInterval;
-          }
-        }
-        const exitUnlocked = !level.requiredCombo || comboCount >= level.requiredCombo;
-        if (exitUnlocked && overlaps(playerRect(), level.exit)) {
-          escapedAt = time;
-          finishActiveTrace();
-          setStatus('escaped');
-          const clearedIndex = activeLevelIndex;
-          setClearedLevels((previous) =>
-            previous.includes(clearedIndex) ? previous : [...previous, clearedIndex],
-          );
-        }
-        if (player.y > CONFIG.worldHeight + 80) {
-          if (demoActive) {
-            console.info('[LEVEL8_DEMO] fell', JSON.stringify({ time: levelElapsed.toFixed(2) }));
-          }
-          reset(false);
         }
       } else if (
         activeLevelIndex < LEVELS.length - 1 &&

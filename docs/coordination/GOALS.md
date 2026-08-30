@@ -83,7 +83,7 @@ the curriculum does not introduce two cold applications at once.
 
 ### G3C — Heat
 
-**State:** ACTIVE
+**State:** DONE
 **Depends on:** G3A; cold interaction contract sufficiently stable.
 **Owns:** heat acquisition, expiry, melt/thaw/reactivation interactions, and tests.
 **Done when:** Level 15 can teach heat with blast still present and heat/cold
@@ -92,6 +92,9 @@ opposition is deterministic and readable.
 **Current slice:** define and implement the smallest shared heat interaction path
 needed for a safe Level 15 introduction, preserving the one-slot traversal-state
 contract and authoring the level intent before geometry.
+
+**Evidence:** `docs/reports/G3C-HEAT-LEVEL-15-001.md` and
+`artifacts/level-validation/level-15.json`.
 
 ### G3D — Magnetism
 
@@ -172,11 +175,15 @@ direct-over-B1 mastery shortcut without new mechanics.
 
 ### G9B — Heat Curriculum
 
-**State:** PROPOSED
+**State:** ACTIVE
 **Depends on:** G2 + G3C.
 **Owns:** Levels 15–19.
 **Done when:** heat is introduced and recombined with blast/cold without a
 checklist-like sequence.
+
+**Current slice:** Level 15 is accepted. Level 16 is next and should use heat to
+reactivate one dormant charge or machine through a shared-engine rule, with its
+route intent authored before geometry and no one-off level controller.
 
 ### G9C — Magnet Introduction
 

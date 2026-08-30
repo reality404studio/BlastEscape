@@ -70,6 +70,12 @@ export type WaterHazard = {
   frozenByInteractionId: string;
 };
 
+export type MeltableBarrier = {
+  id: string;
+  rect: Rect;
+  meltedByInteractionId: string;
+};
+
 export type LevelIntent = {
   primaryRoute: string;
   launchJobs: Array<{ bomb: string; job: string }>;
@@ -123,6 +129,7 @@ export type LevelDefinition = {
   traversalInteractions?: TraversalInteraction[];
   hotSurfaces?: HotSurface[];
   waterHazards?: WaterHazard[];
+  meltableBarriers?: MeltableBarrier[];
 };
 
 export type PlayerState = {

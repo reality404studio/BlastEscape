@@ -330,6 +330,20 @@ New concept, if any: None; the finale synthesizes ice, machinery stabilization, 
 What previous skills are recombined: temporary ice, cold machinery lock, proximity strength, air steering, chained route planning.
 ```
 
+### Level 15 — THERMAL SEAL (accepted intent)
+
+```text
+LEVEL 15 — THERMAL SEAL
+Primary route: START -> furnace duct -> acquire heat -> melt the sealed partition -> cross the opened threshold -> B1 at the right wall -> steer left -> upper exit deck -> EXIT
+Launch job(s): B1 is a familiar right-wall launch into a broad upper exit deck after the heat lesson is complete.
+Landing window(s): The upper exit deck is wide; the new state and obstruction must remain the only unfamiliar decision.
+Timing window(s): The melted partition remains open long enough for a comfortable crossing. B1 retains a familiar prepared commit and broad reversal window.
+Recovery state: Safe before the partition; rejected contact leaves the player visibly stopped at the seal. After crossing, the right floor is stable before B1.
+Mastery shortcut: None. The heat-created opening must remain load-bearing in its introduction.
+New concept, if any: A temporary heat state melts one unmistakable solid factory partition out of authoritative collision.
+What previous skills are recombined: temporary-state acquisition, blast proximity, midair steering.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

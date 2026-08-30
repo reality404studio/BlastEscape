@@ -277,6 +277,11 @@ function movePlayer(
 
   const collisionPlatforms = [
     ...level.platforms.map((rect) => ({ rect, moving: false })),
+    ...(level.meltableBarriers ?? [])
+      .filter((barrier) =>
+        !state.interactionStates[barrier.meltedByInteractionId]?.active,
+      )
+      .map((barrier) => ({ rect: barrier.rect, moving: false })),
     ...(level.traversalInteractions ?? [])
       .filter((interaction) =>
         interaction.kind === 'freeze-water' &&

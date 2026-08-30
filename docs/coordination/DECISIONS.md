@@ -93,3 +93,12 @@ platform geometry at the dock with zero velocity; after expiry it returns to its
 unchanged time-based cycle. Core collision, rider movement, replay, and rendering
 all call that function. This adds a temporary machine state without creating a
 Level 11-only platform implementation or changing Level 6 behaviour.
+
+## D-015 — Heat melting removes linked barrier collision for a timed interval
+
+A `melt-barrier` interaction may control one or more explicit meltable barriers.
+While the interaction is active, the authoritative gameplay step omits those
+barriers from collision; expiry restores them before the next movement substep.
+Rendering observes the same interaction state. Neutral and cold contacts do not
+activate the melt, preserving the mutually exclusive traversal-state contract
+without adding a Level 15-only controller.

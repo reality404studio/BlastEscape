@@ -4,7 +4,7 @@ This file is the compact monitoring surface for Codex `/goal` work.
 
 ## Current phase
 
-**PHASE 6 — heat mechanic introduction**
+**PHASE 6 — bounded heat curriculum production**
 
 G0 contracts and the repository audit are complete. G1 extracted typed level
 data and the authoritative gameplay step without changing constants, coordinates,
@@ -16,8 +16,11 @@ G3B and G8B ship `LEVEL 9 — COLD START`. G9A now ships accepted Levels 10–14
 timed ice, carriage locking, an expiring first-cycle blast route, a cold-created
 recovery route, and `BLUE CIRCUIT`, which synthesizes both cold interactions with
 a machine-verified B1 proximity shortcut. The bounded cold curriculum is DONE.
-G3C Heat is now ACTIVE for the smallest shared heat interaction and Level 15
-introduction. G3D Magnetism and G8A blast replay coverage remain READY.
+G3C now ships `LEVEL 15 — THERMAL SEAL`: heat acquisition removes one linked
+solid partition from authoritative collision for a timed interval, while neutral
+and cold contacts remain blocked. G3C is DONE and G9B is ACTIVE for Level 16's
+shared dormant-charge or machinery reactivation path. G3D Magnetism and G8A
+blast replay coverage remain READY.
 
 ## Active / next goals
 
@@ -28,7 +31,7 @@ introduction. G3D Magnetism and G8A blast replay coverage remain READY.
 | G2 Level Lab / simulation | DONE | G1 | data-driven intent, replay, validators/evaluators complete |
 | G3A Traversal-state substrate | DONE | G1 | shared temporary-state model and interaction hooks complete |
 | G3B Cold | DONE | G3A | cold source/effect contract and Level 9 complete |
-| G3C Heat | ACTIVE | G3A + stable cold contract | heat interactions and Level 15 introduction |
+| G3C Heat | DONE | G3A + stable cold contract | heat acquisition, timed barrier melting, and Level 15 accepted |
 | G3D Magnetism | READY | G3A | timed attachment/release and Level 20 introduction |
 | G4 Art direction / protagonist | READY | G0 | pixel-art execution and identity candidates |
 | G5 Sprite pipeline | PROPOSED | G4 approval | SpriteGen integration and atlas/manifest pipeline |
@@ -37,7 +40,7 @@ introduction. G3D Magnetism and G8A blast replay coverage remain READY.
 | G8A Blast curriculum migration | READY | G2 | preserve/migrate L1–8 |
 | G8B Cold introduction | DONE | G2 + G3B | Level 9 complete |
 | G9A Cold curriculum | DONE | G2 + G3B | Levels 10–14 accepted with route/dependency evidence |
-| G9B Heat levels | PROPOSED | G2 + G3C | L15–19 |
+| G9B Heat levels | ACTIVE | G2 + G3C | Level 15 accepted; Level 16 shared reactivation next |
 | G9C Magnet introduction | PROPOSED | G2 + G3D | L20 |
 | G10 Synthesis / ending levels | PROPOSED | G2 + G3B–D + narrative | L21–25 and dispatch ending |
 | G11 Final QA / release | PROPOSED | G4–G10 | full playthrough, save/pause/restart/build/perf |
@@ -121,6 +124,12 @@ Expected first mandatory human call: protagonist base identity approval before m
   ±80ms primary-route timing noise clears 100/100. 45 tests, Levels 8–14
   validation, lint, build, and local HTTP 200 pass. Evidence:
   `docs/reports/G9A-COLD-LEVEL-14-001.md`.
+- G3C Level 15 adds a heat source and data-linked meltable barrier to the shared
+  core. The accepted route clears at 4.350s using heat, the seal interaction, and
+  B1; neutral and cold states remain blocked; melt expiry restores collision
+  before movement; ±100ms timing noise clears 100/100. 50 tests, Levels 8–15
+  validation, lint, build, and local HTTP 200 pass. Evidence:
+  `docs/reports/G3C-HEAT-LEVEL-15-001.md`.
 
 ## Director update rule
 

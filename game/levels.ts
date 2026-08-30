@@ -758,4 +758,71 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-15',
+    name: 'LEVEL 15',
+    subtitle: 'THERMAL SEAL',
+    hint: 'Pass through the furnace duct. Carry the red state into the sealed partition, then use the charge.',
+    intent: {
+      primaryRoute: 'START -> furnace duct -> acquire heat -> melt sealed partition -> cross opened threshold -> B1 at right wall -> steer left -> upper exit deck -> EXIT',
+      launchJobs: [
+        { bomb: 'B1', job: 'Use the familiar right-wall launch, then steer left into the broad upper exit deck.' },
+      ],
+      landingWindows: [
+        { target: 'upper exit deck', kind: 'wide', description: 'Heat is the new lesson; the returning blast landing stays intentionally broad.' },
+      ],
+      timingWindows: [
+        { target: 'melted partition', kind: 'open', description: 'The seal remains open long enough for a comfortable, readable crossing.' },
+        { target: 'B1 launch', kind: 'commit', description: 'Reach the right wall for the prepared blast, then steer left above the deck.' },
+      ],
+      recovery: { kind: 'safe', description: 'Rejected contact visibly stops at the seal; after crossing, the right floor is stable before B1.' },
+      masteryShortcut: null,
+      newConcept: 'A temporary heat state melts one unmistakable solid factory partition out of authoritative collision.',
+      recombinedSkills: ['temporary-state acquisition', 'blast proximity', 'midair steering'],
+      targetFirstClearSeconds: { min: 55, max: 140 },
+    },
+    validation: {
+      requiredBlastHits: ['B1'],
+      requiredInteractions: ['thermal-seal-melt'],
+      requiredStates: ['heat'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 100, samples: 100, minimumClearRate: 0.8 },
+      ],
+    },
+    start: { x: 82, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 942, h: 50 },
+      { x: 620, y: 350, w: 250, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [{ x: 900, y: 532, delay: -1.5, label: 'B1' }],
+    exit: { x: 700, y: 286, w: 64, h: 64 },
+    traversalStateSources: [
+      {
+        id: 'furnace-duct',
+        rect: { x: 150, y: 500, w: 92, h: 50 },
+        grants: 'heat',
+        durationSeconds: 7,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'thermal-seal-melt',
+        rect: { x: 332, y: 300, w: 58, h: 254 },
+        kind: 'melt-barrier',
+        accepts: ['heat'],
+        activeSeconds: 7,
+      },
+    ],
+    meltableBarriers: [
+      {
+        id: 'thermal-seal',
+        rect: { x: 360, y: 300, w: 30, h: 250 },
+        meltedByInteractionId: 'thermal-seal-melt',
+      },
+    ],
+  },
 ];

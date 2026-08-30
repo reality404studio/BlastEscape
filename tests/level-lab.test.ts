@@ -7,7 +7,7 @@ import { LEVELS } from '../game/levels.ts';
 import { LEVEL_8_CLEAN_REPLAY } from '../game/replays.ts';
 
 test('every authored level carries route intent and bounded pacing metadata', () => {
-  assert.equal(LEVELS.length, 14);
+  assert.equal(LEVELS.length, 15);
   assert.equal(new Set(LEVELS.map((level) => level.id)).size, LEVELS.length);
   for (const level of LEVELS) {
     assert.ok(level.intent.primaryRoute.length > 0, `${level.id} needs a primary route`);

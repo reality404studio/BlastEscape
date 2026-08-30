@@ -458,20 +458,28 @@ export default function BlastEscape() {
       for (let x = 238; x < 754; x += 96) ctx.fillRect(x, 116, 26, 2);
 
       level.traversalStateSources?.forEach((source) => {
-        if (source.grants !== 'cold') return;
-        ctx.fillStyle = '#172a32';
+        if (source.grants !== 'cold' && source.grants !== 'heat') return;
+        const isCold = source.grants === 'cold';
+        const sourceColor = isCold ? VISUAL.cold : VISUAL.hot;
+        ctx.fillStyle = isCold ? '#172a32' : '#321b18';
         ctx.fillRect(source.rect.x, source.rect.y, source.rect.w, source.rect.h);
-        ctx.strokeStyle = VISUAL.cold;
+        ctx.strokeStyle = sourceColor;
         ctx.lineWidth = 2;
         ctx.strokeRect(source.rect.x, source.rect.y, source.rect.w, source.rect.h);
-        ctx.fillStyle = 'rgba(116, 217, 255, 0.28)';
+        ctx.fillStyle = isCold
+          ? 'rgba(116, 217, 255, 0.28)'
+          : 'rgba(255, 81, 62, 0.32)';
         for (let x = source.rect.x + 9; x < source.rect.x + source.rect.w; x += 18) {
           ctx.fillRect(x, source.rect.y + 7, 5, source.rect.h - 14);
         }
-        ctx.fillStyle = VISUAL.cold;
+        ctx.fillStyle = sourceColor;
         ctx.font = '700 8px ui-monospace, monospace';
         ctx.textAlign = 'center';
-        ctx.fillText('COOLANT', source.rect.x + source.rect.w / 2, source.rect.y - 7);
+        ctx.fillText(
+          isCold ? 'COOLANT' : 'FURNACE',
+          source.rect.x + source.rect.w / 2,
+          source.rect.y - 7,
+        );
       });
 
       if (debugEnabled) {
@@ -611,6 +619,34 @@ export default function BlastEscape() {
             ctx.fillRect(boltX, platform.y + 7, 2, 2);
           }
         }
+      });
+
+      level.meltableBarriers?.forEach((barrier) => {
+        const melted = interactionStates[barrier.meltedByInteractionId]?.active ?? false;
+        if (melted) {
+          ctx.fillStyle = 'rgba(255, 81, 62, 0.34)';
+          ctx.fillRect(barrier.rect.x - 8, barrier.rect.y + barrier.rect.h - 5, barrier.rect.w + 16, 5);
+          ctx.fillStyle = VISUAL.amber;
+          ctx.font = '700 8px ui-monospace, monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText('SEAL OPEN', barrier.rect.x + barrier.rect.w / 2, barrier.rect.y - 7);
+          return;
+        }
+        ctx.fillStyle = '#33282d';
+        ctx.fillRect(barrier.rect.x, barrier.rect.y, barrier.rect.w, barrier.rect.h);
+        ctx.fillStyle = '#564048';
+        for (let y = barrier.rect.y + 12; y < barrier.rect.y + barrier.rect.h; y += 28) {
+          ctx.fillRect(barrier.rect.x + 3, y, barrier.rect.w - 6, 3);
+        }
+        ctx.fillStyle = VISUAL.hot;
+        ctx.fillRect(barrier.rect.x, barrier.rect.y + barrier.rect.h / 2 - 3, barrier.rect.w, 6);
+        ctx.strokeStyle = '#ffb05a';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(barrier.rect.x, barrier.rect.y, barrier.rect.w, barrier.rect.h);
+        ctx.fillStyle = VISUAL.hot;
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('THERMAL SEAL', barrier.rect.x + barrier.rect.w / 2, barrier.rect.y - 7);
       });
 
       level.hotSurfaces?.forEach((surface) => {
@@ -893,6 +929,15 @@ export default function BlastEscape() {
         ctx.fillStyle = VISUAL.cold;
         ctx.fillRect(3, 2, 3, 3);
         ctx.fillRect(20, 19, 2, 2);
+      }
+      if (player.traversalState.kind === 'heat') {
+        ctx.strokeStyle = `rgba(255, 81, 62, ${0.58 + Math.sin(time / 95) * 0.2})`;
+        ctx.lineWidth = 2;
+        roundedRect(ctx, -3, -3, CONFIG.playerWidth + 6, CONFIG.playerHeight + 6, 7);
+        ctx.stroke();
+        ctx.fillStyle = '#ffb05a';
+        ctx.fillRect(3, 19, 3, 3);
+        ctx.fillRect(20, 2, 2, 2);
       }
       ctx.restore();
 

@@ -66,6 +66,11 @@ export const LEVEL_14_MASTERY_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: 1 },
 ];
 
+export const LEVEL_15_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 3.6, direction: 1 },
+  { until: Number.POSITIVE_INFINITY, direction: -1 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -147,6 +152,15 @@ export const LEVEL_14_MASTERY_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_14_MASTERY_ROUTE,
 };
 
+export const LEVEL_15_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-15-thermal-seal-clean-route',
+  levelId: 'level-15',
+  description: 'Acquire heat, melt and cross the partition, reach the right wall for B1, then steer left into the exit.',
+  frameRate: 60,
+  maxDurationSeconds: 7,
+  keyframes: LEVEL_15_CLEAN_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
@@ -155,6 +169,7 @@ export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_12_CLEAN_REPLAY,
   LEVEL_13_CLEAN_REPLAY,
   LEVEL_14_CLEAN_REPLAY,
+  LEVEL_15_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

@@ -1370,4 +1370,103 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-23',
+    name: 'LEVEL 23',
+    subtitle: 'QUENCH DROP',
+    hint: 'Ride to receiving. Drop through blue, freeze the catch, then take B2 left to inspection.',
+    intent: {
+      primaryRoute: 'START -> magnetic state -> B1 -> moving carrier -> receiving-end release -> coolant curtain replaces magnetic with cold -> freeze quench basin -> land on temporary ice -> B2 -> steer left -> inspection exit',
+      launchJobs: [
+        { bomb: 'B1', job: 'Lift the magnetized player into the moving carrier at its left dock.' },
+        { bomb: 'B2', job: 'Relaunch from the cold-created basin landing toward the upper-left inspection deck.' },
+      ],
+      landingWindows: [
+        { target: 'coolant curtain and quench basin', kind: 'wide', description: 'The carrier endpoint releases through a broad coolant curtain directly above the linked basin.' },
+        { target: 'upper inspection line', kind: 'wide', description: 'B2 needs a familiar leftward steer, but the inspection line accepts carrier-position variation.' },
+      ],
+      timingWindows: [
+        { target: 'carrier interception', kind: 'intercept', description: 'Prepared B1 meets the same readable left-dock carrier cycle established in Level 21.' },
+        { target: 'temporary quench ice and B2', kind: 'expiring', description: 'The basin remains frozen through B2 preparation but thaws if the player waits instead of taking the launch.' },
+      ],
+      recovery: { kind: 'fatal', description: 'The start floor is safe; after carrier release, missing coolant or freeze contact enters the exposed quench water.' },
+      masteryShortcut: null,
+      newConcept: 'None; airborne magnetic-to-cold replacement prepares a landing that becomes the second launch site.',
+      recombinedSkills: ['magnetic carrier interception', 'automatic endpoint release', 'airborne state replacement', 'timed water freezing', 'prepared B2 launch', 'leftward landing control'],
+      targetFirstClearSeconds: { min: 150, max: 300 },
+    },
+    validation: {
+      requiredBlastHits: ['B1', 'B2'],
+      requiredInteractions: ['quench-carrier', 'quench-basin-freeze'],
+      requiredStates: ['magnetic', 'cold'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 100, samples: 100, minimumClearRate: 0.8 },
+      ],
+    },
+    start: { x: 72, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 320, h: 50 },
+      { x: 286, y: 508, w: 14, h: 42 },
+      { x: 300, y: 90, w: 550, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [
+      { x: 273, y: 532, delay: -1.8, label: 'B1' },
+      { x: 775, y: 402, delay: 4.3, label: 'B2', floating: true },
+    ],
+    exit: { x: 300, y: 90, w: 550, h: 64 },
+    pit: { x: 320, y: 420, w: 622, h: 180 },
+    traversalStateSources: [
+      {
+        id: 'quench-induction-coil',
+        rect: { x: 80, y: 500, w: 82, h: 50 },
+        grants: 'magnetic',
+        durationSeconds: 10,
+      },
+      {
+        id: 'quench-coolant-curtain',
+        rect: { x: 690, y: 215, w: 175, h: 185 },
+        grants: 'cold',
+        durationSeconds: 4,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'quench-carrier',
+        rect: { x: 210, y: 130, w: 610, h: 120 },
+        kind: 'magnetic-attach',
+        accepts: ['magnetic'],
+        activeSeconds: 5,
+        movingResult: {
+          fromX: 230,
+          toX: 600,
+          y: 155,
+          w: 200,
+          h: 16,
+          speed: 85,
+          phase: 5.2558823529,
+        },
+        movingCapturePadding: { horizontal: 20, above: 10, below: 85 },
+        releaseAtMovingEnd: 'to',
+      },
+      {
+        id: 'quench-basin-freeze',
+        rect: { x: 660, y: 340, w: 220, h: 90 },
+        kind: 'freeze-water',
+        accepts: ['cold'],
+        activeSeconds: 3,
+        resultRect: { x: 640, y: 420, w: 240, h: 18 },
+      },
+    ],
+    waterHazards: [
+      {
+        id: 'quench-basin',
+        rect: { x: 640, y: 420, w: 240, h: 180 },
+        frozenByInteractionId: 'quench-basin-freeze',
+      },
+    ],
+  },
 ];

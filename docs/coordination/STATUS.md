@@ -30,9 +30,10 @@ back to gravity. G3D and G9C are DONE. G10 now ships `LEVEL 21 — SHIFT CARRIER
 where the same bounded attachment inherits one authoritative moving rail and
 releases at its receiving endpoint. Level 22 now ships as `POLARITY HANDOFF`:
 heat wakes B1, its arc replaces heat with magnetism in an airborne coil, and a
-rightward rail crossing finishes the route.
-G10 remains ACTIVE for Level 23, followed by bounded escalation and the canonical
-dispatch ending.
+rightward rail crossing finishes the route. Level 23 now ships as `QUENCH DROP`:
+a carrier release replaces
+magnetism with cold during descent, freezes the landing basin, and sets up B2's
+return to inspection. G10 remains ACTIVE for Level 24.
 G8A blast replay coverage remains READY.
 
 ## Active / next goals
@@ -55,7 +56,7 @@ G8A blast replay coverage remains READY.
 | G9A Cold curriculum | DONE | G2 + G3B | Levels 10–14 accepted with route/dependency evidence |
 | G9B Heat levels | DONE | G2 + G3C | Levels 15–19 accepted with selective route hierarchy |
 | G9C Magnet introduction | DONE | G2 + G3D | Level 20 accepted |
-| G10 Synthesis / ending levels | ACTIVE | G2 + G3B–D + narrative | Levels 21–22 accepted; L23–25 and dispatch ending next |
+| G10 Synthesis / ending levels | ACTIVE | G2 + G3B–D + narrative | Levels 21–23 accepted; L24–25 and dispatch ending next |
 | G11 Final QA / release | PROPOSED | G4–G10 | full playthrough, save/pause/restart/build/perf |
 
 ## Open blockers
@@ -188,6 +189,13 @@ Expected first mandatory human call: protagonist base identity approval before m
   rail returns to the safe launch floor without clearing. All constant-direction
   policies fail and ±80ms noise clears 100/100. 92 tests and Levels 8–22
   validation pass. Evidence: `docs/reports/G10-SYNTHESIS-LEVEL-22-001.md`.
+- G10 Level 23 changes the synthesis shape: the moving carrier releases through
+  coolant, cold freezes the receiving basin before contact, and the temporary
+  landing feeds B2 back to the upper inspection line. The route clears at 9.433s;
+  removing coolant or freeze contact dies in water, while removing B2 prevents
+  the final climb. 18 carrier/B2 timing pairs, 30–144Hz, and ±100ms noise pass.
+  98 tests and Levels 8–23 validation pass. Evidence:
+  `docs/reports/G10-SYNTHESIS-LEVEL-23-001.md`.
 
 ## Director update rule
 

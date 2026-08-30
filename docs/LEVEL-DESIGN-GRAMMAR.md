@@ -442,6 +442,20 @@ New concept, if any: None; the level synthesizes existing dormant-charge ignitio
 What previous skills are recombined: heat acquisition, dormant charge reactivation, prepared blast timing, airborne reversal, state replacement, magnetic rail traversal.
 ```
 
+### Level 23 — QUENCH DROP (accepted intent)
+
+```text
+LEVEL 23 — QUENCH DROP
+Primary route: START -> induction coil -> magnetic B1 interception -> moving carrier -> position over receiving end -> automatic release -> fall through coolant curtain -> cold replaces magnetism -> freeze the quench basin before contact -> land on temporary ice beside B2 -> B2 -> steer left to upper inspection exit -> EXIT
+Launch job(s): B1 reaches the moving carrier; B2 converts the deliberately frozen landing into the final climb toward inspection.
+Landing window(s): The carrier release overlaps a broad vertical coolant curtain and basin. The upper inspection line is wide and approached by familiar leftward steering; sequence matters more than precision.
+Timing window(s): Carrier positioning remains generous. Basin ice lasts through the prepared B2 fuse but not indefinitely; B2 is scheduled after the expected quench landing.
+Recovery state: Fatal but readable after release. Missing coolant or the freeze contact enters visible water; the start floor remains safe before B1.
+Mastery shortcut: None. Magnetic transport, cold landing preparation, and B2 must remain load-bearing.
+New concept, if any: None; the level changes the order of established verbs so a mid-fall state replacement prepares a landing rather than opening the launch route.
+What previous skills are recombined: magnetic moving-carrier interception, automatic endpoint release, airborne state replacement, timed water freezing, prepared secondary blast, leftward landing control.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

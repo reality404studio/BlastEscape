@@ -123,6 +123,12 @@ export const LEVEL_22_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: 1 },
 ];
 
+export const LEVEL_23_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 3.64, direction: 1 },
+  { until: 9.2, direction: 0 },
+  { until: Number.POSITIVE_INFINITY, direction: -1 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -294,6 +300,15 @@ export const LEVEL_22_CLEAN_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_22_CLEAN_ROUTE,
 };
 
+export const LEVEL_23_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-23-quench-drop-clean-route',
+  levelId: 'level-23',
+  description: 'Ride the moving carrier, replace magnetism with cold during release, freeze the basin, then take B2 left to inspection.',
+  frameRate: 60,
+  maxDurationSeconds: 13,
+  keyframes: LEVEL_23_CLEAN_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
@@ -310,6 +325,7 @@ export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_20_CLEAN_REPLAY,
   LEVEL_21_CLEAN_REPLAY,
   LEVEL_22_CLEAN_REPLAY,
+  LEVEL_23_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

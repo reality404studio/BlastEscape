@@ -4,7 +4,7 @@ This file is the compact monitoring surface for Codex `/goal` work.
 
 ## Current phase
 
-**PHASE 3 — traversal-state substrate**
+**PHASE 4 — cold mechanic vertical slice**
 
 G0 contracts and the repository audit are complete. G1 extracted typed level
 data and the authoritative gameplay step without changing constants, coordinates,
@@ -12,10 +12,11 @@ or the clamped-frame/three-substep order. Browser play and headless replay now
 share movement, collision, hazards, bombs, blast, combo, death, and exit logic.
 G2 now provides intent-bearing level data, accepted replay/report formats, and
 reachability, exploit, deterministic noisy-human, and mechanic-use evaluators.
-G3A is READY to establish the shared temporary-state and interaction substrate
-before cold, heat, or magnet-dependent levels begin. G8A is also READY for
-existing blast-curriculum replay coverage, but it does not block the mechanic
-substrate.
+G3A now provides one authoritative temporary state slot, typed factory sources,
+typed interaction contacts, lifecycle events, tests, and debug bounds without new
+inputs. G3B Cold is READY for the first mechanic vertical slice and Level 9
+introduction. G3D Magnetism and G8A blast replay coverage are also READY but are
+not the next dependency-critical work.
 
 ## Active / next goals
 
@@ -24,8 +25,10 @@ substrate.
 | G0 Director / contracts | DONE | — | contracts and reality audit recorded |
 | G1 Runtime / physics | DONE | G0 | authoritative core and characterization evidence complete |
 | G2 Level Lab / simulation | DONE | G1 | data-driven intent, replay, validators/evaluators complete |
-| G3A Traversal-state substrate | READY | G1 | shared temporary-state model and interaction hooks |
-| G3B–D Cold / heat / magnetism | PROPOSED | G3A | implement bounded traversal states with tests |
+| G3A Traversal-state substrate | DONE | G1 | shared temporary-state model and interaction hooks complete |
+| G3B Cold | READY | G3A | first state mechanic and Level 9 introduction |
+| G3C Heat | PROPOSED | G3A + stable cold contract | heat interactions and Level 15 introduction |
+| G3D Magnetism | READY | G3A | timed attachment/release and Level 20 introduction |
 | G4 Art direction / protagonist | READY | G0 | pixel-art execution and identity candidates |
 | G5 Sprite pipeline | PROPOSED | G4 approval | SpriteGen integration and atlas/manifest pipeline |
 | G6 FX / game feel | READY | G0; preferably stable runtime events | mute-first feedback polish |
@@ -78,6 +81,11 @@ Expected first mandatory human call: protagonist base identity approval before m
   paths. Level 8 passes all evaluator contracts; 14 tests, lint, and build pass.
   Evidence: `docs/reports/G2-LEVEL-LAB-001.md` and
   `artifacts/level-validation/level-8.json`.
+- G3A added a mutually exclusive neutral/cold/heat/magnetic state slot, typed
+  factory sources/interactions, authoritative acquisition/replacement/expiry,
+  contact events, and runtime debug visibility. 18 tests, Level 8 validation,
+  lint, and build pass. Evidence:
+  `docs/reports/G3A-TRAVERSAL-STATE-SUBSTRATE-001.md`.
 
 ## Director update rule
 

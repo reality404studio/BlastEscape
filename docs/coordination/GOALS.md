@@ -52,16 +52,22 @@ reports using Level 8 as the first complete reference fixture.
 
 ### G3A — Traversal-State Substrate
 
-**State:** READY
+**State:** DONE
 **Depends on:** G1.
 **Owns:** temporary-state lifetime/transition model, interaction hooks, tests,
 debug visualization, and shared visual event boundaries.
 **Done when:** cold, heat, and magnetism can be implemented as data/state
 interactions without adding new player inputs or forking the core.
 
+**Current slice:** add one mutually exclusive temporary state slot, typed factory
+sources and interaction contacts, authoritative acquisition/refresh/expiry events,
+and runtime debug visibility without changing existing level behavior.
+
+**Evidence:** `docs/reports/G3A-TRAVERSAL-STATE-SUBSTRATE-001.md`.
+
 ### G3B — Cold
 
-**State:** PROPOSED
+**State:** READY
 **Depends on:** G3A.
 **Owns:** cold acquisition, expiry, readable effects on water/steam/machinery/hot
 surfaces, and tests.
@@ -78,7 +84,7 @@ opposition is deterministic and readable.
 
 ### G3D — Magnetism
 
-**State:** PROPOSED
+**State:** READY
 **Depends on:** G3A.
 **Owns:** timed attachment/release/discharge on suitable metal infrastructure and
 tests.

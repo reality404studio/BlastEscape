@@ -58,3 +58,12 @@ may turn those events into random particles, shake, flashes, and UI changes, but
 presentation state cannot feed back into `stepGameplay`. This makes browser play
 and headless replay share one authority without forcing visual effects into test
 state.
+
+## D-011 — One mutually exclusive temporary traversal state
+
+Cold, heat, and magnetism share one player state slot with authoritative lifetime,
+source, replacement, and expiry semantics. Touching factory equipment acquires or
+refreshes state; touching a different source replaces it. This preserves the
+small input vocabulary, prevents combinatorial simultaneous-state rules, and
+gives all later mechanics one observable event/debug contract. World effects
+remain owned by their mechanic goals rather than presentation code.

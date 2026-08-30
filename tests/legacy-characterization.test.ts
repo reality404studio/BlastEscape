@@ -21,6 +21,7 @@ const basePlayer = (overrides: Partial<PlayerState> = {}): PlayerState => ({
   vy: 0,
   grounded: true,
   onMovingPlatform: false,
+  traversalState: { kind: 'neutral', remainingSeconds: 0, sourceId: null },
   ...overrides,
 });
 

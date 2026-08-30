@@ -7,11 +7,13 @@ import {
 } from './physics.ts';
 import type { BlastEvaluation } from './physics.ts';
 import type {
+  ActiveTraversalState,
   BombState,
   Direction,
   LevelDefinition,
   PlayerState,
   Rect,
+  TraversalStateKind,
 } from './types.ts';
 
 export type GameplayState = {
@@ -41,7 +43,20 @@ export type GameplayEvent =
       comboCount: number;
     }
   | { type: 'died'; reason: 'spikes' | 'fall' }
-  | { type: 'cleared' };
+  | { type: 'cleared' }
+  | {
+      type: 'traversal-state-changed';
+      previous: ActiveTraversalState;
+      current: ActiveTraversalState;
+      reason: 'acquired' | 'replaced' | 'expired';
+    }
+  | {
+      type: 'traversal-interaction-contact';
+      interactionId: string;
+      interactionKind: string;
+      stateKind: TraversalStateKind;
+      accepted: boolean;
+    };
 
 export function createGameplayState(level: LevelDefinition): GameplayState {
   return {
@@ -54,6 +69,7 @@ export function createGameplayState(level: LevelDefinition): GameplayState {
       vy: 0,
       grounded: true,
       onMovingPlatform: false,
+      traversalState: { kind: 'neutral', remainingSeconds: 0, sourceId: null },
     },
     bombs: freshBombs(level),
     comboCount: 0,
@@ -118,6 +134,66 @@ const playerCenter = (player: PlayerState) => ({
   x: player.x + CONFIG.playerWidth / 2,
   y: player.y + CONFIG.playerHeight / 2,
 });
+
+const copyTraversalState = (state: ActiveTraversalState): ActiveTraversalState => ({ ...state });
+
+function advanceTraversalState(state: GameplayState, dt: number): GameplayEvent[] {
+  const active = state.player.traversalState;
+  if (active.kind === 'neutral') return [];
+
+  active.remainingSeconds = Math.max(0, active.remainingSeconds - dt);
+  if (active.remainingSeconds > 0) return [];
+
+  const previous = copyTraversalState(active);
+  state.player.traversalState = { kind: 'neutral', remainingSeconds: 0, sourceId: null };
+  return [{
+    type: 'traversal-state-changed',
+    previous,
+    current: copyTraversalState(state.player.traversalState),
+    reason: 'expired',
+  }];
+}
+
+function applyTraversalContacts(
+  state: GameplayState,
+  level: LevelDefinition,
+  seenInteractions: Set<string>,
+): GameplayEvent[] {
+  const events: GameplayEvent[] = [];
+  const rect = playerRect(state.player);
+  const source = level.traversalStateSources?.find((candidate) => overlaps(rect, candidate.rect));
+  if (source) {
+    const previous = copyTraversalState(state.player.traversalState);
+    const changed = previous.kind !== source.grants || previous.sourceId !== source.id;
+    state.player.traversalState = {
+      kind: source.grants,
+      remainingSeconds: source.durationSeconds,
+      sourceId: source.id,
+    };
+    if (changed) {
+      events.push({
+        type: 'traversal-state-changed',
+        previous,
+        current: copyTraversalState(state.player.traversalState),
+        reason: previous.kind === 'neutral' ? 'acquired' : 'replaced',
+      });
+    }
+  }
+
+  for (const interaction of level.traversalInteractions ?? []) {
+    if (seenInteractions.has(interaction.id) || !overlaps(rect, interaction.rect)) continue;
+    seenInteractions.add(interaction.id);
+    const stateKind = state.player.traversalState.kind;
+    events.push({
+      type: 'traversal-interaction-contact',
+      interactionId: interaction.id,
+      interactionKind: interaction.kind,
+      stateKind,
+      accepted: stateKind !== 'neutral' && interaction.accepts.includes(stateKind),
+    });
+  }
+  return events;
+}
 
 function movePlayer(
   state: GameplayState,
@@ -203,7 +279,8 @@ export function stepGameplay(
   directionSource: DirectionSource,
   dt: number,
 ) {
-  const events: GameplayEvent[] = [];
+  const events: GameplayEvent[] = [...advanceTraversalState(state, dt)];
+  const seenInteractions = new Set<string>();
 
   for (let index = 0; index < 3; index += 1) {
     const direction = typeof directionSource === 'function'
@@ -214,6 +291,7 @@ export function stepGameplay(
       events.push({ type: 'died', reason: 'spikes' });
       return events;
     }
+    events.push(...applyTraversalContacts(state, level, seenInteractions));
   }
 
   for (const bomb of state.bombs) {

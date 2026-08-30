@@ -24,6 +24,35 @@ export type LandingWindowKind = 'none' | 'wide' | 'medium' | 'tight';
 export type TimingWindowKind = 'open' | 'commit' | 'intercept' | 'expiring';
 export type RecoveryKind = 'safe' | 'recoverable' | 'costly' | 'fatal';
 export type SimplePolicyId = 'hold-left' | 'neutral' | 'hold-right';
+export type TraversalStateKind = 'neutral' | 'cold' | 'heat' | 'magnetic';
+export type TraversalInteractionKind =
+  | 'freeze-water'
+  | 'stabilize-machine'
+  | 'cool-surface'
+  | 'melt-barrier'
+  | 'thaw-ice'
+  | 'reactivate-charge'
+  | 'magnetic-attach';
+
+export type ActiveTraversalState = {
+  kind: TraversalStateKind;
+  remainingSeconds: number;
+  sourceId: string | null;
+};
+
+export type TraversalStateSource = {
+  id: string;
+  rect: Rect;
+  grants: Exclude<TraversalStateKind, 'neutral'>;
+  durationSeconds: number;
+};
+
+export type TraversalInteraction = {
+  id: string;
+  rect: Rect;
+  kind: TraversalInteractionKind;
+  accepts: Array<Exclude<TraversalStateKind, 'neutral'>>;
+};
 
 export type LevelIntent = {
   primaryRoute: string;
@@ -72,6 +101,8 @@ export type LevelDefinition = {
   pit?: Rect;
   movingPlatform?: MovingPlatform;
   requiredCombo?: number;
+  traversalStateSources?: TraversalStateSource[];
+  traversalInteractions?: TraversalInteraction[];
 };
 
 export type PlayerState = {
@@ -82,6 +113,7 @@ export type PlayerState = {
   vy: number;
   grounded: boolean;
   onMovingPlatform: boolean;
+  traversalState: ActiveTraversalState;
 };
 
 export type Direction = -1 | 0 | 1;

@@ -445,6 +445,33 @@ export default function BlastEscape() {
       ctx.fillStyle = 'rgba(255, 173, 55, 0.07)';
       for (let x = 238; x < 754; x += 96) ctx.fillRect(x, 116, 26, 2);
 
+      if (debugEnabled) {
+        const stateColors = {
+          cold: '#74d9ff',
+          heat: VISUAL.hot,
+          magnetic: VISUAL.mint,
+        } as const;
+        level.traversalStateSources?.forEach((source) => {
+          ctx.fillStyle = `${stateColors[source.grants]}24`;
+          ctx.fillRect(source.rect.x, source.rect.y, source.rect.w, source.rect.h);
+          ctx.strokeStyle = stateColors[source.grants];
+          ctx.setLineDash([5, 4]);
+          ctx.strokeRect(source.rect.x, source.rect.y, source.rect.w, source.rect.h);
+          ctx.setLineDash([]);
+        });
+        level.traversalInteractions?.forEach((interaction) => {
+          ctx.strokeStyle = 'rgba(255, 196, 79, 0.72)';
+          ctx.setLineDash([3, 3]);
+          ctx.strokeRect(
+            interaction.rect.x,
+            interaction.rect.y,
+            interaction.rect.w,
+            interaction.rect.h,
+          );
+          ctx.setLineDash([]);
+        });
+      }
+
       if (level.pit) {
         const pitGradient = ctx.createLinearGradient(0, level.pit.y, 0, level.pit.y + level.pit.h);
         pitGradient.addColorStop(0, 'rgba(5, 4, 9, 0.42)');
@@ -778,7 +805,7 @@ export default function BlastEscape() {
 
       if (debugEnabled) {
         ctx.fillStyle = 'rgba(7, 9, 13, 0.82)';
-        roundedRect(ctx, 30, 28, 390, 137, 8); ctx.fill();
+        roundedRect(ctx, 30, 28, 390, 156, 8); ctx.fill();
         ctx.fillStyle = '#66f2d5';
         ctx.font = '700 12px ui-monospace, monospace';
         ctx.textAlign = 'left';
@@ -797,6 +824,11 @@ export default function BlastEscape() {
           `timers      ${bombs.map((bomb) => `${bomb.label}:${bomb.timer.toFixed(1)}`).join(' ')}`,
           46,
           149,
+        );
+        ctx.fillText(
+          `state       ${player.traversalState.kind}  ${player.traversalState.remainingSeconds.toFixed(2)}s`,
+          46,
+          168,
         );
       }
 

@@ -39,6 +39,11 @@ evaluators before level production begins.
   does not block pure-core tests/build work; playable visual evidence remains a
   later verification item.
 
+## Integration
+
+- Ongoing director work is published in Draft PR #5:
+  `https://github.com/reality404studio/BlastEscape/pull/5`.
+
 ## Open human calls
 
 See `docs/coordination/HUMAN-CALLS.md`.

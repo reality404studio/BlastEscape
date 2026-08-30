@@ -181,12 +181,13 @@ direct-over-B1 mastery shortcut without new mechanics.
 **Done when:** heat is introduced and recombined with blast/cold without a
 checklist-like sequence.
 
-**Current slice:** Levels 15–16 are accepted. Level 17 is next and should make the remaining heat
-lifetime a visible route-planning resource without introducing a new input or
-silently consuming state.
+**Current slice:** Levels 15–17 are accepted. Level 18 is next and should let cold
+and heat alter the same factory system in opposite, readable ways through one
+shared data contract rather than parallel level scripts.
 
 **Evidence:** `docs/reports/G3C-HEAT-LEVEL-15-001.md`,
-`docs/reports/G9B-HEAT-LEVEL-16-001.md`, and their Level Lab JSON artifacts.
+`docs/reports/G9B-HEAT-LEVEL-16-001.md`,
+`docs/reports/G9B-HEAT-LEVEL-17-001.md`, and their Level Lab JSON artifacts.
 
 ### G9C — Magnet Introduction
 

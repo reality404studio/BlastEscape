@@ -358,6 +358,20 @@ New concept, if any: Heat powers a linked dormant blast charge, allowing its aut
 What previous skills are recombined: heat acquisition, prepared blast timing, blast proximity, midair steering.
 ```
 
+### Level 17 — HEAT WINDOW (accepted intent)
+
+```text
+LEVEL 17 — HEAT WINDOW
+Primary route: Wait before the furnace lane -> cross the furnace late enough to preserve heat -> reach right-wall B1 before its fuse -> launch left -> melt the upper thermal seal while still hot -> upper exit -> EXIT
+Launch job(s): B1 lifts the player from the right wall toward the upper deck and its heat-locked left section.
+Landing window(s): The upper deck is wide. The thermal seal spans the intended leftward path rather than demanding a narrow landing point.
+Timing window(s): Acquiring heat immediately makes it expire before the upper seal; delaying at the safe start leaves enough lifetime after B1 to cross it. The useful window is measured in seconds, not frames.
+Recovery state: Recoverable. If the upper seal rejects an expired state, the player can drop back to the safe lower floor, reacquire heat, and use the repeating B1 cycle.
+Mastery shortcut: None. Preserving heat until the upper interaction is the lesson.
+New concept, if any: None; remaining heat lifetime becomes an explicit route-planning resource without consuming state or adding an input.
+What previous skills are recombined: heat acquisition, timed barrier melting, prepared blast cycle, airborne reversal, safe reset routing.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

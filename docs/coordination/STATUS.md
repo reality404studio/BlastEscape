@@ -19,9 +19,11 @@ a machine-verified B1 proximity shortcut. The bounded cold curriculum is DONE.
 G3C ships `LEVEL 15 — THERMAL SEAL`: heat acquisition removes one linked
 solid partition from authoritative collision for a timed interval, while neutral
 and cold contacts remain blocked. G9B now also ships `LEVEL 16 — REIGNITION`,
-where a heat-powered circuit advances a previously dormant B1 fuse. G9B remains
-ACTIVE for Level 17's heat-lifetime route choice. G3D Magnetism and G8A blast
-replay coverage remain READY.
+where a heat-powered circuit advances a previously dormant B1 fuse, and
+`LEVEL 17 — HEAT WINDOW`, where delayed heat acquisition survives an upper B1
+route while immediate acquisition expires at its seal. G9B remains ACTIVE for
+Level 18's opposing cold/heat system. G3D Magnetism and G8A blast replay coverage
+remain READY.
 
 ## Active / next goals
 
@@ -41,7 +43,7 @@ replay coverage remain READY.
 | G8A Blast curriculum migration | READY | G2 | preserve/migrate L1–8 |
 | G8B Cold introduction | DONE | G2 + G3B | Level 9 complete |
 | G9A Cold curriculum | DONE | G2 + G3B | Levels 10–14 accepted with route/dependency evidence |
-| G9B Heat levels | ACTIVE | G2 + G3C | Levels 15–16 accepted; Level 17 heat-lifetime planning next |
+| G9B Heat levels | ACTIVE | G2 + G3C | Levels 15–17 accepted; Level 18 opposing cold/heat system next |
 | G9C Magnet introduction | PROPOSED | G2 + G3D | L20 |
 | G10 Synthesis / ending levels | PROPOSED | G2 + G3B–D + narrative | L21–25 and dispatch ending |
 | G11 Final QA / release | PROPOSED | G4–G10 | full playthrough, save/pause/restart/build/perf |
@@ -137,6 +139,12 @@ Expected first mandatory human call: protagonist base identity approval before m
   produce zero explosions; ±100ms timing noise clears 100/100. 55 tests, Levels
   8–16 validation, lint, build, and local HTTP 200 pass. Evidence:
   `docs/reports/G9B-HEAT-LEVEL-16-001.md`.
+- G9B Level 17 reuses timed heat, B1, and meltable collision to make pickup time
+  load-bearing. Immediate pickup expires at the upper seal; waits from 0.4–1.8s
+  clear; an early attempt can drop, reacquire heat, and clear on B1's repeat at
+  11.783s. The accepted route clears at 6.183s and ±100ms noise clears 100/100.
+  60 tests, Levels 8–17 validation, lint, build, and local HTTP 200 pass.
+  Evidence: `docs/reports/G9B-HEAT-LEVEL-17-001.md`.
 
 ## Director update rule
 

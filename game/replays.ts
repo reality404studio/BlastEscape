@@ -76,6 +76,21 @@ export const LEVEL_16_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: -1 },
 ];
 
+export const LEVEL_17_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 1.4, direction: 0 },
+  { until: 4.9, direction: 1 },
+  { until: Number.POSITIVE_INFINITY, direction: -1 },
+];
+
+export const LEVEL_17_RECOVERY_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 4.9, direction: 1 },
+  { until: 6.2, direction: -1 },
+  { until: 7.5, direction: 1 },
+  { until: 8.7, direction: -1 },
+  { until: 10.5, direction: 1 },
+  { until: Number.POSITIVE_INFINITY, direction: -1 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -175,6 +190,24 @@ export const LEVEL_16_CLEAN_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_16_CLEAN_ROUTE,
 };
 
+export const LEVEL_17_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-17-heat-window-clean-route',
+  levelId: 'level-17',
+  description: 'Delay furnace pickup, reach first-cycle B1, then carry the remaining heat left through the upper seal.',
+  frameRate: 60,
+  maxDurationSeconds: 8,
+  keyframes: LEVEL_17_CLEAN_ROUTE,
+};
+
+export const LEVEL_17_RECOVERY_REPLAY: ReplayDefinition = {
+  id: 'level-17-heat-window-recovery-route',
+  levelId: 'level-17',
+  description: 'Pick heat too early, bounce off the upper seal, drop to the furnace, then recover through the repeating B1 cycle.',
+  frameRate: 60,
+  maxDurationSeconds: 14,
+  keyframes: LEVEL_17_RECOVERY_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
@@ -185,6 +218,7 @@ export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_14_CLEAN_REPLAY,
   LEVEL_15_CLEAN_REPLAY,
   LEVEL_16_CLEAN_REPLAY,
+  LEVEL_17_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

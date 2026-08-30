@@ -893,4 +893,71 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-17',
+    name: 'LEVEL 17',
+    subtitle: 'HEAT WINDOW',
+    hint: 'The upper seal is far from the furnace. Take the red state when the charge is nearly ready.',
+    intent: {
+      primaryRoute: 'Wait before furnace lane -> acquire heat late -> right-wall B1 before expiry -> launch left -> melt upper thermal seal -> upper exit -> EXIT',
+      launchJobs: [
+        { bomb: 'B1', job: 'Launch from the right wall toward the upper deck and its heat-locked left section.' },
+      ],
+      landingWindows: [
+        { target: 'upper exit deck', kind: 'wide', description: 'The seal spans the intended leftward path; the deck itself remains broad.' },
+      ],
+      timingWindows: [
+        { target: 'heat pickup', kind: 'commit', description: 'Immediate pickup expires before the upper seal; a seconds-wide delayed pickup survives the B1 route.' },
+        { target: 'B1 launch', kind: 'expiring', description: 'Reach the prepared first-cycle blast with enough heat lifetime remaining for the upper interaction.' },
+      ],
+      recovery: { kind: 'recoverable', description: 'A rejected upper seal drops the player to safe lower floor for another furnace pickup and repeating B1 cycle.' },
+      masteryShortcut: null,
+      newConcept: 'No new mechanic; remaining heat lifetime becomes an explicit route-planning resource.',
+      recombinedSkills: ['heat acquisition', 'timed barrier melting', 'prepared blast cycle', 'airborne reversal', 'safe reset routing'],
+      targetFirstClearSeconds: { min: 120, max: 220 },
+    },
+    validation: {
+      requiredBlastHits: ['B1'],
+      requiredInteractions: ['upper-seal-melt'],
+      requiredStates: ['heat'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 100, samples: 100, minimumClearRate: 0.75 },
+      ],
+    },
+    start: { x: 82, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 942, h: 50 },
+      { x: 520, y: 350, w: 350, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [{ x: 900, y: 532, delay: 0, label: 'B1' }],
+    exit: { x: 550, y: 286, w: 64, h: 64 },
+    traversalStateSources: [
+      {
+        id: 'furnace-lane',
+        rect: { x: 650, y: 500, w: 92, h: 50 },
+        grants: 'heat',
+        durationSeconds: 3.2,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'upper-seal-melt',
+        rect: { x: 622, y: 200, w: 88, h: 154 },
+        kind: 'melt-barrier',
+        accepts: ['heat'],
+        activeSeconds: 6,
+      },
+    ],
+    meltableBarriers: [
+      {
+        id: 'upper-thermal-seal',
+        rect: { x: 650, y: 210, w: 30, h: 140 },
+        meltedByInteractionId: 'upper-seal-melt',
+      },
+    ],
+  },
 ];

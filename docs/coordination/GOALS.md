@@ -216,12 +216,13 @@ free flight.
 **Human gate:** ending meaning must remain cancellation -> no new objective -> player-controlled departure.
 **Done when:** synthesis levels are fair and the ending lands without dialogue/cutscene exposition.
 
-**Current slice:** Level 21 is accepted with one shared moving-carrier extension.
-Level 22 is next: synthesize at least two established state/blast verbs without
-adding another traversal system, and author route hierarchy before geometry.
+**Current slice:** Levels 21–22 are accepted. Level 22 makes heat-powered B1,
+airborne state replacement, and static magnetic traversal mutually dependent
+without another mechanic. Level 23 is next and should deepen selective synthesis
+with a distinct route shape rather than repeat the same launch-to-rail handoff.
 
 **Evidence:** `docs/reports/G10-SYNTHESIS-LEVEL-21-001.md` and
-`artifacts/level-validation/level-21.json`.
+`docs/reports/G10-SYNTHESIS-LEVEL-22-001.md`, plus their Level Lab artifacts.
 
 ### G11 — Final QA / Release
 

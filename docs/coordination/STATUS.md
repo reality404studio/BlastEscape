@@ -23,13 +23,16 @@ where a heat-powered circuit advances a previously dormant B1 fuse. Level 17
 makes heat lifetime load-bearing; Level 18 makes cold and heat oppose each other
 on one condensate span. `LEVEL 19 — THERMAL CATCH` closes the sequence: heat owns
 the fast primary route, while cold appears only after a missed B1 as the B2
-recovery branch. G9B is DONE. G3D
-and G9C now ship `LEVEL 20 — INDUCTION RAIL`: B1 captures a magnetized player on
+recovery branch. G9B is DONE. G3D and G9C now ship
+`LEVEL 20 — INDUCTION RAIL`: B1 captures a magnetized player on
 a bounded overhead rail, left/right traverses it, and its end or timer releases
 back to gravity. G3D and G9C are DONE. G10 now ships `LEVEL 21 — SHIFT CARRIER`,
 where the same bounded attachment inherits one authoritative moving rail and
-releases at its receiving endpoint. G10 remains ACTIVE for Level 22 synthesis,
-followed by bounded escalation and the canonical dispatch ending.
+releases at its receiving endpoint. Level 22 now ships as `POLARITY HANDOFF`:
+heat wakes B1, its arc replaces heat with magnetism in an airborne coil, and a
+rightward rail crossing finishes the route.
+G10 remains ACTIVE for Level 23, followed by bounded escalation and the canonical
+dispatch ending.
 G8A blast replay coverage remains READY.
 
 ## Active / next goals
@@ -52,7 +55,7 @@ G8A blast replay coverage remains READY.
 | G9A Cold curriculum | DONE | G2 + G3B | Levels 10–14 accepted with route/dependency evidence |
 | G9B Heat levels | DONE | G2 + G3C | Levels 15–19 accepted with selective route hierarchy |
 | G9C Magnet introduction | DONE | G2 + G3D | Level 20 accepted |
-| G10 Synthesis / ending levels | ACTIVE | G2 + G3B–D + narrative | Level 21 accepted; L22–25 and dispatch ending next |
+| G10 Synthesis / ending levels | ACTIVE | G2 + G3B–D + narrative | Levels 21–22 accepted; L23–25 and dispatch ending next |
 | G11 Final QA / release | PROPOSED | G4–G10 | full playthrough, save/pause/restart/build/perf |
 
 ## Open blockers
@@ -179,6 +182,12 @@ Expected first mandatory human call: protagonist base identity approval before m
   magnetism or carrier travel dies in the water trench; all constant-direction
   policies fail; ±120ms noise clears 100/100. 86 tests and Levels 8–21 validation
   pass. Evidence: `docs/reports/G10-SYNTHESIS-LEVEL-21-001.md`.
+- G10 Level 22 makes heat-powered B1, an airborne heat-to-magnetic replacement,
+  and static rail traversal one dependent route. It clears at 6.367s across
+  30–144Hz; removing heat leaves B1 dormant, while removing the airborne coil or
+  rail returns to the safe launch floor without clearing. All constant-direction
+  policies fail and ±80ms noise clears 100/100. 92 tests and Levels 8–22
+  validation pass. Evidence: `docs/reports/G10-SYNTHESIS-LEVEL-22-001.md`.
 
 ## Director update rule
 

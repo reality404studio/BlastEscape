@@ -1,0 +1,117 @@
+{
+  "generatedBy": "npm run validate:levels",
+  "schemaVersion": 1,
+  "levelId": "level-22",
+  "levelName": "LEVEL 22 — POLARITY HANDOFF",
+  "replayId": "level-22-polarity-handoff-clean-route",
+  "status": "pass",
+  "evaluations": [
+    {
+      "evaluator": "reachability",
+      "id": "accepted-route-clears",
+      "status": "pass",
+      "summary": "Accepted replay clears in 6.367s.",
+      "metrics": {
+        "outcome": "cleared",
+        "elapsedSeconds": 6.366666666666646,
+        "maximumAirCombo": 1
+      }
+    },
+    {
+      "evaluator": "exploit",
+      "id": "simple-policy-bypass",
+      "status": "pass",
+      "summary": "No forbidden constant-direction policy clears the level.",
+      "metrics": {
+        "testedPolicies": [
+          "hold-left",
+          "neutral",
+          "hold-right"
+        ],
+        "bypassPolicies": []
+      }
+    },
+    {
+      "evaluator": "noisy-human",
+      "id": "timing-jitter-80ms",
+      "status": "pass",
+      "summary": "100/100 deterministic jittered replays cleared.",
+      "metrics": {
+        "jitterMilliseconds": 80,
+        "samples": 100,
+        "clears": 100,
+        "clearRate": 1,
+        "minimumClearRate": 0.8
+      }
+    },
+    {
+      "evaluator": "mechanic",
+      "id": "intended-mechanic-use",
+      "status": "pass",
+      "summary": "Accepted replay exercises the required blasts and combo.",
+      "metrics": {
+        "requiredBlastHits": [
+          "B1"
+        ],
+        "actualBlastHits": [
+          "B1"
+        ],
+        "missingBlastHits": [],
+        "requiredInteractions": [
+          "handoff-ignition",
+          "handoff-rail"
+        ],
+        "actualInteractions": [
+          "handoff-ignition",
+          "handoff-rail"
+        ],
+        "missingInteractions": [],
+        "requiredStates": [
+          "heat",
+          "magnetic"
+        ],
+        "actualStates": [
+          "heat",
+          "magnetic"
+        ],
+        "missingStates": [],
+        "minimumAirCombo": 0,
+        "actualMaximumAirCombo": 1
+      }
+    }
+  ],
+  "acceptedReplay": {
+    "replayId": "level-22-polarity-handoff-clean-route",
+    "levelId": "level-22",
+    "outcome": "cleared",
+    "elapsedSeconds": 6.366666666666646,
+    "frames": 382,
+    "frameRate": 60,
+    "deathReason": null,
+    "blastExplosions": [
+      "B1"
+    ],
+    "blastHits": [
+      "B1"
+    ],
+    "acceptedInteractions": [
+      "handoff-ignition",
+      "handoff-rail"
+    ],
+    "acquiredStates": [
+      "heat",
+      "magnetic"
+    ],
+    "landingCount": 0,
+    "maximumAirCombo": 1,
+    "highestPointY": 156,
+    "finalPlayer": {
+      "x": 907.601234567913,
+      "y": 251.71111111111117,
+      "controlVx": 275,
+      "blastVx": 0,
+      "vy": 471.9999999999994
+    }
+  },
+  "caveat": "These evaluators reject broken or contract-violating routes; they do not prove fun."
+}

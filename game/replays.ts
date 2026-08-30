@@ -117,6 +117,12 @@ export const LEVEL_21_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: 0 },
 ];
 
+export const LEVEL_22_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 3, direction: 1 },
+  { until: 3.45, direction: -1 },
+  { until: Number.POSITIVE_INFINITY, direction: 1 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -279,6 +285,15 @@ export const LEVEL_21_CLEAN_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_21_CLEAN_ROUTE,
 };
 
+export const LEVEL_22_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-22-polarity-handoff-clean-route',
+  levelId: 'level-22',
+  description: 'Use heat to power B1, steer left through the airborne induction coil, then reverse right across the magnetic rail.',
+  frameRate: 60,
+  maxDurationSeconds: 10,
+  keyframes: LEVEL_22_CLEAN_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
@@ -294,6 +309,7 @@ export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_19_CLEAN_REPLAY,
   LEVEL_20_CLEAN_REPLAY,
   LEVEL_21_CLEAN_REPLAY,
+  LEVEL_22_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

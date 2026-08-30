@@ -1278,4 +1278,96 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-22',
+    name: 'LEVEL 22',
+    subtitle: 'POLARITY HANDOFF',
+    hint: 'Wake B1 while hot. On launch, cut left through the green coil—then reverse along the rail.',
+    intent: {
+      primaryRoute: 'START -> furnace heat -> ignition circuit -> dormant B1 -> steer left through airborne induction coil -> magnetic state replaces heat -> rail capture -> reverse right -> rail-end release -> receiving deck -> EXIT',
+      launchJobs: [
+        { bomb: 'B1', job: 'The heat-reactivated charge lifts the player through the elevated magnetic source and into the rail capture band.' },
+      ],
+      landingWindows: [
+        { target: 'airborne induction coil and rail capture', kind: 'wide', description: 'The coil and capture band share a broad left-steered section of the B1 ascent.' },
+        { target: 'right receiving deck', kind: 'wide', description: 'The deck sits directly beneath the static rail end.' },
+      ],
+      timingWindows: [
+        { target: 'heat-powered B1', kind: 'commit', description: 'The ignition interval covers the first fuse and leaves time to settle against the marked launch stop.' },
+        { target: 'magnetic traversal', kind: 'expiring', description: 'The airborne magnetic pickup and attachment comfortably cover one rightward rail crossing, not waiting.' },
+      ],
+      recovery: { kind: 'recoverable', description: 'An unpowered B1 remains dormant; missing the airborne handoff returns the left-steered arc to the launch floor for the repeating cycle.' },
+      masteryShortcut: null,
+      newConcept: 'None; dormant heat ignition, airborne state replacement, and bounded magnetic attachment form one dependent handoff.',
+      recombinedSkills: ['heat acquisition', 'dormant charge reactivation', 'prepared blast timing', 'airborne reversal', 'state replacement', 'magnetic rail traversal'],
+      targetFirstClearSeconds: { min: 120, max: 270 },
+    },
+    validation: {
+      requiredBlastHits: ['B1'],
+      requiredInteractions: ['handoff-ignition', 'handoff-rail'],
+      requiredStates: ['heat', 'magnetic'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 80, samples: 100, minimumClearRate: 0.8 },
+      ],
+    },
+    start: { x: 72, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 320, h: 50 },
+      { x: 286, y: 508, w: 14, h: 42 },
+      { x: 760, y: 350, w: 182, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [
+      {
+        x: 273,
+        y: 532,
+        delay: -2.1,
+        label: 'B1',
+        reactivatedByInteractionId: 'handoff-ignition',
+      },
+    ],
+    exit: { x: 840, y: 286, w: 102, h: 64 },
+    pit: { x: 320, y: 350, w: 440, h: 250 },
+    traversalStateSources: [
+      {
+        id: 'handoff-furnace',
+        rect: { x: 80, y: 500, w: 76, h: 50 },
+        grants: 'heat',
+        durationSeconds: 5.5,
+      },
+      {
+        id: 'airborne-induction-coil',
+        rect: { x: 110, y: 230, w: 140, h: 160 },
+        grants: 'magnetic',
+        durationSeconds: 7,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'handoff-ignition',
+        rect: { x: 150, y: 500, w: 84, h: 50 },
+        kind: 'reactivate-charge',
+        accepts: ['heat'],
+        activeSeconds: 4.5,
+      },
+      {
+        id: 'handoff-rail',
+        rect: { x: 110, y: 105, w: 230, h: 155 },
+        kind: 'magnetic-attach',
+        accepts: ['magnetic'],
+        activeSeconds: 4,
+        resultRect: { x: 130, y: 140, w: 680, h: 16 },
+      },
+    ],
+    waterHazards: [
+      {
+        id: 'handoff-trench',
+        rect: { x: 320, y: 350, w: 440, h: 250 },
+        frozenByInteractionId: 'no-freeze-route',
+      },
+    ],
+  },
 ];

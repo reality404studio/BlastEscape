@@ -428,6 +428,20 @@ New concept, if any: The same bounded magnetic attachment may target a data-driv
 What previous skills are recombined: temporary magnetic state, prepared blast timing, moving-platform interception, bounded rail traversal, automatic release-point landing.
 ```
 
+### Level 22 — POLARITY HANDOFF (accepted intent)
+
+```text
+LEVEL 22 — POLARITY HANDOFF
+Primary route: START -> furnace -> acquire heat -> power the dormant B1 circuit -> prepare at the launch stop -> B1 -> steer left through an airborne induction coil -> heat is replaced by magnetic state -> rise into the overhead rail -> automatic attachment -> reverse right along the rail -> automatic end release -> receiving deck -> EXIT
+Launch job(s): Heat-reactivated B1 supplies the only access to the elevated induction coil and rail. Its arc must pass through the coil before capture.
+Landing window(s): The airborne coil and rail capture band overlap a broad left-steered portion of B1's ascent. The right receiving deck is wide beneath the rail end.
+Timing window(s): The heat-powered fuse gives enough time to reach the launch stop. Magnetic lifetime and rail attachment cover one decisive rightward traversal but not indefinite waiting.
+Recovery state: Recoverable. Failing to power the charge leaves the player on stable floor; missing the airborne coil or rail returns the left-steered arc to the launch floor for the repeating B1 cycle.
+Mastery shortcut: None. Heat ignition, airborne state replacement, and magnetic traversal must all remain load-bearing.
+New concept, if any: None; the level synthesizes existing dormant-charge ignition, single-slot state replacement, blast steering, and bounded magnetic attachment.
+What previous skills are recombined: heat acquisition, dormant charge reactivation, prepared blast timing, airborne reversal, state replacement, magnetic rail traversal.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

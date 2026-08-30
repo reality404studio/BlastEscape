@@ -75,3 +75,12 @@ unavoidable cold-source pickup and a broad, temporarily cooled floor plate, then
 returns to one familiar blast launch. Water freezing remains Level 10. This keeps
 the cold introduction observable and avoids asking the first cold level to teach
 both state acquisition and temporary platform creation.
+
+## D-013 — Frozen water is timed shared-core collision geometry
+
+An accepted `freeze-water` interaction may expose one data-defined `resultRect`
+for its active lifetime. The authoritative gameplay step uses that rectangle for
+collision and suppresses only water hazards linked to the same interaction.
+Expiry removes both protections before the next movement substep; rendering only
+observes the result. This keeps runtime, replay, and later cold levels on one rule
+instead of encoding an ice platform privately in Level 10 presentation code.

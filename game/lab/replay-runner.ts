@@ -12,7 +12,7 @@ export type ReplayResult = {
   elapsedSeconds: number;
   frames: number;
   frameRate: number;
-  deathReason: 'spikes' | 'fall' | 'hot-surface' | null;
+  deathReason: 'spikes' | 'fall' | 'hot-surface' | 'water' | null;
   blastExplosions: string[];
   blastHits: string[];
   acceptedInteractions: string[];

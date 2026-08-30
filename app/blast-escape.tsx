@@ -511,6 +511,49 @@ export default function BlastEscape() {
         ctx.fillRect(level.pit.x, level.pit.y, level.pit.w, 2);
       }
 
+      level.waterHazards?.forEach((hazard) => {
+        const frozen = interactionStates[hazard.frozenByInteractionId]?.active ?? false;
+        const waterGradient = ctx.createLinearGradient(0, hazard.rect.y, 0, hazard.rect.y + hazard.rect.h);
+        waterGradient.addColorStop(0, frozen ? 'rgba(116, 217, 255, 0.38)' : 'rgba(42, 118, 155, 0.86)');
+        waterGradient.addColorStop(1, frozen ? 'rgba(35, 80, 105, 0.82)' : 'rgba(8, 33, 50, 0.98)');
+        ctx.fillStyle = waterGradient;
+        ctx.fillRect(hazard.rect.x, hazard.rect.y, hazard.rect.w, hazard.rect.h);
+        ctx.fillStyle = frozen ? '#d8f7ff' : 'rgba(116, 217, 255, 0.58)';
+        for (let x = hazard.rect.x + 8; x < hazard.rect.x + hazard.rect.w; x += 30) {
+          ctx.fillRect(x, hazard.rect.y + 3, 18, frozen ? 3 : 2);
+        }
+      });
+
+      level.traversalInteractions?.forEach((interaction) => {
+        if (
+          interaction.kind !== 'freeze-water' ||
+          !interaction.resultRect ||
+          !interactionStates[interaction.id]?.active
+        ) return;
+        ctx.fillStyle = 'rgba(116, 217, 255, 0.82)';
+        ctx.fillRect(
+          interaction.resultRect.x,
+          interaction.resultRect.y,
+          interaction.resultRect.w,
+          interaction.resultRect.h,
+        );
+        ctx.fillStyle = '#d8f7ff';
+        ctx.fillRect(
+          interaction.resultRect.x,
+          interaction.resultRect.y,
+          interaction.resultRect.w,
+          3,
+        );
+        ctx.fillStyle = VISUAL.cold;
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          'CONDENSATE FROZEN',
+          interaction.resultRect.x + interaction.resultRect.w / 2,
+          interaction.resultRect.y - 7,
+        );
+      });
+
       const track = level.movingPlatform;
       if (track) {
         const trackY = track.y + track.h / 2;

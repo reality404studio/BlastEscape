@@ -376,4 +376,74 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-10',
+    name: 'LEVEL 10',
+    subtitle: 'CONDENSATE GAP',
+    hint: 'Carry coolant to the dripping edge. Cross while the frozen path holds, then use the charge.',
+    intent: {
+      primaryRoute: 'START -> coolant source -> freeze condensate -> cross temporary ice -> pass B1 -> blast into upper shaft -> steer left -> EXIT',
+      launchJobs: [
+        { bomb: 'B1', job: 'Launch from the right wall up the open shaft, then allow a leftward landing on the exit deck.' },
+      ],
+      landingWindows: [
+        { target: 'frozen condensate bridge', kind: 'wide', description: 'The new temporary surface spans the whole water gap.' },
+        { target: 'upper exit deck', kind: 'wide', description: 'The familiar blast landing remains forgiving while freezing is learned.' },
+      ],
+      timingWindows: [
+        { target: 'frozen bridge', kind: 'expiring', description: 'The bridge lasts long enough for a readable crossing and then thaws deterministically.' },
+        { target: 'B1 launch', kind: 'commit', description: 'Reach the far launch wall for the prepared blast, then steer left above the deck.' },
+      ],
+      recovery: { kind: 'fatal', description: 'A short crossing enters the water; the far bank is stable once reached.' },
+      masteryShortcut: null,
+      newConcept: 'Cold freezes one water span into a temporary collision surface.',
+      recombinedSkills: ['cold acquisition', 'blast proximity', 'midair steering'],
+      targetFirstClearSeconds: { min: 65, max: 150 },
+    },
+    validation: {
+      requiredBlastHits: ['B1'],
+      requiredInteractions: ['condensate-freeze'],
+      requiredStates: ['cold'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 100, samples: 100, minimumClearRate: 0.8 },
+      ],
+    },
+    start: { x: 82, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 320, h: 50 },
+      { x: 650, y: 550, w: 292, h: 50 },
+      { x: 620, y: 350, w: 250, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+      { x: 942, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [{ x: 900, y: 532, delay: -1.5, label: 'B1' }],
+    exit: { x: 700, y: 286, w: 64, h: 64 },
+    traversalStateSources: [
+      {
+        id: 'coolant-gate',
+        rect: { x: 130, y: 500, w: 92, h: 50 },
+        grants: 'cold',
+        durationSeconds: 7,
+      },
+    ],
+    traversalInteractions: [
+      {
+        id: 'condensate-freeze',
+        rect: { x: 292, y: 494, w: 56, h: 60 },
+        kind: 'freeze-water',
+        accepts: ['cold'],
+        activeSeconds: 4.8,
+        resultRect: { x: 320, y: 550, w: 330, h: 18 },
+      },
+    ],
+    waterHazards: [
+      {
+        id: 'condensate-pool',
+        rect: { x: 320, y: 550, w: 330, h: 50 },
+        frozenByInteractionId: 'condensate-freeze',
+      },
+    ],
+  },
 ];

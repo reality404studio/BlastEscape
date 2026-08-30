@@ -43,7 +43,7 @@ export type GameplayEvent =
       continuesAirChain: boolean;
       comboCount: number;
     }
-  | { type: 'died'; reason: 'spikes' | 'fall' | 'hot-surface' }
+  | { type: 'died'; reason: 'spikes' | 'fall' | 'hot-surface' | 'water' }
   | { type: 'cleared' }
   | {
       type: 'traversal-state-changed';
@@ -273,6 +273,13 @@ function movePlayer(
 
   const collisionPlatforms = [
     ...level.platforms.map((rect) => ({ rect, moving: false })),
+    ...(level.traversalInteractions ?? [])
+      .filter((interaction) =>
+        interaction.kind === 'freeze-water' &&
+        interaction.resultRect &&
+        state.interactionStates[interaction.id]?.active,
+      )
+      .map((interaction) => ({ rect: interaction.resultRect!, moving: false })),
     ...(movingAfter ? [{ rect: movingAfter.rect, moving: true }] : []),
   ];
 
@@ -356,6 +363,14 @@ export function stepGameplay(
     );
     if (hotSurface) {
       events.push({ type: 'died', reason: 'hot-surface' });
+      return events;
+    }
+    const waterHazard = level.waterHazards?.find((hazard) =>
+      overlaps(playerRect(state.player), hazard.rect) &&
+      !state.interactionStates[hazard.frozenByInteractionId]?.active,
+    );
+    if (waterHazard) {
+      events.push({ type: 'died', reason: 'water' });
       return events;
     }
   }

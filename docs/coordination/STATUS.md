@@ -12,10 +12,11 @@ or the clamped-frame/three-substep order. Browser play and headless replay now
 share movement, collision, hazards, bombs, blast, combo, death, and exit logic.
 G2 now provides intent-bearing level data, accepted replay/report formats, and
 reachability, exploit, deterministic noisy-human, and mechanic-use evaluators.
-G3B and G8B now ship `LEVEL 9 — COLD START`: an unavoidable coolant pickup cools
-one hot plate before a familiar blast exit. The same replay without coolant dies,
-while the accepted route passes all four evaluator families. G9A is READY for
-bounded Levels 10–14 production, beginning with water freezing in Level 10. G3C
+G3B and G8B ship `LEVEL 9 — COLD START`. G9A now also ships the accepted Level 10
+slice: `CONDENSATE GAP` turns a linked water span into shared-core collision for
+a timed window, then reuses a familiar blast exit. The clean replay clears, the
+same route without coolant dies in water, and expiry removes the surface
+authoritatively. G9A remains ACTIVE with Level 11 machinery stabilization next. G3C
 Heat, G3D Magnetism, and G8A blast replay coverage are also READY.
 
 ## Active / next goals
@@ -35,7 +36,7 @@ Heat, G3D Magnetism, and G8A blast replay coverage are also READY.
 | G7 Environmental story | READY | G0 | factory zones, signage, nonverbal narrative |
 | G8A Blast curriculum migration | READY | G2 | preserve/migrate L1–8 |
 | G8B Cold introduction | DONE | G2 + G3B | Level 9 complete |
-| G9A Cold curriculum | READY | G2 + G3B | Levels 10–14 in bounded slices |
+| G9A Cold curriculum | ACTIVE | G2 + G3B | Level 10 accepted; Level 11 machinery stabilization next |
 | G9B Heat levels | PROPOSED | G2 + G3C | L15–19 |
 | G9C Magnet introduction | PROPOSED | G2 + G3D | L20 |
 | G10 Synthesis / ending levels | PROPOSED | G2 + G3B–D + narrative | L21–25 and dispatch ending |
@@ -92,6 +93,11 @@ Expected first mandatory human call: protagonist base identity approval before m
   clears at 4.35s; no-cold control dies; ±100ms timing noise clears 100/100.
   21 tests, Levels 8–9 validation, lint, and build pass. Evidence:
   `docs/reports/G3B-COLD-LEVEL-9-001.md`.
+- G9A Level 10 added timed frozen-water collision and a linked water hazard in
+  the authoritative core. The accepted route clears at 4.35s; removing coolant
+  dies in water; expiry removes the surface; ±100ms timing noise clears 100/100.
+  25 tests, Levels 8–10 validation, lint, and build pass. Evidence:
+  `docs/reports/G9A-COLD-LEVEL-10-001.md`.
 
 ## Director update rule
 

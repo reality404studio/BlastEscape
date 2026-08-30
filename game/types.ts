@@ -53,12 +53,19 @@ export type TraversalInteraction = {
   kind: TraversalInteractionKind;
   accepts: Array<Exclude<TraversalStateKind, 'neutral'>>;
   activeSeconds?: number;
+  resultRect?: Rect;
 };
 
 export type HotSurface = {
   id: string;
   rect: Rect;
   cooledByInteractionId: string;
+};
+
+export type WaterHazard = {
+  id: string;
+  rect: Rect;
+  frozenByInteractionId: string;
 };
 
 export type LevelIntent = {
@@ -113,6 +120,7 @@ export type LevelDefinition = {
   traversalStateSources?: TraversalStateSource[];
   traversalInteractions?: TraversalInteraction[];
   hotSurfaces?: HotSurface[];
+  waterHazards?: WaterHazard[];
 };
 
 export type PlayerState = {

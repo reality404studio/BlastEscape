@@ -260,6 +260,20 @@ New concept, if any:
 What previous skills are recombined:
 ```
 
+### Level 10 — CONDENSATE GAP (accepted intent)
+
+```text
+LEVEL 10 — CONDENSATE GAP
+Primary route: START -> coolant source -> freeze condensate -> cross the temporary ice -> B1 -> upper exit deck -> EXIT
+Launch job(s): B1 lifts from the far side of the frozen crossing to the upper exit deck.
+Landing window(s): The frozen bridge is wide; the upper exit deck is wide because temporary traversal, not precision landing, is the lesson.
+Timing window(s): The bridge is expiring but lasts long enough for a readable, non-frame-perfect crossing.
+Recovery state: Falling short of the far bank enters the water and resets; reaching the bank is stable.
+Mastery shortcut: None. The cold-created route must remain load-bearing.
+New concept, if any: Accepted cold contact freezes one water span into a temporary collision surface.
+What previous skills are recombined: cold acquisition, blast proximity, midair steering.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

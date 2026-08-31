@@ -39,7 +39,15 @@ required B2 return.
 Level 25 now ships as `FINAL INSPECTION`: one final B1-to-B2 air chain reaches
 dispatch, scanning reveals cancellation without ending control, and only the
 player's later walk through the already-open door completes the game. G10 is DONE.
-G4/G6/G7 and G8A are the next ready production tracks before final QA.
+G4 now has an executable visual contract and three protagonist identity
+candidates. HC-ART-001 is OPEN with A (Foundry Pod) recommended; character
+animation production remains blocked at that gate. G6/G7 and G8A continue as
+unblocked production tracks before final QA.
+
+G6 slice 001 now maps existing authoritative blast, landing, traversal,
+magnetic, interaction, and dispatch events to presentation-only feedback. The
+111-test suite, lint, and production build pass; interactive mute-first visual
+inspection remains.
 
 ## Active / next goals
 
@@ -52,9 +60,9 @@ G4/G6/G7 and G8A are the next ready production tracks before final QA.
 | G3B Cold | DONE | G3A | cold source/effect contract and Level 9 complete |
 | G3C Heat | DONE | G3A + stable cold contract | heat acquisition, timed barrier melting, and Level 15 accepted |
 | G3D Magnetism | DONE | G3A | bounded timed attachment/release and Level 20 accepted |
-| G4 Art direction / protagonist | READY | G0 | pixel-art execution and identity candidates |
+| G4 Art direction / protagonist | HUMAN_NEEDED | G0 | visual contract/candidates complete; HC-ART-001 open |
 | G5 Sprite pipeline | PROPOSED | G4 approval | SpriteGen integration and atlas/manifest pipeline |
-| G6 FX / game feel | READY | G0; preferably stable runtime events | mute-first feedback polish |
+| G6 FX / game feel | ACTIVE | G0; stable runtime events | event-driven mute-first feedback; visual inspection remains |
 | G7 Environmental story | READY | G0 | factory zones, signage, nonverbal narrative |
 | G8A Blast curriculum migration | READY | G2 | preserve/migrate L1–8 |
 | G8B Cold introduction | DONE | G2 + G3B | Level 9 complete |
@@ -79,7 +87,9 @@ G4/G6/G7 and G8A are the next ready production tracks before final QA.
 
 See `docs/coordination/HUMAN-CALLS.md`.
 
-Expected first mandatory human call: protagonist base identity approval before mass sprite generation.
+`HC-ART-001` is OPEN: choose A Foundry Pod, B Inspection Wedge, C Cratelet Unit,
+or request one bounded revision before mass sprite generation. Director default:
+A. Evidence: `docs/reports/G4-PROTAGONIST-CANDIDATES-001.md`.
 
 ## Recent accepted outcomes
 
@@ -91,6 +101,14 @@ Expected first mandatory human call: protagonist base identity approval before m
   `5c02443795bca2db31e8faf02235a2bdc21a1c5b`.
 - The former noncanonical “all directives complete” overlay is replaced by the
   scanner cancellation, retained-control, open-door departure contract in D-020.
+- G4 now has a `32 x 40` sprite-frame and palette/edge/zone execution contract,
+  plus three gameplay-scale protagonist identity candidates. HC-ART-001 is open
+  and recommends A; full animation remains blocked. Evidence:
+  `docs/reports/G4-PROTAGONIST-CANDIDATES-001.md`.
+- G6 slice 001 connects authoritative gameplay events to presentation-only
+  flashes, state/contact pulses, particles, landing squash, and camera impulse.
+  111 tests, lint, and build pass. Evidence:
+  `docs/reports/G6-EVENT-FEEDBACK-001.md`.
 - G1 slice 001 extracted all eight level definitions, compatibility constants,
   movement/blast formulas, moving-platform math, and the Level 8 clean replay.
   Runtime imports the extracted modules; 7 characterization tests, lint, build,

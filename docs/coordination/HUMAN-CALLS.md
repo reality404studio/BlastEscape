@@ -4,20 +4,23 @@ This ledger is for decisions that genuinely require human taste, judgment, exter
 
 ## Open calls
 
-None.
-
-## Expected gates
-
 ### HC-ART-001 — Protagonist base identity
 
-**Status:** NOT YET OPEN  
-**Owner:** G4 Art Direction / G5 Sprite Pipeline  
-**Decision needed:** choose or approve the base protagonist design before mass sprite generation.  
-**Why human:** identity/silhouette is a taste and authorship decision; regenerating all states after changing it is expensive.  
-**Expected evidence:** 2–4 candidates or SpriteGen curation view, shown at gameplay scale and on representative factory backgrounds.  
-**Default if deferred:** select the most readable candidate that best communicates "unfinished armless service/industrial robot with no jump hardware" and record the choice as provisional.  
-**Blocked work:** final character animation production.  
-**Unblocked work:** environment art, runtime integration scaffold, effects, level tools.
+**Status:** OPEN
+**Owner:** G4 Art Direction / G5 Sprite Pipeline
+**Decision needed:** choose the base protagonist identity before full sprite and animation production.
+**Why human:** the silhouette is a taste/authorship decision, and changing it after animation production would invalidate expensive downstream work.
+**Options:**
+1. **A — Foundry Pod (Director recommendation):** closest key-art continuity and clearest gameplay-scale separation of shell, sensor, undercarriage, and feet.
+2. **B — Inspection Wedge:** strongest forward direction, with a more technical/scout-like character.
+3. **C — Cratelet Unit:** most vulnerable cargo/service-unit identity, with a deliberately plain wide shell.
+4. **Request one bounded revision:** name the candidate to revise and one or two concrete traits to retain/change; do not start a new visual direction without recording that material change.
+**Evidence:** `docs/reports/G4-PROTAGONIST-CANDIDATES-001.md` and the three PNGs in `artifacts/art-direction/`.
+**Default if deferred:** provisionally select A because it scores highest on the executable rubric and best preserves the existing key-art/runtime identity.
+**Blocked work:** final character source sprite, complete animation/state production, and G5 runtime atlas integration.
+**Unblocked work:** environment art, deterministic runtime integration scaffold, FX, environmental story, Level 1–8 evidence, and release infrastructure.
+
+## Expected gates
 
 ### HC-QA-001 — End-to-end release playthrough
 

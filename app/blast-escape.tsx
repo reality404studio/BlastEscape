@@ -23,7 +23,7 @@ type ContactParticle = {
   size: number;
   color: string;
 };
-type Wave = { x: number; y: number; radius: number; life: number };
+type Wave = { x: number; y: number; radius: number; life: number; color: string };
 type BlastFlash = { x: number; y: number; life: number };
 type LaunchVector = { x: number; y: number; vx: number; vy: number; life: number; label: string };
 type TrajectoryPoint = { x: number; y: number };
@@ -91,6 +91,7 @@ export default function BlastEscape() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    ctx.imageSmoothingEnabled = false;
 
     let animationFrame = 0;
     let previousTime = performance.now();
@@ -255,11 +256,80 @@ export default function BlastEscape() {
       }
     };
 
+    const addContactBurst = (
+      x: number,
+      y: number,
+      color: string,
+      count = 8,
+    ) => {
+      for (let index = 0; index < count; index += 1) {
+        const angle = (Math.PI * 2 * index) / count + Math.random() * 0.24;
+        const speed = 42 + Math.random() * 82;
+        contactParticles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 18,
+          life: 0.22 + Math.random() * 0.2,
+          size: 2 + Math.random() * 2,
+          color,
+        });
+      }
+    };
+
+    const stateColor = (kind: 'neutral' | 'cold' | 'heat' | 'magnetic') =>
+      kind === 'cold'
+        ? VISUAL.cold
+        : kind === 'heat'
+          ? VISUAL.hot
+          : kind === 'magnetic'
+            ? VISUAL.mint
+            : VISUAL.structureEdge;
+
+    const addGameplayCue = (event: GameplayEvent, level: (typeof LEVELS)[number]) => {
+      if (event.type === 'traversal-state-changed') {
+        const center = playerCenter();
+        addContactBurst(center.x, center.y, stateColor(event.current.kind), event.reason === 'expired' ? 5 : 10);
+        return;
+      }
+
+      if (event.type === 'traversal-interaction-contact' && event.accepted) {
+        const interaction = level.traversalInteractions?.find(
+          (candidate) => candidate.id === event.interactionId,
+        );
+        if (!interaction) return;
+        const x = interaction.rect.x + interaction.rect.w / 2;
+        const y = interaction.rect.y + interaction.rect.h / 2;
+        const color = stateColor(event.stateKind);
+        waves.push({ x, y, radius: 5, life: 0.72, color });
+        addContactBurst(x, y, color, 8);
+        return;
+      }
+
+      if (event.type === 'magnetic-attached' || event.type === 'magnetic-released') {
+        const center = playerCenter();
+        waves.push({ x: center.x, y: center.y, radius: 6, life: 0.62, color: VISUAL.mint });
+        addContactBurst(center.x, center.y, VISUAL.mint, 7);
+        shake = Math.max(shake, event.type === 'magnetic-attached' ? 3.5 : 1.5);
+        return;
+      }
+
+      if (event.type === 'dispatch-scanned' && level.dispatchSequence) {
+        const scanner = level.dispatchSequence.scanner;
+        const x = scanner.x + scanner.w / 2;
+        const y = scanner.y + scanner.h / 2;
+        waves.push({ x, y, radius: 8, life: 1, color: VISUAL.gold });
+        waves.push({ x, y, radius: 2, life: 0.72, color: VISUAL.player });
+        addContactBurst(x, y, VISUAL.gold, 14);
+        shake = Math.max(shake, 4);
+      }
+    };
+
     const addBombEffects = (
       event: Extract<GameplayEvent, { type: 'bomb-exploded' }>,
     ) => {
       const { bomb, blast } = event;
-      waves.push({ x: bomb.x, y: bomb.y, radius: 8, life: 1 });
+      waves.push({ x: bomb.x, y: bomb.y, radius: 8, life: 1, color: VISUAL.amber });
       blastFlashes.push({ x: bomb.x, y: bomb.y, life: 1 });
       for (let index = 0; index < 18; index += 1) {
         const angle = (Math.PI * 2 * index) / 18 + Math.random() * 0.25;
@@ -332,6 +402,7 @@ export default function BlastEscape() {
         dispatchScanned = gameplay.dispatchScanned;
 
         for (const event of events) {
+          addGameplayCue(event, level);
           if (event.type === 'moved') {
             sampleActiveTrace(event.dt, event.point, event.grounded);
           } else if (event.type === 'landed') {
@@ -995,10 +1066,12 @@ export default function BlastEscape() {
       });
       ctx.globalAlpha = 1;
       waves.forEach((wave) => {
-        ctx.strokeStyle = `rgba(255,180,55,${wave.life})`;
+        ctx.globalAlpha = Math.min(1, wave.life);
+        ctx.strokeStyle = wave.color;
         ctx.lineWidth = 7 * wave.life + 1;
         ctx.beginPath(); ctx.arc(wave.x, wave.y, wave.radius, 0, Math.PI * 2); ctx.stroke();
       });
+      ctx.globalAlpha = 1;
       particles.forEach((particle) => {
         ctx.globalAlpha = Math.min(1, particle.life * 2);
         ctx.fillStyle = particle.life > 0.35 ? '#ffd35d' : '#ff543d';

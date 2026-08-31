@@ -114,11 +114,19 @@ crossing while preserving left/right-only control.
 
 ### G4 — Art Direction / Protagonist
 
-**State:** READY
+**State:** HUMAN_NEEDED
 **Depends on:** G0.
 **Owns:** pixel scale, palette, outline/lighting rules, factory visual grammar, protagonist silhouette/base design.
 **Human gate:** base protagonist identity approval before mass animation generation.
 **Done when:** visual bible is executable and one base protagonist identity is approved.
+
+**Current slice:** the executable visual contract and three gameplay-scale base
+identity candidates are complete. HC-ART-001 is open; G5 animation production is
+blocked, while G6/G7 and other unblocked work continue.
+
+**Evidence:** `docs/VISUAL-BIBLE.md`,
+`docs/reports/G4-PROTAGONIST-CANDIDATES-001.md`, and
+`artifacts/art-direction/`.
 
 ### G5 — Sprite Pipeline
 
@@ -130,10 +138,17 @@ crossing while preserving left/right-only control.
 
 ### G6 — FX / Game Feel
 
-**State:** READY
+**State:** ACTIVE
 **Depends on:** G0; shared runtime event boundaries preferred.
 **Owns:** explosion, impact, cold, heat, magnet feedback; camera impulse; hit-stop/impact freeze; particles/debris.
 **Done when:** mute play remains tactile and effects do not perturb authoritative simulation.
+
+**Current slice:** authoritative blast, landing, traversal-state, accepted
+interaction, magnetic attachment/release, and dispatch-scan events now drive
+presentation-only flashes, pulses, debris, squash, and camera impulses. Visual
+mute-first inspection remains before completion.
+
+**Evidence:** `docs/reports/G6-EVENT-FEEDBACK-001.md`.
 
 ### G7 — Environmental Storytelling
 

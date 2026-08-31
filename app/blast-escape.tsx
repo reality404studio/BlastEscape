@@ -114,6 +114,7 @@ export default function BlastEscape() {
     let demoActive = false;
     let bombs = initialGameplay.bombs;
     let interactionStates = initialGameplay.interactionStates;
+    let dispatchScanned = initialGameplay.dispatchScanned;
     const player = initialGameplay.player;
 
     const horizontalVelocity = () => playerHorizontalVelocity(player);
@@ -191,6 +192,7 @@ export default function BlastEscape() {
       demoActive = false;
       bombs = freshGameplay.bombs;
       interactionStates = freshGameplay.interactionStates;
+      dispatchScanned = freshGameplay.dispatchScanned;
       particles = [];
       contactParticles = [];
       waves = [];
@@ -307,7 +309,14 @@ export default function BlastEscape() {
         const keys = keysRef.current;
         const manualDirection = ((keys.has('d') || keys.has('arrowright') ? 1 : 0) -
           (keys.has('a') || keys.has('arrowleft') ? 1 : 0)) as Direction;
-        const gameplay = { levelElapsed, player, bombs, comboCount, interactionStates };
+        const gameplay = {
+          levelElapsed,
+          player,
+          bombs,
+          comboCount,
+          interactionStates,
+          dispatchScanned,
+        };
         const events = stepGameplay(
           gameplay,
           level,
@@ -320,6 +329,7 @@ export default function BlastEscape() {
         bombs = gameplay.bombs;
         comboCount = gameplay.comboCount;
         interactionStates = gameplay.interactionStates;
+        dispatchScanned = gameplay.dispatchScanned;
 
         for (const event of events) {
           if (event.type === 'moved') {
@@ -829,42 +839,79 @@ export default function BlastEscape() {
         );
       }
 
-      const exit = level.exit;
-      const exitUnlocked = !level.requiredCombo || comboCount >= level.requiredCombo;
-      const exitColor = exitUnlocked ? VISUAL.gold : '#77717f';
-      ctx.fillStyle = exitUnlocked ? 'rgba(255,200,86,0.055)' : 'rgba(119,113,127,0.05)';
-      ctx.fillRect(exit.x - 13, exit.y - 20, exit.w + 26, exit.h + 20);
-      ctx.fillStyle = '#241f27';
-      ctx.fillRect(exit.x - 5, exit.y - 5, exit.w + 10, exit.h + 5);
-      ctx.fillStyle = '#0d0c11';
-      ctx.fillRect(exit.x + 4, exit.y + 4, exit.w - 8, exit.h - 4);
-      ctx.strokeStyle = exitColor;
-      ctx.lineWidth = 2;
-      ctx.strokeRect(exit.x, exit.y, exit.w, exit.h);
-      ctx.fillStyle = exitColor;
-      ctx.fillRect(exit.x, exit.y, exit.w, 3);
-      ctx.fillRect(exit.x + exit.w - 6, exit.y + 8, 2, exit.h - 16);
-      ctx.beginPath();
-      ctx.arc(exit.x + exit.w - 11, exit.y + exit.h / 2, 3, 0, Math.PI * 2);
-      ctx.fill();
-      if (exitUnlocked) {
-        ctx.strokeStyle = 'rgba(255, 196, 79, 0.64)';
+      if (level.dispatchSequence) {
+        const { scanner, openDoor } = level.dispatchSequence;
+        ctx.fillStyle = '#181a20';
+        ctx.fillRect(scanner.x, scanner.y, scanner.w, scanner.h);
+        ctx.strokeStyle = dispatchScanned ? VISUAL.hot : VISUAL.mint;
         ctx.lineWidth = 2;
+        ctx.strokeRect(scanner.x, scanner.y, scanner.w, scanner.h);
+        ctx.fillStyle = dispatchScanned ? 'rgba(255, 81, 62, 0.2)' : 'rgba(102, 242, 213, 0.14)';
+        ctx.fillRect(scanner.x + 5, scanner.y + 5, scanner.w - 10, scanner.h - 10);
+        ctx.fillStyle = dispatchScanned ? VISUAL.hot : VISUAL.mint;
+        ctx.font = '700 9px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(dispatchScanned ? 'ORDER CANCELLED' : 'DISPATCH SCAN', scanner.x + scanner.w / 2, scanner.y - 8);
+        ctx.fillStyle = '#05070a';
+        ctx.fillRect(openDoor.x, openDoor.y, openDoor.w, openDoor.h);
+        ctx.strokeStyle = VISUAL.gold;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(openDoor.x, openDoor.y, openDoor.w, openDoor.h);
+        ctx.fillStyle = VISUAL.gold;
+        ctx.fillRect(openDoor.x + openDoor.w - 5, openDoor.y, 5, openDoor.h);
+        ctx.font = '700 9px ui-monospace, monospace';
+        ctx.fillText('EXIT OPEN', openDoor.x + openDoor.w / 2, openDoor.y - 8);
+        if (dispatchScanned) {
+          ctx.fillStyle = 'rgba(7, 8, 12, 0.9)';
+          ctx.fillRect(320, 30, 320, 74);
+          ctx.strokeStyle = VISUAL.hot;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(320, 30, 320, 74);
+          ctx.fillStyle = VISUAL.hot;
+          ctx.font = '900 21px ui-monospace, monospace';
+          ctx.fillText('OUTBOUND ORDER // CANCELLED', 480, 61);
+          ctx.fillStyle = '#b7afb9';
+          ctx.font = '700 10px ui-monospace, monospace';
+          ctx.fillText('NO ACTIVE DIRECTIVE', 480, 84);
+        }
+      } else {
+        const exit = level.exit;
+        const exitUnlocked = !level.requiredCombo || comboCount >= level.requiredCombo;
+        const exitColor = exitUnlocked ? VISUAL.gold : '#77717f';
+        ctx.fillStyle = exitUnlocked ? 'rgba(255,200,86,0.055)' : 'rgba(119,113,127,0.05)';
+        ctx.fillRect(exit.x - 13, exit.y - 20, exit.w + 26, exit.h + 20);
+        ctx.fillStyle = '#241f27';
+        ctx.fillRect(exit.x - 5, exit.y - 5, exit.w + 10, exit.h + 5);
+        ctx.fillStyle = '#0d0c11';
+        ctx.fillRect(exit.x + 4, exit.y + 4, exit.w - 8, exit.h - 4);
+        ctx.strokeStyle = exitColor;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(exit.x, exit.y, exit.w, exit.h);
+        ctx.fillStyle = exitColor;
+        ctx.fillRect(exit.x, exit.y, exit.w, 3);
+        ctx.fillRect(exit.x + exit.w - 6, exit.y + 8, 2, exit.h - 16);
         ctx.beginPath();
-        ctx.moveTo(exit.x + 14, exit.y + exit.h / 2);
-        ctx.lineTo(exit.x + exit.w - 20, exit.y + exit.h / 2);
-        ctx.lineTo(exit.x + exit.w - 27, exit.y + exit.h / 2 - 6);
-        ctx.moveTo(exit.x + exit.w - 20, exit.y + exit.h / 2);
-        ctx.lineTo(exit.x + exit.w - 27, exit.y + exit.h / 2 + 6);
-        ctx.stroke();
+        ctx.arc(exit.x + exit.w - 11, exit.y + exit.h / 2, 3, 0, Math.PI * 2);
+        ctx.fill();
+        if (exitUnlocked) {
+          ctx.strokeStyle = 'rgba(255, 196, 79, 0.64)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(exit.x + 14, exit.y + exit.h / 2);
+          ctx.lineTo(exit.x + exit.w - 20, exit.y + exit.h / 2);
+          ctx.lineTo(exit.x + exit.w - 27, exit.y + exit.h / 2 - 6);
+          ctx.moveTo(exit.x + exit.w - 20, exit.y + exit.h / 2);
+          ctx.lineTo(exit.x + exit.w - 27, exit.y + exit.h / 2 + 6);
+          ctx.stroke();
+        }
+        ctx.font = '700 10px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          exitUnlocked ? 'OUTBOUND' : `${level.requiredCombo}X TO OPEN`,
+          exit.x + exit.w / 2,
+          exit.y - 10,
+        );
       }
-      ctx.font = '700 10px ui-monospace, monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(
-        exitUnlocked ? 'OUTBOUND' : `${level.requiredCombo}X TO OPEN`,
-        exit.x + exit.w / 2,
-        exit.y - 10,
-      );
 
       bombs.forEach((bomb) => {
         const powered = bombIsPowered(bomb, interactionStates);
@@ -1114,7 +1161,7 @@ export default function BlastEscape() {
         ctx.fillStyle = VISUAL.gold;
         ctx.font = '900 74px ui-sans-serif, system-ui, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(nextLevel ? 'OUTBOUND' : 'ALL CLEAR', 480, 284);
+        ctx.fillText(nextLevel ? 'OUTBOUND' : 'END OF LINE', 480, 284);
         ctx.fillStyle = '#f5f2eb';
         ctx.font = '600 16px ui-monospace, monospace';
         if (nextLevel) {
@@ -1125,7 +1172,10 @@ export default function BlastEscape() {
           ctx.fillStyle = VISUAL.gold;
           ctx.fillRect(390, 344, 180 * progress, 4);
         } else {
-          ctx.fillText('EVERY DIRECTIVE COMPLETE / UNIT U-07 IS OUT', 480, 322);
+          ctx.fillText('ORDER CANCELLED / DEPARTURE CHOSEN', 480, 322);
+          ctx.fillStyle = '#b7afb9';
+          ctx.font = '600 11px ui-monospace, monospace';
+          ctx.fillText('BLAST ESCAPE  ·  THANK YOU FOR PLAYING', 480, 350);
         }
       }
       ctx.restore();

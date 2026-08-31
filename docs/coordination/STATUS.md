@@ -4,7 +4,7 @@ This file is the compact monitoring surface for Codex `/goal` work.
 
 ## Current phase
 
-**PHASE 8 — synthesis and ending production**
+**PHASE 9 — art, story, polish, and release production**
 
 G0 contracts and the repository audit are complete. G1 extracted typed level
 data and the authoritative gameplay step without changing constants, coordinates,
@@ -31,13 +31,15 @@ where the same bounded attachment inherits one authoritative moving rail and
 releases at its receiving endpoint. Level 22 now ships as `POLARITY HANDOFF`:
 heat wakes B1, its arc replaces heat with magnetism in an airborne coil, and a
 rightward rail crossing finishes the route. Level 23 now ships as `QUENCH DROP`:
-a carrier release replaces
-magnetism with cold during descent, freezes the landing basin, and sets up B2's
+a carrier release replaces magnetism with cold during descent, freezes the
+landing basin, and sets up B2's
 return to inspection. Level 24 now ships as `TEMPER CIRCUIT`: cold builds the B1
-transfer and locks its
-carriage, then heat replaces cold aboard it and wakes the required B2 return.
-G10 remains ACTIVE for Level 25 and the canonical dispatch ending.
-G8A blast replay coverage remains READY.
+transfer and locks its carriage, then heat replaces cold aboard it and wakes the
+required B2 return.
+Level 25 now ships as `FINAL INSPECTION`: one final B1-to-B2 air chain reaches
+dispatch, scanning reveals cancellation without ending control, and only the
+player's later walk through the already-open door completes the game. G10 is DONE.
+G4/G6/G7 and G8A are the next ready production tracks before final QA.
 
 ## Active / next goals
 
@@ -59,7 +61,7 @@ G8A blast replay coverage remains READY.
 | G9A Cold curriculum | DONE | G2 + G3B | Levels 10–14 accepted with route/dependency evidence |
 | G9B Heat levels | DONE | G2 + G3C | Levels 15–19 accepted with selective route hierarchy |
 | G9C Magnet introduction | DONE | G2 + G3D | Level 20 accepted |
-| G10 Synthesis / ending levels | ACTIVE | G2 + G3B–D + narrative | Levels 21–24 accepted; L25 and dispatch ending next |
+| G10 Synthesis / ending levels | DONE | G2 + G3B–D + narrative | Levels 21–25 and canonical player-controlled ending accepted |
 | G11 Final QA / release | PROPOSED | G4–G10 | full playthrough, save/pause/restart/build/perf |
 
 ## Open blockers
@@ -87,8 +89,8 @@ Expected first mandatory human call: protagonist base identity approval before m
 - Human calls are for judgment/taste/external choices, not routine implementation permission.
 - Baseline lint and production build pass at audit commit
   `5c02443795bca2db31e8faf02235a2bdc21a1c5b`.
-- The current final-clear overlay is explicitly noncanonical; the ending must be
-  rebuilt around cancellation, an open door, and retained player control.
+- The former noncanonical “all directives complete” overlay is replaced by the
+  scanner cancellation, retained-control, open-door departure contract in D-020.
 - G1 slice 001 extracted all eight level definitions, compatibility constants,
   movement/blast formulas, moving-platform math, and the Level 8 clean replay.
   Runtime imports the extracted modules; 7 characterization tests, lint, build,
@@ -205,6 +207,13 @@ Expected first mandatory human call: protagonist base identity approval before m
   its respective dependency. Eight final-steer samples, 30–144Hz, and ±80ms
   noise pass. 105 tests and Levels 8–24 validation pass. Evidence:
   `docs/reports/G10-SYNTHESIS-LEVEL-24-001.md`.
+- G10 Level 25 returns to a concise B1-to-B2 air chain before the final scanner.
+  Scanning records cancellation but never clears, pauses, or moves the player;
+  neutral waiting and leftward retreat remain possible. Only a later rightward
+  entry into the already-open departure completes the run. The accepted route
+  clears at 5.300s with 2X, ±100ms noise clears 100/100, and 30–144Hz passes.
+  111 tests and Levels 8–25 validation pass. Evidence:
+  `docs/reports/G10-ENDING-LEVEL-25-001.md`.
 
 ## Director update rule
 

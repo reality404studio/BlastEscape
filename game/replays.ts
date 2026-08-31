@@ -134,6 +134,10 @@ export const LEVEL_24_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: -1 },
 ];
 
+export const LEVEL_25_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: Number.POSITIVE_INFINITY, direction: 1 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -323,6 +327,15 @@ export const LEVEL_24_CLEAN_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_24_CLEAN_ROUTE,
 };
 
+export const LEVEL_25_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-25-final-inspection-clean-route',
+  levelId: 'level-25',
+  description: 'Take the final B1-to-B2 air relay, cross the scanner, retain control, and choose the already-open departure.',
+  frameRate: 60,
+  maxDurationSeconds: 11,
+  keyframes: LEVEL_25_CLEAN_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
@@ -341,6 +354,7 @@ export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_22_CLEAN_REPLAY,
   LEVEL_23_CLEAN_REPLAY,
   LEVEL_24_CLEAN_REPLAY,
+  LEVEL_25_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

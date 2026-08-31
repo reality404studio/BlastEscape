@@ -107,6 +107,7 @@
       "magnetic",
       "cold"
     ],
+    "dispatchScanned": false,
     "landingCount": 1,
     "maximumAirCombo": 1,
     "highestPointY": 152.34850589711945,

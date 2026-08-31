@@ -90,6 +90,12 @@ export type MeltableBarrier = {
   meltedByInteractionId: string;
 };
 
+export type DispatchSequence = {
+  scanner: Rect;
+  openDoor: Rect;
+  departure: Rect;
+};
+
 export type LevelIntent = {
   primaryRoute: string;
   launchJobs: Array<{ bomb: string; job: string }>;
@@ -144,6 +150,7 @@ export type LevelDefinition = {
   hotSurfaces?: HotSurface[];
   waterHazards?: WaterHazard[];
   meltableBarriers?: MeltableBarrier[];
+  dispatchSequence?: DispatchSequence;
 };
 
 export type PlayerState = {

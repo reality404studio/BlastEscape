@@ -102,6 +102,7 @@
       "cold",
       "heat"
     ],
+    "dispatchScanned": false,
     "landingCount": 1,
     "maximumAirCombo": 1,
     "highestPointY": 173.3018518518512,

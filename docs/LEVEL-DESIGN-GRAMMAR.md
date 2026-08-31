@@ -470,6 +470,20 @@ New concept, if any: None; a cold-created route hands control to a heat-powered 
 What previous skills are recombined: temporary ice, cold machinery lock, B1 transfer, state replacement, heat charge reactivation, prepared B2 return.
 ```
 
+### Level 25 — FINAL INSPECTION (accepted intent)
+
+```text
+LEVEL 25 — FINAL INSPECTION
+Primary route: START -> prepared B1 -> airborne B2 relay -> dispatch deck -> walk through final scanner -> outbound order changes to CANCELLED -> control remains active with no replacement objective -> player chooses to walk through the already-open right door -> departure -> END
+Launch job(s): B1 starts one clean callback arc; B2 continues the airborne chain and places the player on the broad dispatch deck.
+Landing window(s): The dispatch deck is wide. The scanner and open door are ground-level spaces with no timing precision.
+Timing window(s): The two-blast relay is prepared and readable. After scanning, there is no timer, forced motion, or auto-completion.
+Recovery state: Safe before B1; missed relays return to the lower line or exposed pit depending on the arc. Restart remains immediate.
+Mastery shortcut: None. The final check is intentionally concise so the cancellation and voluntary departure can breathe.
+New concept, if any: The dispatch scanner records cancellation without clearing the level; only a later player-controlled departure through the already-open door completes the game.
+What previous skills are recombined: prepared blast launch, two-blast air chain, landing control, ordinary left/right walking.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

@@ -96,6 +96,7 @@
     "acquiredStates": [
       "magnetic"
     ],
+    "dispatchScanned": false,
     "landingCount": 0,
     "maximumAirCombo": 1,
     "highestPointY": 171,

@@ -113,6 +113,7 @@
     ],
     "acceptedInteractions": [],
     "acquiredStates": [],
+    "dispatchScanned": false,
     "landingCount": 0,
     "maximumAirCombo": 5,
     "highestPointY": 18,

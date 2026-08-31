@@ -95,6 +95,7 @@
     "acquiredStates": [
       "cold"
     ],
+    "dispatchScanned": false,
     "landingCount": 1,
     "maximumAirCombo": 1,
     "highestPointY": 378.84590979300924,

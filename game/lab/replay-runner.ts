@@ -17,6 +17,7 @@ export type ReplayResult = {
   blastHits: string[];
   acceptedInteractions: string[];
   acquiredStates: string[];
+  dispatchScanned: boolean;
   landingCount: number;
   maximumAirCombo: number;
   highestPointY: number;
@@ -97,6 +98,7 @@ export function runReplay(
     blastHits,
     acceptedInteractions,
     acquiredStates,
+    dispatchScanned: state.dispatchScanned,
     landingCount,
     maximumAirCombo,
     highestPointY,

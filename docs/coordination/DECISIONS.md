@@ -141,3 +141,13 @@ the carrier's frame-to-frame displacement and may reposition only with existing
 left/right control. A direction change at the configured endpoint releases back
 to gravity. This extends D-018 without a second motion system, free flight, a new
 input, or a Level 21-only controller.
+
+## D-020 — Dispatch scanning reveals cancellation but does not clear the game
+
+A final level may define a dispatch scanner, already-open door, and departure
+volume. Crossing the scanner records one authoritative `dispatchScanned` state
+and emits `dispatch-scanned`; it does not freeze simulation, move the player, or
+complete the level. Completion requires the scanned player to later enter the
+separate departure volume using ordinary left/right control. Runtime signage and
+headless replay observe the same state. This replaces the prototype's automatic
+“all directives complete” ending while preserving D-005 player agency.

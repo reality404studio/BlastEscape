@@ -25,6 +25,7 @@ export type GameplayState = {
   bombs: BombState[];
   comboCount: number;
   interactionStates: Record<string, { active: boolean; remainingSeconds: number }>;
+  dispatchScanned: boolean;
 };
 
 export type DirectionSource = Direction | ((levelElapsed: number) => Direction);
@@ -48,6 +49,7 @@ export type GameplayEvent =
     }
   | { type: 'died'; reason: 'spikes' | 'fall' | 'hot-surface' | 'water' }
   | { type: 'cleared' }
+  | { type: 'dispatch-scanned' }
   | {
       type: 'traversal-state-changed';
       previous: ActiveTraversalState;
@@ -95,6 +97,7 @@ export function createGameplayState(level: LevelDefinition): GameplayState {
     },
     bombs: freshBombs(level),
     comboCount: 0,
+    dispatchScanned: false,
     interactionStates: Object.fromEntries(
       (level.traversalInteractions ?? []).map((interaction) => [
         interaction.id,
@@ -546,7 +549,19 @@ export function stepGameplay(
   }
 
   const exitUnlocked = !level.requiredCombo || state.comboCount >= level.requiredCombo;
-  if (exitUnlocked && overlaps(playerRect(state.player), level.exit)) {
+  if (level.dispatchSequence) {
+    if (!state.dispatchScanned && overlaps(playerRect(state.player), level.dispatchSequence.scanner)) {
+      state.dispatchScanned = true;
+      events.push({ type: 'dispatch-scanned' });
+    }
+    if (
+      exitUnlocked &&
+      state.dispatchScanned &&
+      overlaps(playerRect(state.player), level.dispatchSequence.departure)
+    ) {
+      events.push({ type: 'cleared' });
+    }
+  } else if (exitUnlocked && overlaps(playerRect(state.player), level.exit)) {
     events.push({ type: 'cleared' });
   }
   if (state.player.y > CONFIG.worldHeight + 80) {

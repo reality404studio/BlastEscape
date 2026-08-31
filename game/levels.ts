@@ -1583,4 +1583,57 @@ export const LEVELS: readonly LevelDefinition[] = [
       },
     ],
   },
+  {
+    id: 'level-25',
+    name: 'LEVEL 25',
+    subtitle: 'FINAL INSPECTION',
+    hint: 'One last relay to dispatch. After the scanner, the open door waits for your input.',
+    intent: {
+      primaryRoute: 'START -> B1 -> airborne B2 -> dispatch deck -> final scanner -> order cancelled with control retained -> player walks through already-open door -> departure',
+      launchJobs: [
+        { bomb: 'B1', job: 'Start one clean callback arc toward the airborne dispatch relay.' },
+        { bomb: 'B2', job: 'Continue the air chain and place the player on the broad dispatch deck.' },
+      ],
+      landingWindows: [
+        { target: 'dispatch deck', kind: 'wide', description: 'The final mechanical check yields a broad, calm arrival before the scanner.' },
+        { target: 'scanner and open door', kind: 'wide', description: 'Both are ground-level spaces with no precision requirement.' },
+      ],
+      timingWindows: [
+        { target: 'B1-to-B2 relay', kind: 'commit', description: 'The two prepared charges form one readable final air chain.' },
+        { target: 'post-scan departure', kind: 'open', description: 'There is no timer, forced movement, or automatic departure after cancellation.' },
+      ],
+      recovery: { kind: 'recoverable', description: 'The lower line is safe before B1; failed relay arcs either return there or expose the central pit.' },
+      masteryShortcut: null,
+      newConcept: 'The scanner reveals cancellation without ending control; only the player entering the open departure completes the game.',
+      recombinedSkills: ['prepared blast launch', 'two-blast air chain', 'landing control', 'ordinary left/right walking'],
+      targetFirstClearSeconds: { min: 120, max: 240 },
+    },
+    validation: {
+      requiredBlastHits: ['B1', 'B2'],
+      minimumAirCombo: 2,
+      simplePoliciesMustFail: ['hold-left', 'neutral'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 100, samples: 100, minimumClearRate: 0.8 },
+      ],
+    },
+    start: { x: 72, y: 514 },
+    platforms: [
+      { x: 0, y: 550, w: 430, h: 50 },
+      { x: 394, y: 508, w: 14, h: 42 },
+      { x: 700, y: 300, w: 260, h: 22 },
+      { x: 0, y: 0, w: 960, h: 18 },
+      { x: 0, y: 0, w: 18, h: 600 },
+    ],
+    bombs: [
+      { x: 381, y: 532, delay: -1.8, label: 'B1' },
+      { x: 590, y: 330, delay: -0.9, label: 'B2', floating: true },
+    ],
+    exit: { x: 930, y: 220, w: 54, h: 100 },
+    pit: { x: 430, y: 300, w: 270, h: 300 },
+    dispatchSequence: {
+      scanner: { x: 700, y: 236, w: 80, h: 64 },
+      openDoor: { x: 910, y: 220, w: 42, h: 80 },
+      departure: { x: 930, y: 220, w: 54, h: 100 },
+    },
+  },
 ];

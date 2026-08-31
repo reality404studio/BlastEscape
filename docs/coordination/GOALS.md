@@ -210,21 +210,22 @@ free flight.
 
 ### G10 — Synthesis / Ending
 
-**State:** ACTIVE
+**State:** DONE
 **Depends on:** G2 + G3B + G3C + G3D + narrative contract.
 **Owns:** Levels 21–25, dispatch scanner sequence, cancellation reveal, open-door exit.
 **Human gate:** ending meaning must remain cancellation -> no new objective -> player-controlled departure.
 **Done when:** synthesis levels are fair and the ending lands without dialogue/cutscene exposition.
 
-**Current slice:** Levels 21–24 are accepted. Level 24 closes full gameplay
-escalation with a cold-built B1 route handing off to heat-powered B2. Level 25 is
-next: a bounded dispatch approach and final gameplay check, followed by the
-canonical scanner cancellation reveal and player-controlled open-door departure.
+**Current slice:** Levels 21–25 and the canonical ending are accepted. Level 25
+returns to a concise B1-to-B2 air chain, then separates dispatch scanning from
+completion: cancellation preserves control, and only the player's later movement
+through the already-open door ends the run.
 
 **Evidence:** `docs/reports/G10-SYNTHESIS-LEVEL-21-001.md` and
 `docs/reports/G10-SYNTHESIS-LEVEL-22-001.md`,
 `docs/reports/G10-SYNTHESIS-LEVEL-23-001.md`,
-`docs/reports/G10-SYNTHESIS-LEVEL-24-001.md`, plus their Level Lab artifacts.
+`docs/reports/G10-SYNTHESIS-LEVEL-24-001.md`, and
+`docs/reports/G10-ENDING-LEVEL-25-001.md`, plus their Level Lab artifacts.
 
 ### G11 — Final QA / Release
 

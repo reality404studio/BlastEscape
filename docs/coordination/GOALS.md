@@ -152,11 +152,18 @@ mute-first inspection remains before completion.
 
 ### G7 — Environmental Storytelling
 
-**State:** READY
+**State:** VERIFYING
 **Depends on:** G0.
 **Owns:** factory zones, props, signage, production/inspection context, visual foreshadowing, ending-space language.
 **Cannot own:** gameplay physics or level-route rewrites unless coordinated.
 **Done when:** a player can infer shipment/testing/factory context without dialogue.
+
+**Current slice:** a tested five-zone presentation map and low-contrast runtime
+background pass now progress from mobility testing through production, transfer,
+and dispatch without entering gameplay state. Interactive visual inspection
+remains before completion.
+
+**Evidence:** `docs/reports/G7-ZONE-STORY-001.md`.
 
 ### G8A — Blast Curriculum Migration / Preservation
 

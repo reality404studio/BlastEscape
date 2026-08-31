@@ -151,3 +151,12 @@ complete the level. Completion requires the scanned player to later enter the
 separate departure volume using ordinary left/right control. Runtime signage and
 headless replay observe the same state. This replaces the prototype's automatic
 “all directives complete” ending while preserving D-005 player agency.
+
+## D-021 — Factory-zone presentation stays data-owned and non-authoritative
+
+`game/presentation.ts` maps the 25 levels to mobility test, coolant, thermal,
+induction transfer, and dispatch presentation zones. Canvas code may render each
+zone's low-contrast motifs and functional label, but those props do not enter
+level collision, interaction, replay, or completion state. This makes the
+nonverbal factory-to-shipment progression consistent without turning visual
+foreshadowing into hidden gameplay geometry or a second level scripting system.

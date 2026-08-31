@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { CONFIG } from '@/game/config';
 import { bombIsPowered, createGameplayState, spikeTriangles, stepGameplay } from '@/game/core';
 import { LEVELS } from '@/game/levels';
+import { factoryZoneForLevelIndex } from '@/game/presentation';
 import {
   movingPlatformAt,
   playerHorizontalVelocity,
@@ -483,6 +484,97 @@ export default function BlastEscape() {
       ctx.fill();
     };
 
+    const drawFactoryZone = (levelIndex: number, time: number) => {
+      const zone = factoryZoneForLevelIndex(levelIndex);
+      const accent = zone.accent === 'cold'
+        ? VISUAL.cold
+        : zone.accent === 'mint'
+          ? VISUAL.mint
+          : zone.accent === 'gold'
+            ? VISUAL.gold
+            : VISUAL.hot;
+
+      ctx.save();
+      ctx.globalAlpha = 0.24;
+      ctx.fillStyle = VISUAL.structureDark;
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 2;
+
+      if (zone.id === 'mobility-test') {
+        [214, 480, 746].forEach((x, index) => {
+          ctx.strokeRect(x, 82 + (index % 2) * 42, 92, 126);
+          for (let y = 96; y < 192 + (index % 2) * 42; y += 16) {
+            ctx.fillStyle = index === levelIndex % 3 ? accent : VISUAL.structureEdge;
+            ctx.fillRect(x + 8, y, index === levelIndex % 3 ? 18 : 8, 2);
+          }
+        });
+        ctx.fillStyle = accent;
+        for (let x = 116; x < 872; x += 32) ctx.fillRect(x, 248, 12, 2);
+      } else if (zone.id === 'coolant-works') {
+        ctx.fillRect(54, 72, 852, 14);
+        [154, 418, 746].forEach((x) => {
+          ctx.fillRect(x, 72, 18, 134);
+          ctx.strokeRect(x - 6, 98, 30, 18);
+        });
+        ctx.fillStyle = accent;
+        for (let x = 170; x < 820; x += 82) {
+          const dripY = 118 + Math.round(((time / 18 + x) % 54) / 2) * 2;
+          ctx.fillRect(x, dripY, 3, 8);
+        }
+        ctx.strokeRect(70, 154, 120, 88);
+        ctx.strokeRect(770, 164, 112, 78);
+      } else if (zone.id === 'thermal-processing') {
+        [74, 792].forEach((x) => {
+          ctx.fillRect(x, 92, 96, 190);
+          ctx.strokeRect(x + 12, 118, 72, 128);
+          ctx.fillStyle = accent;
+          for (let y = 136; y < 230; y += 22) ctx.fillRect(x + 24, y, 48, 4);
+          ctx.fillStyle = VISUAL.structureDark;
+        });
+        ctx.fillStyle = accent;
+        for (let x = 226; x < 750; x += 74) ctx.fillRect(x, 104, 38, 3);
+        ctx.strokeRect(346, 70, 268, 70);
+      } else if (zone.id === 'induction-transfer') {
+        ctx.fillRect(62, 76, 838, 8);
+        ctx.fillRect(62, 108, 838, 4);
+        [160, 352, 544, 736].forEach((x) => {
+          ctx.strokeRect(x, 88, 62, 42);
+          ctx.fillStyle = accent;
+          ctx.fillRect(x + 8, 100, 46, 4);
+          ctx.fillStyle = VISUAL.structureDark;
+        });
+        [244, 468, 692].forEach((x) => {
+          ctx.strokeRect(x, 168, 84, 54);
+          ctx.fillRect(x + 8, 178, 68, 34);
+        });
+      } else {
+        ctx.globalAlpha = 0.34;
+        [104, 292, 480].forEach((x) => {
+          ctx.strokeRect(x, 102, 132, 154);
+          ctx.strokeRect(x + 18, 122, 96, 114);
+        });
+        ctx.fillStyle = accent;
+        for (let x = 614; x < 858; x += 48) {
+          ctx.beginPath();
+          ctx.moveTo(x, 132);
+          ctx.lineTo(x + 18, 144);
+          ctx.lineTo(x, 156);
+          ctx.lineTo(x + 7, 144);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.strokeRect(850, 84, 82, 190);
+        ctx.fillRect(924, 96, 4, 166);
+      }
+
+      ctx.globalAlpha = 0.34;
+      ctx.fillStyle = accent;
+      ctx.font = '700 8px ui-monospace, monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(zone.functionLabel, 38, 42);
+      ctx.restore();
+    };
+
     const draw = (time: number) => {
       const level = LEVELS[activeLevelIndex];
       const stabilizerId = level.movingPlatform?.stabilizedByInteractionId;
@@ -541,6 +633,8 @@ export default function BlastEscape() {
       ctx.stroke();
       ctx.fillStyle = 'rgba(255, 173, 55, 0.07)';
       for (let x = 238; x < 754; x += 96) ctx.fillRect(x, 116, 26, 2);
+
+      drawFactoryZone(activeLevelIndex, time);
 
       level.traversalStateSources?.forEach((source) => {
         if (

@@ -51,6 +51,11 @@ magnetic, interaction, and dispatch events to presentation-only feedback. The
 111-test suite, lint, and production build pass; interactive mute-first visual
 inspection remains.
 
+G7 slice 001 now renders five tested factory departments behind gameplay:
+mobility test, coolant works, thermal processing, induction transfer, and final
+dispatch. It remains VERIFYING until interactive visual inspection. The combined
+suite is 118/118 with lint/build passing.
+
 ## Active / next goals
 
 | Goal | State | Depends on | Purpose |
@@ -65,7 +70,7 @@ inspection remains.
 | G4 Art direction / protagonist | HUMAN_NEEDED | G0 | visual contract/candidates complete; HC-ART-001 open |
 | G5 Sprite pipeline | PROPOSED | G4 approval | SpriteGen integration and atlas/manifest pipeline |
 | G6 FX / game feel | ACTIVE | G0; stable runtime events | event-driven mute-first feedback; visual inspection remains |
-| G7 Environmental story | READY | G0 | factory zones, signage, nonverbal narrative |
+| G7 Environmental story | VERIFYING | G0 | five-zone nonverbal progression; visual inspection remains |
 | G8A Blast curriculum migration | DONE | G2 | Levels 1–8 accepted replays and validator evidence complete |
 | G8B Cold introduction | DONE | G2 + G3B | Level 9 complete |
 | G9A Cold curriculum | DONE | G2 + G3B | Levels 10–14 accepted with route/dependency evidence |
@@ -84,6 +89,17 @@ inspection remains.
 
 - Ongoing director work is published in Draft PR #5:
   `https://github.com/reality404studio/BlastEscape/pull/5`.
+
+## Safe resume point
+
+- G7 zone presentation is implemented and verified by tests/lint/build; resume
+  with interactive visual inspection, then either mark G7 DONE or tune only
+  presentation-layer opacity/placement.
+- G6 remains ACTIVE for the same mute-first visual inspection pass.
+- HC-ART-001 remains the only open human gate. Do not begin G5 mass character
+  animation until the protagonist base identity is resolved.
+- G8A and gameplay progression through the canonical ending are DONE; do not
+  reopen physics or level geometry without new evidence.
 
 ## Open human calls
 
@@ -115,6 +131,10 @@ A. Evidence: `docs/reports/G4-PROTAGONIST-CANDIDATES-001.md`.
   contracts, JSON reports, and regression tests; Level 8 retains its full slalom
   evidence. Levels 2–6 also clear one replay across 30–144Hz. The suite is now
   116/116. Evidence: `docs/reports/G8A-BLAST-CURRICULUM-001.md`.
+- G7 slice 001 adds a tested five-zone presentation map and restrained background
+  motifs that progress from mobility test bays to dispatch without gameplay
+  state or dialogue. 118 tests, lint, and build pass. Evidence:
+  `docs/reports/G7-ZONE-STORY-001.md`.
 - G1 slice 001 extracted all eight level definitions, compatibility constants,
   movement/blast formulas, moving-platform math, and the Level 8 clean replay.
   Runtime imports the extracted modules; 7 characterization tests, lint, build,

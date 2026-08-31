@@ -160,12 +160,15 @@ mute-first inspection remains before completion.
 
 ### G8A — Blast Curriculum Migration / Preservation
 
-**State:** READY
+**State:** DONE
 **Depends on:** G2.
 **Owns:** Levels 1–8 after schema migration, preserving known good feel/routes and
 locking regression evidence before tuning.
 **Done when:** the blast curriculum is coherent in the shared schema and every
 accepted route has replay/validator evidence.
+
+**Evidence:** `docs/reports/G8A-BLAST-CURRICULUM-001.md` and
+`artifacts/level-validation/level-1.json` through `level-8.json`.
 
 ### G8B — Cold Introduction
 

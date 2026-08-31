@@ -1,0 +1,104 @@
+{
+  "generatedBy": "npm run validate:levels",
+  "schemaVersion": 1,
+  "levelId": "level-1",
+  "levelName": "LEVEL 1 — TEST CHAMBER",
+  "replayId": "level-1-test-chamber-clean-route",
+  "status": "warn",
+  "evaluations": [
+    {
+      "evaluator": "reachability",
+      "id": "accepted-route-clears",
+      "status": "pass",
+      "summary": "Accepted replay clears in 8.033s.",
+      "metrics": {
+        "outcome": "cleared",
+        "elapsedSeconds": 8.033333333333312,
+        "maximumAirCombo": 1
+      }
+    },
+    {
+      "evaluator": "exploit",
+      "id": "simple-policy-bypass",
+      "status": "pass",
+      "summary": "No forbidden constant-direction policy clears the level.",
+      "metrics": {
+        "testedPolicies": [
+          "hold-left",
+          "neutral",
+          "hold-right"
+        ],
+        "bypassPolicies": []
+      }
+    },
+    {
+      "evaluator": "noisy-human",
+      "id": "timing-jitter",
+      "status": "warn",
+      "summary": "No noisy-human robustness profile is defined for this level.",
+      "metrics": {
+        "profiles": 0
+      }
+    },
+    {
+      "evaluator": "mechanic",
+      "id": "intended-mechanic-use",
+      "status": "pass",
+      "summary": "Accepted replay exercises the required blasts and combo.",
+      "metrics": {
+        "requiredBlastHits": [
+          "B1",
+          "B2",
+          "B3"
+        ],
+        "actualBlastHits": [
+          "B1",
+          "B2",
+          "B3"
+        ],
+        "missingBlastHits": [],
+        "requiredInteractions": [],
+        "actualInteractions": [],
+        "missingInteractions": [],
+        "requiredStates": [],
+        "actualStates": [],
+        "missingStates": [],
+        "minimumAirCombo": 0,
+        "actualMaximumAirCombo": 1
+      }
+    }
+  ],
+  "acceptedReplay": {
+    "replayId": "level-1-test-chamber-clean-route",
+    "levelId": "level-1",
+    "outcome": "cleared",
+    "elapsedSeconds": 8.033333333333312,
+    "frames": 482,
+    "frameRate": 60,
+    "deathReason": null,
+    "blastExplosions": [
+      "B1",
+      "B2",
+      "B3"
+    ],
+    "blastHits": [
+      "B1",
+      "B2",
+      "B3"
+    ],
+    "acceptedInteractions": [],
+    "acquiredStates": [],
+    "dispatchScanned": false,
+    "landingCount": 2,
+    "maximumAirCombo": 1,
+    "highestPointY": 41.86030777682751,
+    "finalPlayer": {
+      "x": 808.1328987175157,
+      "y": 192.88291567370425,
+      "controlVx": 275,
+      "blastVx": 513.2310714764812,
+      "vy": -540.4695040221884
+    }
+  },
+  "caveat": "These evaluators reject broken or contract-violating routes; they do not prove fun."
+}

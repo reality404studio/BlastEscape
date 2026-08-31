@@ -41,8 +41,10 @@ dispatch, scanning reveals cancellation without ending control, and only the
 player's later walk through the already-open door completes the game. G10 is DONE.
 G4 now has an executable visual contract and three protagonist identity
 candidates. HC-ART-001 is OPEN with A (Foundry Pod) recommended; character
-animation production remains blocked at that gate. G6/G7 and G8A continue as
-unblocked production tracks before final QA.
+animation production remains blocked at that gate. G8A now locks accepted
+repository replays and validator evidence for the complete Levels 1–8 blast
+curriculum without geometry or physics changes. G6/G7 continue as unblocked
+production tracks before final QA.
 
 G6 slice 001 now maps existing authoritative blast, landing, traversal,
 magnetic, interaction, and dispatch events to presentation-only feedback. The
@@ -64,7 +66,7 @@ inspection remains.
 | G5 Sprite pipeline | PROPOSED | G4 approval | SpriteGen integration and atlas/manifest pipeline |
 | G6 FX / game feel | ACTIVE | G0; stable runtime events | event-driven mute-first feedback; visual inspection remains |
 | G7 Environmental story | READY | G0 | factory zones, signage, nonverbal narrative |
-| G8A Blast curriculum migration | READY | G2 | preserve/migrate L1–8 |
+| G8A Blast curriculum migration | DONE | G2 | Levels 1–8 accepted replays and validator evidence complete |
 | G8B Cold introduction | DONE | G2 + G3B | Level 9 complete |
 | G9A Cold curriculum | DONE | G2 + G3B | Levels 10–14 accepted with route/dependency evidence |
 | G9B Heat levels | DONE | G2 + G3C | Levels 15–19 accepted with selective route hierarchy |
@@ -109,6 +111,10 @@ A. Evidence: `docs/reports/G4-PROTAGONIST-CANDIDATES-001.md`.
   flashes, state/contact pulses, particles, landing squash, and camera impulse.
   111 tests, lint, and build pass. Evidence:
   `docs/reports/G6-EVENT-FEEDBACK-001.md`.
+- G8A now gives Levels 1–7 named clean replays, required-blast and simple-policy
+  contracts, JSON reports, and regression tests; Level 8 retains its full slalom
+  evidence. Levels 2–6 also clear one replay across 30–144Hz. The suite is now
+  116/116. Evidence: `docs/reports/G8A-BLAST-CURRICULUM-001.md`.
 - G1 slice 001 extracted all eight level definitions, compatibility constants,
   movement/blast formulas, moving-platform math, and the Level 8 clean replay.
   Runtime imports the extracted modules; 7 characterization tests, lint, build,

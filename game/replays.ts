@@ -14,6 +14,70 @@ export type ReplayDefinition = {
   keyframes: readonly DirectionKeyframe[];
 };
 
+export const LEVEL_1_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 0.8, direction: 1 },
+  { until: 0.9, direction: -1 },
+  { until: 5.05, direction: 0 },
+  { until: 5.3, direction: 1 },
+  { until: 5.8, direction: 0 },
+  { until: 6.05, direction: 1 },
+  { until: 6.3, direction: 0 },
+  { until: 6.55, direction: -1 },
+  { until: 7.05, direction: 1 },
+  { until: 7.55, direction: 0 },
+  { until: 8.05, direction: 1 },
+  { until: Number.POSITIVE_INFINITY, direction: 0 },
+];
+
+export const LEVEL_2_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 1.305, direction: 1 },
+  { until: 1.37, direction: -1 },
+  { until: 4.8, direction: 0 },
+  { until: Number.POSITIVE_INFINITY, direction: 1 },
+];
+
+export const LEVEL_3_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 0.95, direction: 1 },
+  { until: 1, direction: -1 },
+  { until: 4.8, direction: 0 },
+  { until: 4.9, direction: 1 },
+  { until: 5.4, direction: -1 },
+  { until: Number.POSITIVE_INFINITY, direction: 1 },
+];
+
+export const LEVEL_4_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 1.1279, direction: 1 },
+  { until: 1.2559, direction: -1 },
+  { until: 4.8148, direction: 0 },
+  { until: Number.POSITIVE_INFINITY, direction: 1 },
+];
+
+export const LEVEL_5_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 0.5902, direction: 1 },
+  { until: 0.6296, direction: -1 },
+  { until: 4.8648, direction: 0 },
+  { until: Number.POSITIVE_INFINITY, direction: 1 },
+];
+
+export const LEVEL_6_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 0.62, direction: 1 },
+  { until: 0.7, direction: -1 },
+  { until: 2, direction: 0 },
+  { until: Number.POSITIVE_INFINITY, direction: 1 },
+];
+
+export const LEVEL_7_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 0.45, direction: 1 },
+  { until: 0.5, direction: -1 },
+  { until: 2.3, direction: 0 },
+  { until: 4.62, direction: 1 },
+  { until: 5.35, direction: -1 },
+  { until: 5.65, direction: 1 },
+  { until: 6.225, direction: 0 },
+  { until: 6.72, direction: -1 },
+  { until: Number.POSITIVE_INFINITY, direction: 0 },
+];
+
 export const LEVEL_8_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
   { until: 2.9, direction: 1 },
   { until: 3.3, direction: -1 },
@@ -137,6 +201,69 @@ export const LEVEL_24_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
 export const LEVEL_25_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: 1 },
 ];
+
+export const LEVEL_1_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-1-test-chamber-clean-route',
+  levelId: 'level-1',
+  description: 'Set up B1, climb the two broad decks through B2, then confirm the final B3 launch into the exit.',
+  frameRate: 60,
+  maxDurationSeconds: 12,
+  keyframes: LEVEL_1_CLEAN_ROUTE,
+};
+
+export const LEVEL_2_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-2-trajectory-test-clean-route',
+  levelId: 'level-2',
+  description: 'Set a rightward B1 line, then steer through the visible opening and across the exit deck.',
+  frameRate: 60,
+  maxDurationSeconds: 8,
+  keyframes: LEVEL_2_CLEAN_ROUTE,
+};
+
+export const LEVEL_3_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-3-tight-pocket-clean-route',
+  levelId: 'level-3',
+  description: 'Launch through the slot, counter-steer to brake, then settle into the exit pocket.',
+  frameRate: 60,
+  maxDurationSeconds: 8,
+  keyframes: LEVEL_3_CLEAN_ROUTE,
+};
+
+export const LEVEL_4_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-4-air-combo-clean-route',
+  levelId: 'level-4',
+  description: 'Use B1 to meet floating B2 without touching down, then carry the 2X chain onto the exit deck.',
+  frameRate: 60,
+  maxDurationSeconds: 8,
+  keyframes: LEVEL_4_CLEAN_ROUTE,
+};
+
+export const LEVEL_5_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-5-synthesis-clean-route',
+  levelId: 'level-5',
+  description: 'Take B1 across the first pit, meet B2 without touching the teeth, then descend through the exit.',
+  frameRate: 60,
+  maxDurationSeconds: 9,
+  keyframes: LEVEL_5_CLEAN_ROUTE,
+};
+
+export const LEVEL_6_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-6-intercept-clean-route',
+  levelId: 'level-6',
+  description: 'Use B1 to intercept the moving platform at its rightward approach, land on it, then walk onto the exit deck.',
+  frameRate: 60,
+  maxDurationSeconds: 6,
+  keyframes: LEVEL_6_CLEAN_ROUTE,
+};
+
+export const LEVEL_7_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-7-return-arc-clean-route',
+  levelId: 'level-7',
+  description: 'Clear the first teeth, use B2 to return left, settle left of B3, then launch into the upper-left exit.',
+  frameRate: 60,
+  maxDurationSeconds: 10,
+  keyframes: LEVEL_7_CLEAN_ROUTE,
+};
 
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
@@ -337,6 +464,13 @@ export const LEVEL_25_CLEAN_REPLAY: ReplayDefinition = {
 };
 
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
+  LEVEL_1_CLEAN_REPLAY,
+  LEVEL_2_CLEAN_REPLAY,
+  LEVEL_3_CLEAN_REPLAY,
+  LEVEL_4_CLEAN_REPLAY,
+  LEVEL_5_CLEAN_REPLAY,
+  LEVEL_6_CLEAN_REPLAY,
+  LEVEL_7_CLEAN_REPLAY,
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
   LEVEL_10_CLEAN_REPLAY,

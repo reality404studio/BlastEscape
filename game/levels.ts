@@ -21,7 +21,10 @@ export const LEVELS: readonly LevelDefinition[] = [
       recombinedSkills: [],
       targetFirstClearSeconds: { min: 35, max: 90 },
     },
-    validation: {},
+    validation: {
+      requiredBlastHits: ['B1', 'B2', 'B3'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+    },
     start: { x: 92, y: 514 },
     platforms: [
       { x: 0, y: 550, w: 960, h: 50 },
@@ -53,7 +56,13 @@ export const LEVELS: readonly LevelDefinition[] = [
       recombinedSkills: ['blast proximity', 'side choice'],
       targetFirstClearSeconds: { min: 45, max: 110 },
     },
-    validation: {},
+    validation: {
+      requiredBlastHits: ['B1'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 30, samples: 100, minimumClearRate: 0.8 },
+      ],
+    },
     start: { x: 92, y: 514 },
     platforms: [
       { x: 0, y: 550, w: 960, h: 50 },
@@ -83,7 +92,13 @@ export const LEVELS: readonly LevelDefinition[] = [
       recombinedSkills: ['launch line', 'midair steering'],
       targetFirstClearSeconds: { min: 55, max: 140 },
     },
-    validation: {},
+    validation: {
+      requiredBlastHits: ['B1'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 10, samples: 100, minimumClearRate: 0.7 },
+      ],
+    },
     start: { x: 92, y: 464 },
     platforms: [
       { x: 0, y: 500, w: 390, h: 22 },
@@ -118,7 +133,14 @@ export const LEVELS: readonly LevelDefinition[] = [
       recombinedSkills: ['launch line', 'midair steering'],
       targetFirstClearSeconds: { min: 60, max: 150 },
     },
-    validation: { requiredBlastHits: ['B1', 'B2'], minimumAirCombo: 2 },
+    validation: {
+      requiredBlastHits: ['B1', 'B2'],
+      minimumAirCombo: 2,
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 30, samples: 100, minimumClearRate: 0.6 },
+      ],
+    },
     start: { x: 92, y: 514 },
     platforms: [
       { x: 0, y: 550, w: 960, h: 50 },
@@ -155,7 +177,13 @@ export const LEVELS: readonly LevelDefinition[] = [
       recombinedSkills: ['air braking', 'air chain'],
       targetFirstClearSeconds: { min: 75, max: 180 },
     },
-    validation: {},
+    validation: {
+      requiredBlastHits: ['B1', 'B2'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 10, samples: 100, minimumClearRate: 0.6 },
+      ],
+    },
     start: { x: 92, y: 514 },
     platforms: [
       { x: 0, y: 550, w: 300, h: 50 },
@@ -190,7 +218,14 @@ export const LEVELS: readonly LevelDefinition[] = [
       recombinedSkills: ['blast strength by proximity', 'air steering'],
       targetFirstClearSeconds: { min: 80, max: 200 },
     },
-    validation: {},
+    validation: {
+      requiredBlastHits: ['B1'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+      noisyHumanProfiles: [
+        { jitterMilliseconds: 30, samples: 100, minimumClearRate: 0.9 },
+        { jitterMilliseconds: 50, samples: 100, minimumClearRate: 0.4 },
+      ],
+    },
     start: { x: 92, y: 514 },
     platforms: [
       { x: 0, y: 550, w: 330, h: 50 },
@@ -235,7 +270,10 @@ export const LEVELS: readonly LevelDefinition[] = [
       recombinedSkills: ['blast timing', 'air steering', 'route hierarchy'],
       targetFirstClearSeconds: { min: 100, max: 240 },
     },
-    validation: {},
+    validation: {
+      requiredBlastHits: ['B1', 'B2', 'B3'],
+      simplePoliciesMustFail: ['hold-left', 'neutral', 'hold-right'],
+    },
     start: { x: 92, y: 514 },
     platforms: [
       { x: 0, y: 550, w: 330, h: 50 },

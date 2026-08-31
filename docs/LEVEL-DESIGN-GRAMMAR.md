@@ -456,6 +456,20 @@ New concept, if any: None; the level changes the order of established verbs so a
 What previous skills are recombined: magnetic moving-carrier interception, automatic endpoint release, airborne state replacement, timed water freezing, prepared secondary blast, leftward landing control.
 ```
 
+### Level 24 — TEMPER CIRCUIT (accepted intent)
+
+```text
+LEVEL 24 — TEMPER CIRCUIT
+Primary route: START -> coolant -> freeze intake -> cold-lock transfer carriage -> B1 -> land on locked carriage -> cross furnace duct -> heat replaces cold -> power dormant B2 -> reach right launch stop -> B2 -> steer left to upper temper deck -> EXIT
+Launch job(s): B1 reaches the cold-stabilized carriage; heat-reactivated B2 performs the final leftward climb.
+Landing window(s): The locked carriage is broad. The upper temper deck is medium-wide and rewards a deliberate B2 return rather than a precision pixel.
+Timing window(s): Cold-created intake and carriage lock cover the B1 transfer. The furnace/ignition interval starts B2 with enough time to take the marked right stop before firing.
+Recovery state: Recoverable before B1 through stable floors and repeating equipment. Missing the carriage or final deck falls into the exposed lower void.
+Mastery shortcut: None. Unlike the earlier cold circuit, heat replacement and the dormant B2 are load-bearing in this final escalation.
+New concept, if any: None; a cold-created route hands control to a heat-powered blast after the player commits to the carriage.
+What previous skills are recombined: temporary ice, cold machinery lock, B1 transfer, state replacement, heat charge reactivation, prepared B2 return.
+```
+
 Then implement the smallest geometry that realizes that contract.
 
 ## Non-goals

@@ -216,14 +216,15 @@ free flight.
 **Human gate:** ending meaning must remain cancellation -> no new objective -> player-controlled departure.
 **Done when:** synthesis levels are fair and the ending lands without dialogue/cutscene exposition.
 
-**Current slice:** Levels 21–23 are accepted. Level 23 turns carrier release into
-a magnetic-to-cold falling handoff, temporary landing, and B2 relaunch. Level 24
-is next as the final full gameplay escalation before Level 25's dispatch approach;
-it must remain selective rather than require every mechanic.
+**Current slice:** Levels 21–24 are accepted. Level 24 closes full gameplay
+escalation with a cold-built B1 route handing off to heat-powered B2. Level 25 is
+next: a bounded dispatch approach and final gameplay check, followed by the
+canonical scanner cancellation reveal and player-controlled open-door departure.
 
 **Evidence:** `docs/reports/G10-SYNTHESIS-LEVEL-21-001.md` and
 `docs/reports/G10-SYNTHESIS-LEVEL-22-001.md`,
-`docs/reports/G10-SYNTHESIS-LEVEL-23-001.md`, plus their Level Lab artifacts.
+`docs/reports/G10-SYNTHESIS-LEVEL-23-001.md`,
+`docs/reports/G10-SYNTHESIS-LEVEL-24-001.md`, plus their Level Lab artifacts.
 
 ### G11 — Final QA / Release
 

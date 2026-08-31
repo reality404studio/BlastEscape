@@ -33,7 +33,10 @@ heat wakes B1, its arc replaces heat with magnetism in an airborne coil, and a
 rightward rail crossing finishes the route. Level 23 now ships as `QUENCH DROP`:
 a carrier release replaces
 magnetism with cold during descent, freezes the landing basin, and sets up B2's
-return to inspection. G10 remains ACTIVE for Level 24.
+return to inspection. Level 24 now ships as `TEMPER CIRCUIT`: cold builds the B1
+transfer and locks its
+carriage, then heat replaces cold aboard it and wakes the required B2 return.
+G10 remains ACTIVE for Level 25 and the canonical dispatch ending.
 G8A blast replay coverage remains READY.
 
 ## Active / next goals
@@ -56,7 +59,7 @@ G8A blast replay coverage remains READY.
 | G9A Cold curriculum | DONE | G2 + G3B | Levels 10–14 accepted with route/dependency evidence |
 | G9B Heat levels | DONE | G2 + G3C | Levels 15–19 accepted with selective route hierarchy |
 | G9C Magnet introduction | DONE | G2 + G3D | Level 20 accepted |
-| G10 Synthesis / ending levels | ACTIVE | G2 + G3B–D + narrative | Levels 21–23 accepted; L24–25 and dispatch ending next |
+| G10 Synthesis / ending levels | ACTIVE | G2 + G3B–D + narrative | Levels 21–24 accepted; L25 and dispatch ending next |
 | G11 Final QA / release | PROPOSED | G4–G10 | full playthrough, save/pause/restart/build/perf |
 
 ## Open blockers
@@ -196,6 +199,12 @@ Expected first mandatory human call: protagonist base identity approval before m
   the final climb. 18 carrier/B2 timing pairs, 30–144Hz, and ±100ms noise pass.
   98 tests and Levels 8–23 validation pass. Evidence:
   `docs/reports/G10-SYNTHESIS-LEVEL-23-001.md`.
+- G10 Level 24 closes full gameplay escalation with a cold-frozen intake,
+  stabilized B1 carriage, cold-to-heat replacement, and heat-reactivated B2.
+  The route clears at 6.700s; removing cold, the carriage lock, heat, or B2 blocks
+  its respective dependency. Eight final-steer samples, 30–144Hz, and ±80ms
+  noise pass. 105 tests and Levels 8–24 validation pass. Evidence:
+  `docs/reports/G10-SYNTHESIS-LEVEL-24-001.md`.
 
 ## Director update rule
 

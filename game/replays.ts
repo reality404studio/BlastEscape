@@ -129,6 +129,11 @@ export const LEVEL_23_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
   { until: Number.POSITIVE_INFINITY, direction: -1 },
 ];
 
+export const LEVEL_24_CLEAN_ROUTE: readonly DirectionKeyframe[] = [
+  { until: 5.95, direction: 1 },
+  { until: Number.POSITIVE_INFINITY, direction: -1 },
+];
+
 export const LEVEL_8_CLEAN_REPLAY: ReplayDefinition = {
   id: 'level-8-clean-route',
   levelId: 'level-8',
@@ -309,6 +314,15 @@ export const LEVEL_23_CLEAN_REPLAY: ReplayDefinition = {
   keyframes: LEVEL_23_CLEAN_ROUTE,
 };
 
+export const LEVEL_24_CLEAN_REPLAY: ReplayDefinition = {
+  id: 'level-24-temper-circuit-clean-route',
+  levelId: 'level-24',
+  description: 'Build the cold route to B1, replace cold with heat on the locked carriage, wake B2, then return left to the temper deck.',
+  frameRate: 60,
+  maxDurationSeconds: 11,
+  keyframes: LEVEL_24_CLEAN_ROUTE,
+};
+
 export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_8_CLEAN_REPLAY,
   LEVEL_9_CLEAN_REPLAY,
@@ -326,6 +340,7 @@ export const ACCEPTED_REPLAYS: readonly ReplayDefinition[] = [
   LEVEL_21_CLEAN_REPLAY,
   LEVEL_22_CLEAN_REPLAY,
   LEVEL_23_CLEAN_REPLAY,
+  LEVEL_24_CLEAN_REPLAY,
 ];
 
 export function directionAtTime(

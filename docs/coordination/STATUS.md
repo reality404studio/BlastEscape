@@ -40,21 +40,23 @@ Level 25 now ships as `FINAL INSPECTION`: one final B1-to-B2 air chain reaches
 dispatch, scanning reveals cancellation without ending control, and only the
 player's later walk through the already-open door completes the game. G10 is DONE.
 G4 now has an executable visual contract and three protagonist identity
-candidates. HC-ART-001 is OPEN with A (Foundry Pod) recommended; character
-animation production remains blocked at that gate. G8A now locks accepted
+candidates. The human selected A (Foundry Pod), resolving HC-ART-001 and marking
+G4 DONE. G5 now ships a locked `32 x 40` true-pixel Foundry Pod base, curated
+idle/walk/airborne/land rows, and a SpriteGen atlas/manifest consumed by the
+runtime without changing the collision box. G5 is DONE. G8A now locks accepted
 repository replays and validator evidence for the complete Levels 1–8 blast
 curriculum without geometry or physics changes. G6/G7 continue as unblocked
 production tracks before final QA.
 
-G6 slice 001 now maps existing authoritative blast, landing, traversal,
-magnetic, interaction, and dispatch events to presentation-only feedback. The
-111-test suite, lint, and production build pass; interactive mute-first visual
+G6 slice 001 maps existing authoritative blast, landing, traversal, magnetic,
+interaction, and dispatch events to presentation-only feedback. The current
+122-test suite, lint, and production build pass; interactive mute-first visual
 inspection remains.
 
 G7 slice 001 now renders five tested factory departments behind gameplay:
 mobility test, coolant works, thermal processing, induction transfer, and final
 dispatch. It remains VERIFYING until interactive visual inspection. The combined
-suite is 118/118 with lint/build passing.
+suite is 122/122 with lint/build passing.
 
 ## Active / next goals
 
@@ -67,8 +69,8 @@ suite is 118/118 with lint/build passing.
 | G3B Cold | DONE | G3A | cold source/effect contract and Level 9 complete |
 | G3C Heat | DONE | G3A + stable cold contract | heat acquisition, timed barrier melting, and Level 15 accepted |
 | G3D Magnetism | DONE | G3A | bounded timed attachment/release and Level 20 accepted |
-| G4 Art direction / protagonist | HUMAN_NEEDED | G0 | visual contract/candidates complete; HC-ART-001 open |
-| G5 Sprite pipeline | PROPOSED | G4 approval | SpriteGen integration and atlas/manifest pipeline |
+| G4 Art direction / protagonist | DONE | G0 | A — Foundry Pod selected; visual contract and identity approved |
+| G5 Sprite pipeline | DONE | G4 approval | locked base and four runtime-consumed SpriteGen animation rows |
 | G6 FX / game feel | ACTIVE | G0; stable runtime events | event-driven mute-first feedback; visual inspection remains |
 | G7 Environmental story | VERIFYING | G0 | five-zone nonverbal progression; visual inspection remains |
 | G8A Blast curriculum migration | DONE | G2 | Levels 1–8 accepted replays and validator evidence complete |
@@ -96,8 +98,8 @@ suite is 118/118 with lint/build passing.
   with interactive visual inspection, then either mark G7 DONE or tune only
   presentation-layer opacity/placement.
 - G6 remains ACTIVE for the same mute-first visual inspection pass.
-- HC-ART-001 remains the only open human gate. Do not begin G5 mass character
-  animation until the protagonist base identity is resolved.
+- G5 is DONE: the locked Foundry Pod base and component-row production run are
+  preserved under `assets/generated/sprites/`; runtime consumes the manifest.
 - G8A and gameplay progression through the canonical ending are DONE; do not
   reopen physics or level geometry without new evidence.
 
@@ -105,9 +107,8 @@ suite is 118/118 with lint/build passing.
 
 See `docs/coordination/HUMAN-CALLS.md`.
 
-`HC-ART-001` is OPEN: choose A Foundry Pod, B Inspection Wedge, C Cratelet Unit,
-or request one bounded revision before mass sprite generation. Director default:
-A. Evidence: `docs/reports/G4-PROTAGONIST-CANDIDATES-001.md`.
+None. `HC-ART-001` was resolved on 2026-08-31 with A — Foundry Pod. Evidence:
+`docs/reports/G4-PROTAGONIST-CANDIDATES-001.md`.
 
 ## Recent accepted outcomes
 
@@ -120,9 +121,14 @@ A. Evidence: `docs/reports/G4-PROTAGONIST-CANDIDATES-001.md`.
 - The former noncanonical “all directives complete” overlay is replaced by the
   scanner cancellation, retained-control, open-door departure contract in D-020.
 - G4 now has a `32 x 40` sprite-frame and palette/edge/zone execution contract,
-  plus three gameplay-scale protagonist identity candidates. HC-ART-001 is open
-  and recommends A; full animation remains blocked. Evidence:
+  plus three gameplay-scale protagonist identity candidates. The human selected
+  A — Foundry Pod on 2026-08-31. Evidence:
   `docs/reports/G4-PROTAGONIST-CANDIDATES-001.md`.
+- G5 locks that identity into an exact eight-colour `32 x 40` base and ships
+  4-frame idle, 8-frame walk, 4-frame airborne, and 4-frame land rows. SpriteGen
+  preview/inspect/compose pass; runtime samples manifest rectangles and timing;
+  122 tests, lint, and build pass. Evidence:
+  `docs/reports/G5-SPRITE-PIPELINE-001.md`.
 - G6 slice 001 connects authoritative gameplay events to presentation-only
   flashes, state/contact pulses, particles, landing squash, and camera impulse.
   111 tests, lint, and build pass. Evidence:

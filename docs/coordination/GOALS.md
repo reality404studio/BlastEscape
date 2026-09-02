@@ -114,15 +114,15 @@ crossing while preserving left/right-only control.
 
 ### G4 — Art Direction / Protagonist
 
-**State:** HUMAN_NEEDED
+**State:** DONE
 **Depends on:** G0.
 **Owns:** pixel scale, palette, outline/lighting rules, factory visual grammar, protagonist silhouette/base design.
 **Human gate:** base protagonist identity approval before mass animation generation.
 **Done when:** visual bible is executable and one base protagonist identity is approved.
 
 **Current slice:** the executable visual contract and three gameplay-scale base
-identity candidates are complete. HC-ART-001 is open; G5 animation production is
-blocked, while G6/G7 and other unblocked work continue.
+identity candidates are complete. The human selected A — Foundry Pod on
+2026-08-31, resolving HC-ART-001 and unblocking G5.
 
 **Evidence:** `docs/VISUAL-BIBLE.md`,
 `docs/reports/G4-PROTAGONIST-CANDIDATES-001.md`, and
@@ -130,11 +130,19 @@ blocked, while G6/G7 and other unblocked work continue.
 
 ### G5 — Sprite Pipeline
 
-**State:** PROPOSED
+**State:** DONE
 **Depends on:** G4 protagonist approval.
 **Owns:** SpriteGen setup/instructions, source request metadata, curated atlas/manifest integration.
 **Reference:** `https://github.com/aldegad/sprite-gen`.
 **Done when:** approved character states are reproducibly generated/curated and consumed by the runtime.
+
+**Current slice:** the Foundry Pod base is locked at true `32 x 40` pixel scale;
+idle, walk, airborne, and land rows passed SpriteGen extraction, motion QA, and
+atlas composition. Runtime now consumes the shipping manifest's exact frame
+rectangles and timing without changing the authoritative collision box.
+
+**Evidence:** `docs/reports/G5-SPRITE-PIPELINE-001.md`,
+`assets/generated/sprites/foundry-pod/`, and `public/sprites/foundry-pod/`.
 
 ### G6 — FX / Game Feel
 

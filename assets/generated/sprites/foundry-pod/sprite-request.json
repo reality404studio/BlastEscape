@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "kind": "sprite-gen-request",
+  "engine": "component-row",
+  "character": {
+    "id": "foundry-pod",
+    "description": "Approved Foundry Pod: rounded off-white armless service robot with dark horizontal sensor, one amber status light, compact undercarriage, and two feet",
+    "base_image": "base-source.png"
+  },
+  "cell": {
+    "shape": "rect",
+    "width": 32,
+    "height": 40,
+    "safe_margin_x": 3,
+    "safe_margin_y": 2
+  },
+  "chroma_key": {
+    "name": "magenta",
+    "hex": "#FF00FF",
+    "rgb": [
+      255,
+      0,
+      255
+    ],
+    "selection": "manual"
+  },
+  "states": {
+    "idle": {
+      "frames": 4,
+      "fps": 4,
+      "loop": true,
+      "action": "subtle heavy chassis settle and one restrained amber status-light blink; both feet remain planted"
+    },
+    "walk": {
+      "frames": 8,
+      "fps": 8,
+      "loop": true,
+      "action": "compact right-facing two-foot factory walk cycle with alternating foot contacts and a heavy stable shell"
+    },
+    "airborne": {
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "action": "blast-launch body reaction from compressed takeoff through a tucked rise to a neutral airborne pose and descending extension"
+    },
+    "land": {
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "action": "landing contact sequence from feet-first impact through compact squash and short rebound back toward idle"
+    }
+  },
+  "style": "Follow the attached canonical Foundry Pod idle exactly for pixel density, proportions, one-pixel outline, palette, sensor, status light, undercarriage, and two-foot identity. Rows own motion only.",
+  "motion_phase_guides": true,
+  "layout": "taxonomy/v1",
+  "fit": {
+    "pixel_unfake": true,
+    "logical_height": 40,
+    "palette_size": 8,
+    "detail_bias": true,
+    "outline": false,
+    "align_x": "foot-centroid",
+    "align_y": "bottom",
+    "ground_frames": false
+  },
+  "chroma": {
+    "mode": "rgb",
+    "unmix_reach": 4,
+    "spill_max_fraction": 0.005
+  }
+}

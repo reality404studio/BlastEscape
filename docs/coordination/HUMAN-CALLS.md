@@ -4,9 +4,13 @@ This ledger is for decisions that genuinely require human taste, judgment, exter
 
 ## Open calls
 
+None.
+
+## Resolved calls
+
 ### HC-ART-001 — Protagonist base identity
 
-**Status:** OPEN
+**Status:** RESOLVED
 **Owner:** G4 Art Direction / G5 Sprite Pipeline
 **Decision needed:** choose the base protagonist identity before full sprite and animation production.
 **Why human:** the silhouette is a taste/authorship decision, and changing it after animation production would invalidate expensive downstream work.
@@ -17,8 +21,17 @@ This ledger is for decisions that genuinely require human taste, judgment, exter
 4. **Request one bounded revision:** name the candidate to revise and one or two concrete traits to retain/change; do not start a new visual direction without recording that material change.
 **Evidence:** `docs/reports/G4-PROTAGONIST-CANDIDATES-001.md` and the three PNGs in `artifacts/art-direction/`.
 **Default if deferred:** provisionally select A because it scores highest on the executable rubric and best preserves the existing key-art/runtime identity.
-**Blocked work:** final character source sprite, complete animation/state production, and G5 runtime atlas integration.
-**Unblocked work:** environment art, deterministic runtime integration scaffold, FX, environmental story, Level 1–8 evidence, and release infrastructure.
+**Resolution:** A — Foundry Pod, selected by the human on 2026-08-31. The
+approved identity preserves its rounded off-white shell, dark horizontal sensor,
+restrained amber status light, compact undercarriage, and two readable feet.
+**Recorded in:** the commit containing this resolution entry.
+**Previously blocked work:** final character source sprite, complete
+animation/state production, and G5 runtime atlas integration.
+**Now unblocked:** G5 may create and lock a canonical pixel-art idle anchor, then
+produce curated animation rows and integrate the resulting atlas/manifest.
+**Downstream outcome:** G5 completed that base lock, four-state animation set,
+and runtime integration on 2026-09-02. Evidence:
+`docs/reports/G5-SPRITE-PIPELINE-001.md`.
 
 ## Expected gates
 

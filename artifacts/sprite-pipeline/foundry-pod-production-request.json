@@ -1,0 +1,47 @@
+{
+  "cell": {
+    "shape": "rect",
+    "width": 32,
+    "height": 40,
+    "safe_margin_x": 3,
+    "safe_margin_y": 2
+  },
+  "states": {
+    "idle": {
+      "frames": 4,
+      "fps": 4,
+      "loop": true,
+      "action": "subtle heavy chassis settle and one restrained amber status-light blink; both feet remain planted"
+    },
+    "walk": {
+      "frames": 8,
+      "fps": 8,
+      "loop": true,
+      "action": "compact right-facing two-foot factory walk cycle with alternating foot contacts and a heavy stable shell"
+    },
+    "airborne": {
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "action": "blast-launch body reaction from compressed takeoff through a tucked rise to a neutral airborne pose and descending extension"
+    },
+    "land": {
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "action": "landing contact sequence from feet-first impact through compact squash and short rebound back toward idle"
+    }
+  },
+  "fit": {
+    "pixel_unfake": true,
+    "logical_height": 40,
+    "palette_size": 8,
+    "detail_bias": true,
+    "outline": false,
+    "align_x": "foot-centroid",
+    "align_y": "bottom",
+    "ground_frames": false
+  },
+  "style": "Follow the attached canonical Foundry Pod idle exactly for pixel density, proportions, one-pixel outline, palette, sensor, status light, undercarriage, and two-foot identity. Rows own motion only.",
+  "motion_phase_guides": true
+}

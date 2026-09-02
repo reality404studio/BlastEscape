@@ -160,3 +160,21 @@ zone's low-contrast motifs and functional label, but those props do not enter
 level collision, interaction, replay, or completion state. This makes the
 nonverbal factory-to-shipment progression consistent without turning visual
 foreshadowing into hidden gameplay geometry or a second level scripting system.
+
+## D-022 — Foundry Pod is the approved protagonist identity
+
+The human selected candidate A, Foundry Pod, on 2026-08-31. G5 must preserve its
+rounded off-white shell, dark horizontal sensor, restrained amber status light,
+compact undercarriage, and two readable feet. The approval resolves identity and
+unblocks the sprite pipeline; it does not waive SpriteGen's separate base-lock,
+curation, motion-continuity, or runtime-manifest gates.
+
+## D-023 — The SpriteGen manifest is character-animation runtime authority
+
+The shipping Foundry Pod renderer reads animation timing and exact atlas
+rectangles from SpriteGen's `manifest.json`; runtime code must not duplicate a
+private row/column table. The canonical art faces right and is mirrored only at
+draw time. Its `32 x 40` presentation cell surrounds the unchanged `26 x 36`
+authoritative collision box, so animation and facing cannot perturb physics,
+replay, or level validation. Evidence:
+`docs/reports/G5-SPRITE-PIPELINE-001.md`.

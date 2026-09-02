@@ -11,7 +11,16 @@ import {
   traversalInteractionResultAt,
 } from '@/game/physics';
 import { directionAtTime, LEVEL_8_CLEAN_ROUTE } from '@/game/replays';
+import {
+  animationDurationSeconds,
+  animationFrameAt,
+  FOUNDRY_POD_ATLAS_URL,
+  FOUNDRY_POD_MANIFEST_URL,
+  isSpriteManifest,
+  playerAnimationStateFor,
+} from '@/game/sprites';
 import type { GameplayEvent } from '@/game/core';
+import type { PlayerAnimationState, SpriteManifest } from '@/game/sprites';
 import type { Direction } from '@/game/types';
 
 type Particle = { x: number; y: number; vx: number; vy: number; life: number };
@@ -94,6 +103,27 @@ export default function BlastEscape() {
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
 
+    let spriteManifest: SpriteManifest | null = null;
+    let spriteAtlas: HTMLImageElement | null = null;
+    let spriteDisposed = false;
+    void (async () => {
+      try {
+        const response = await fetch(FOUNDRY_POD_MANIFEST_URL);
+        if (!response.ok) throw new Error(`manifest request failed: ${response.status}`);
+        const manifest: unknown = await response.json();
+        if (!isSpriteManifest(manifest)) throw new Error('manifest contract mismatch');
+        const atlas = new Image();
+        atlas.src = FOUNDRY_POD_ATLAS_URL;
+        await atlas.decode();
+        if (!spriteDisposed) {
+          spriteManifest = manifest;
+          spriteAtlas = atlas;
+        }
+      } catch (error) {
+        console.warn('[FOUNDRY_POD_SPRITE] using fallback renderer', error);
+      }
+    })();
+
     let animationFrame = 0;
     let previousTime = performance.now();
     let debugEnabled = false;
@@ -104,6 +134,10 @@ export default function BlastEscape() {
     let waves: Wave[] = [];
     let blastFlashes: BlastFlash[] = [];
     let landingSquash = 0;
+    let landingAnimationElapsed = Number.POSITIVE_INFINITY;
+    let playerAnimationState: PlayerAnimationState = 'idle';
+    let playerAnimationElapsed = 0;
+    let playerFacing: -1 | 1 = 1;
     let launchVectors: LaunchVector[] = [];
     let trajectoryTraces: TrajectoryTrace[] = [];
     let activeTrace: TrajectoryTrace | undefined;
@@ -200,6 +234,10 @@ export default function BlastEscape() {
       waves = [];
       blastFlashes = [];
       landingSquash = 0;
+      landingAnimationElapsed = Number.POSITIVE_INFINITY;
+      playerAnimationState = 'idle';
+      playerAnimationElapsed = 0;
+      playerFacing = 1;
       launchVectors = [];
       comboCount = freshGameplay.comboCount;
       comboFlashCount = 0;
@@ -243,6 +281,7 @@ export default function BlastEscape() {
       event: Extract<GameplayEvent, { type: 'landed' }>,
     ) => {
       landingSquash = Math.min(1, (event.impactVelocity - 250) / 430 + 0.32);
+      landingAnimationElapsed = 0;
       for (let index = 0; index < 4; index += 1) {
         const direction = index < 2 ? -1 : 1;
         contactParticles.push({
@@ -458,6 +497,24 @@ export default function BlastEscape() {
       launchVectors = launchVectors.filter((vector) => vector.life > 0);
       comboFlashLife = Math.max(0, comboFlashLife - dt);
       landingSquash = Math.max(0, landingSquash - dt * 5.5);
+      landingAnimationElapsed += dt;
+      const velocity = horizontalVelocity();
+      if (Math.abs(velocity) >= 1) playerFacing = velocity < 0 ? -1 : 1;
+      const landingDuration = spriteManifest
+        ? animationDurationSeconds(spriteManifest, 'land')
+        : 0.4;
+      const nextAnimationState = playerAnimationStateFor(
+        player.grounded,
+        velocity,
+        landingAnimationElapsed,
+        landingDuration,
+      );
+      if (nextAnimationState === playerAnimationState) {
+        playerAnimationElapsed += dt;
+      } else {
+        playerAnimationState = nextAnimationState;
+        playerAnimationElapsed = 0;
+      }
       shake *= Math.pow(0.04, dt);
     };
 
@@ -1221,22 +1278,46 @@ export default function BlastEscape() {
       ctx.translate(player.x + CONFIG.playerWidth / 2, player.y + CONFIG.playerHeight);
       ctx.scale(1 + landingSquash * 0.08, 1 - landingSquash * 0.12);
       ctx.translate(-CONFIG.playerWidth / 2, -CONFIG.playerHeight);
-      ctx.fillStyle = VISUAL.player;
-      roundedRect(ctx, 0, 0, CONFIG.playerWidth, CONFIG.playerHeight, 5);
-      ctx.fill();
-      ctx.fillStyle = VISUAL.playerShade;
-      ctx.fillRect(3, 24, 20, 2);
-      ctx.fillRect(5, 34, 6, 2);
-      ctx.fillRect(15, 34, 6, 2);
-      ctx.fillStyle = VISUAL.sensor;
-      roundedRect(ctx, 4, 8, 18, 7, 2);
-      ctx.fill();
-      ctx.fillStyle = VISUAL.hot;
-      ctx.fillRect(horizontalVelocity() >= 0 ? 17 : 6, 10, 3, 3);
-      ctx.fillStyle = '#6c6670';
-      ctx.font = '700 6px ui-monospace, monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('U-07', 13, 31);
+      if (spriteAtlas && spriteManifest) {
+        const frame = animationFrameAt(
+          spriteManifest,
+          playerAnimationState,
+          playerAnimationElapsed,
+        );
+        ctx.save();
+        ctx.translate(CONFIG.playerWidth / 2, 0);
+        ctx.scale(playerFacing, 1);
+        ctx.translate(-CONFIG.playerWidth / 2, 0);
+        ctx.drawImage(
+          spriteAtlas,
+          frame.rect.x,
+          frame.rect.y,
+          frame.rect.w,
+          frame.rect.h,
+          -3,
+          -2,
+          spriteManifest.animation.cellWidth,
+          spriteManifest.animation.cellHeight,
+        );
+        ctx.restore();
+      } else {
+        ctx.fillStyle = VISUAL.player;
+        roundedRect(ctx, 0, 0, CONFIG.playerWidth, CONFIG.playerHeight, 5);
+        ctx.fill();
+        ctx.fillStyle = VISUAL.playerShade;
+        ctx.fillRect(3, 24, 20, 2);
+        ctx.fillRect(5, 34, 6, 2);
+        ctx.fillRect(15, 34, 6, 2);
+        ctx.fillStyle = VISUAL.sensor;
+        roundedRect(ctx, 4, 8, 18, 7, 2);
+        ctx.fill();
+        ctx.fillStyle = VISUAL.hot;
+        ctx.fillRect(horizontalVelocity() >= 0 ? 17 : 6, 10, 3, 3);
+        ctx.fillStyle = '#6c6670';
+        ctx.font = '700 6px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('U-07', 13, 31);
+      }
       if (player.traversalState.kind === 'cold') {
         ctx.strokeStyle = `rgba(116, 217, 255, ${0.55 + Math.sin(time / 120) * 0.18})`;
         ctx.lineWidth = 2;
@@ -1358,6 +1439,7 @@ export default function BlastEscape() {
     animationFrame = requestAnimationFrame(frame);
 
     return () => {
+      spriteDisposed = true;
       cancelAnimationFrame(animationFrame);
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);

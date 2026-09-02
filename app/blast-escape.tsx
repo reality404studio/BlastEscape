@@ -1,39 +1,28 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { CONFIG } from '@/game/config';
+import { bombIsPowered, createGameplayState, spikeTriangles, stepGameplay } from '@/game/core';
+import { LEVELS } from '@/game/levels';
+import { factoryZoneForLevelIndex } from '@/game/presentation';
+import {
+  movingPlatformAt,
+  playerHorizontalVelocity,
+  traversalInteractionResultAt,
+} from '@/game/physics';
+import { directionAtTime, LEVEL_8_CLEAN_ROUTE } from '@/game/replays';
+import {
+  animationDurationSeconds,
+  animationFrameAt,
+  FOUNDRY_POD_ATLAS_URL,
+  FOUNDRY_POD_MANIFEST_URL,
+  isSpriteManifest,
+  playerAnimationStateFor,
+} from '@/game/sprites';
+import type { GameplayEvent } from '@/game/core';
+import type { PlayerAnimationState, SpriteManifest } from '@/game/sprites';
+import type { Direction } from '@/game/types';
 
-const CONFIG = {
-  worldWidth: 960,
-  worldHeight: 600,
-  playerWidth: 26,
-  playerHeight: 36,
-  runAcceleration: 1900,
-  airAcceleration: 760,
-  maxRunSpeed: 275,
-  groundFriction: 0.8,
-  blastAirRetention: 0.985,
-  blastGroundRetention: 0.68,
-  gravity: 1180,
-  maxFallSpeed: 920,
-  explosionRadius: 154,
-  explosionImpulse: 830,
-  explosionMinImpulse: 370,
-  explosionMaxImpulse: 900,
-  explosionVerticalBias: 58,
-  bombFuseDuration: 4.8,
-  bombRepeatInterval: 5.6,
-  screenShake: 10,
-} as const;
-
-type Rect = { x: number; y: number; w: number; h: number };
-type Bomb = {
-  x: number;
-  y: number;
-  timer: number;
-  delay: number;
-  label: string;
-  floating?: boolean;
-};
 type Particle = { x: number; y: number; vx: number; vy: number; life: number };
 type ContactParticle = {
   x: number;
@@ -44,7 +33,7 @@ type ContactParticle = {
   size: number;
   color: string;
 };
-type Wave = { x: number; y: number; radius: number; life: number };
+type Wave = { x: number; y: number; radius: number; life: number; color: string };
 type BlastFlash = { x: number; y: number; life: number };
 type LaunchVector = { x: number; y: number; vx: number; vy: number; life: number; label: string };
 type TrajectoryPoint = { x: number; y: number };
@@ -55,30 +44,8 @@ type TrajectoryTrace = {
   sampleElapsed: number;
   active: boolean;
 };
-type MovingPlatform = {
-  fromX: number;
-  toX: number;
-  y: number;
-  w: number;
-  h: number;
-  speed: number;
-  phase: number;
-};
-type Level = {
-  name: string;
-  subtitle: string;
-  hint: string;
-  start: { x: number; y: number };
-  platforms: Rect[];
-  bombs: Array<{ x: number; y: number; delay: number; label: string; floating?: boolean }>;
-  exit: Rect;
-  opening?: Rect;
-  spikes?: Rect[];
-  pit?: Rect;
-  movingPlatform?: MovingPlatform;
-  requiredCombo?: number;
-};
-
+// How long the clear overlay holds before the next level loads.
+const LEVEL_ADVANCE_DELAY = 1600;
 const MAX_RECENT_TRAJECTORIES = 5;
 const MAX_TRAJECTORY_POINTS = 150;
 const MAX_TRAJECTORY_DURATION = 5;
@@ -99,205 +66,9 @@ const VISUAL = {
   hot: '#ff513e',
   amber: '#ffad37',
   mint: '#66f2d5',
+  cold: '#74d9ff',
   gold: '#ffc44f',
 } as const;
-
-const LEVELS: Level[] = [
-  {
-    name: 'LEVEL 1',
-    subtitle: 'TEST CHAMBER',
-    hint: 'Get close. Pick a side. Let the blast do the jumping.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 960, h: 50 },
-      { x: 396, y: 402, w: 224, h: 22 },
-      { x: 704, y: 238, w: 210, h: 22 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [
-      { x: 304, y: 532, delay: 0, label: 'B1' },
-      { x: 535, y: 384, delay: 1.7, label: 'B2' },
-      { x: 754, y: 220, delay: 3.2, label: 'B3' },
-    ],
-    exit: { x: 822, y: 174, w: 54, h: 64 },
-  },
-  {
-    name: 'LEVEL 2',
-    subtitle: 'TRAJECTORY TEST',
-    hint: 'Choose your launch line. Steer through the opening while airborne.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 960, h: 50 },
-      { x: 18, y: 330, w: 477, h: 28 },
-      { x: 610, y: 330, w: 332, h: 28 },
-      { x: 0, y: 0, w: 960, h: 18 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [{ x: 460, y: 532, delay: 0, label: 'B1' }],
-    exit: { x: 838, y: 266, w: 54, h: 64 },
-    opening: { x: 495, y: 330, w: 115, h: 28 },
-  },
-  {
-    name: 'LEVEL 3',
-    subtitle: 'TIGHT POCKET',
-    hint: 'Thread the slot. Brake in midair. Land in the pocket.',
-    start: { x: 92, y: 464 },
-    platforms: [
-      { x: 0, y: 500, w: 390, h: 22 },
-      { x: 18, y: 300, w: 372, h: 22 },
-      { x: 490, y: 300, w: 30, h: 22 },
-      { x: 560, y: 360, w: 110, h: 22 },
-      { x: 520, y: 170, w: 180, h: 22 },
-      { x: 700, y: 170, w: 28, h: 330 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [{ x: 350, y: 482, delay: 0, label: 'B1' }],
-    exit: { x: 588, y: 296, w: 54, h: 64 },
-    opening: { x: 390, y: 300, w: 100, h: 22 },
-  },
-  {
-    name: 'LEVEL 4',
-    subtitle: 'AIR COMBO',
-    hint: 'First blast starts the chain. Meet the floating bomb before you touch down.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 960, h: 50 },
-      { x: 18, y: 350, w: 432, h: 22 },
-      { x: 580, y: 350, w: 140, h: 22 },
-      { x: 750, y: 190, w: 192, h: 22 },
-      { x: 0, y: 0, w: 960, h: 18 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [
-      { x: 400, y: 532, delay: 0, label: 'B1' },
-      { x: 625, y: 260, delay: 0.7, label: 'B2', floating: true },
-    ],
-    exit: { x: 842, y: 126, w: 54, h: 64 },
-    opening: { x: 450, y: 350, w: 130, h: 22 },
-  },
-  {
-    name: 'LEVEL 5',
-    subtitle: 'SYNTHESIS I',
-    hint: 'Find the line between the void and the teeth.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 300, h: 50 },
-      { x: 370, y: 500, w: 160, h: 22 },
-      { x: 600, y: 360, w: 342, h: 22 },
-      { x: 300, y: 200, w: 130, h: 20 },
-      { x: 0, y: 0, w: 960, h: 18 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [
-      { x: 190, y: 532, delay: 0, label: 'B1' },
-      { x: 455, y: 470, delay: 0.75, label: 'B2', floating: true },
-    ],
-    exit: { x: 842, y: 296, w: 54, h: 64 },
-    spikes: [{ x: 300, y: 220, w: 130, h: 65 }],
-    pit: { x: 300, y: 500, w: 300, h: 100 },
-  },
-  {
-    name: 'LEVEL 6',
-    subtitle: 'INTERCEPT',
-    hint: 'Launch for where the platform will be. Close blast, fast exit. Wide blast, safer ride.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 330, h: 50 },
-      { x: 840, y: 450, w: 102, h: 22 },
-      { x: 0, y: 0, w: 960, h: 18 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [{ x: 250, y: 532, delay: -2.8, label: 'B1' }],
-    exit: { x: 876, y: 386, w: 54, h: 64 },
-    pit: { x: 330, y: 450, w: 510, h: 150 },
-    movingPlatform: {
-      fromX: 440,
-      toX: 700,
-      y: 450,
-      w: 140,
-      h: 22,
-      speed: 140,
-      phase: 2.14,
-    },
-  },
-  {
-    name: 'LEVEL 7',
-    subtitle: 'RETURN ARC',
-    hint: 'Clear the hanging teeth after B1. Return left with B2, then launch from the left side of B3.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 330, h: 50 },
-      { x: 40, y: 140, w: 210, h: 22 },
-      { x: 250, y: 300, w: 250, h: 22 },
-      { x: 400, y: 470, w: 390, h: 22 },
-      { x: 360, y: 70, w: 140, h: 20 },
-      { x: 0, y: 0, w: 960, h: 18 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [
-      { x: 250, y: 532, delay: -2.5, label: 'B1' },
-      { x: 680, y: 452, delay: -0.2, label: 'B2' },
-      { x: 400, y: 282, delay: 1.9, label: 'B3' },
-    ],
-    exit: { x: 120, y: 76, w: 54, h: 64 },
-    spikes: [
-      { x: 250, y: 322, w: 70, h: 58 },
-      { x: 360, y: 90, w: 140, h: 70 },
-    ],
-    pit: { x: 330, y: 470, w: 630, h: 130 },
-  },
-  {
-    name: 'LEVEL 8',
-    subtitle: 'AIR SLALOM',
-    hint: 'Build 5X: right B2, left B3, right B4, dip left into B5, then drive right.',
-    start: { x: 92, y: 514 },
-    platforms: [
-      { x: 0, y: 550, w: 330, h: 50 },
-      { x: 0, y: 0, w: 960, h: 18 },
-      { x: 0, y: 0, w: 18, h: 600 },
-      { x: 942, y: 0, w: 18, h: 600 },
-    ],
-    bombs: [
-      { x: 250, y: 532, delay: -2.6, label: 'B1' },
-      { x: 530, y: 440, delay: -2, label: 'B2', floating: true },
-      { x: 330, y: 410, delay: -1.65, label: 'B3', floating: true },
-      { x: 560, y: 260, delay: -1.05, label: 'B4', floating: true },
-      { x: 430, y: 280, delay: -0.8, label: 'B5', floating: true },
-    ],
-    exit: { x: 520, y: 55, w: 90, h: 70 },
-    pit: { x: 330, y: 500, w: 630, h: 100 },
-    requiredCombo: 5,
-  },
-];
-
-function movingPlatformAt(platform: MovingPlatform, time: number) {
-  const travelTime = (platform.toX - platform.fromX) / platform.speed;
-  const cycleTime = travelTime * 2;
-  const cyclePosition = (time + platform.phase) % cycleTime;
-  const movingRight = cyclePosition < travelTime;
-  const x = movingRight
-    ? platform.fromX + cyclePosition * platform.speed
-    : platform.toX - (cyclePosition - travelTime) * platform.speed;
-
-  return {
-    rect: { x, y: platform.y, w: platform.w, h: platform.h },
-    velocityX: movingRight ? platform.speed : -platform.speed,
-  };
-}
-
-function freshBombs(level: Level): Bomb[] {
-  return level.bombs.map((bomb) => ({
-    ...bomb,
-    timer: CONFIG.bombFuseDuration + bomb.delay,
-  }));
-}
 
 function roundedRect(
   ctx: CanvasRenderingContext2D,
@@ -311,45 +82,6 @@ function roundedRect(
   ctx.roundRect(x, y, w, h, radius);
 }
 
-function spikeTriangles(strip: Rect) {
-  const toothCount = Math.max(1, Math.round(strip.w / 24));
-  const toothWidth = strip.w / toothCount;
-  return Array.from({ length: toothCount }, (_, index) => {
-    const left = strip.x + toothWidth * index;
-    return [
-      { x: left, y: strip.y },
-      { x: left + toothWidth, y: strip.y },
-      { x: left + toothWidth / 2, y: strip.y + strip.h },
-    ];
-  });
-}
-
-function triangleOverlapsRect(triangle: Array<{ x: number; y: number }>, rect: Rect) {
-  const rectPoints = [
-    { x: rect.x, y: rect.y },
-    { x: rect.x + rect.w, y: rect.y },
-    { x: rect.x + rect.w, y: rect.y + rect.h },
-    { x: rect.x, y: rect.y + rect.h },
-  ];
-  const axes = [
-    { x: 1, y: 0 },
-    { x: 0, y: 1 },
-    ...triangle.map((point, index) => {
-      const next = triangle[(index + 1) % triangle.length];
-      return { x: -(next.y - point.y), y: next.x - point.x };
-    }),
-  ];
-
-  return axes.every((axis) => {
-    const triangleProjection = triangle.map((point) => point.x * axis.x + point.y * axis.y);
-    const rectProjection = rectPoints.map((point) => point.x * axis.x + point.y * axis.y);
-    return (
-      Math.max(...triangleProjection) >= Math.min(...rectProjection) &&
-      Math.max(...rectProjection) >= Math.min(...triangleProjection)
-    );
-  });
-}
-
 export default function BlastEscape() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const keysRef = useRef(new Set<string>());
@@ -359,8 +91,8 @@ export default function BlastEscape() {
   const [debug, setDebug] = useState(false);
   const [status, setStatus] = useState<'playing' | 'escaped'>('playing');
   const [levelIndex, setLevelIndex] = useState(0);
+  const [clearedLevels, setClearedLevels] = useState<number[]>([]);
 
-  const restart = useCallback(() => resetRef.current(), []);
   const selectLevel = useCallback((index: number) => changeLevelRef.current(index), []);
   const playDemo = useCallback(() => demoRef.current(), []);
 
@@ -369,6 +101,28 @@ export default function BlastEscape() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    ctx.imageSmoothingEnabled = false;
+
+    let spriteManifest: SpriteManifest | null = null;
+    let spriteAtlas: HTMLImageElement | null = null;
+    let spriteDisposed = false;
+    void (async () => {
+      try {
+        const response = await fetch(FOUNDRY_POD_MANIFEST_URL);
+        if (!response.ok) throw new Error(`manifest request failed: ${response.status}`);
+        const manifest: unknown = await response.json();
+        if (!isSpriteManifest(manifest)) throw new Error('manifest contract mismatch');
+        const atlas = new Image();
+        atlas.src = FOUNDRY_POD_ATLAS_URL;
+        await atlas.decode();
+        if (!spriteDisposed) {
+          spriteManifest = manifest;
+          spriteAtlas = atlas;
+        }
+      } catch (error) {
+        console.warn('[FOUNDRY_POD_SPRITE] using fallback renderer', error);
+      }
+    })();
 
     let animationFrame = 0;
     let previousTime = performance.now();
@@ -380,33 +134,35 @@ export default function BlastEscape() {
     let waves: Wave[] = [];
     let blastFlashes: BlastFlash[] = [];
     let landingSquash = 0;
+    let landingAnimationElapsed = Number.POSITIVE_INFINITY;
+    let playerAnimationState: PlayerAnimationState = 'idle';
+    let playerAnimationElapsed = 0;
+    let playerFacing: -1 | 1 = 1;
     let launchVectors: LaunchVector[] = [];
     let trajectoryTraces: TrajectoryTrace[] = [];
     let activeTrace: TrajectoryTrace | undefined;
-    let comboCount = 0;
+    const initialGameplay = createGameplayState(LEVELS[0]);
+    let comboCount = initialGameplay.comboCount;
     let comboFlashCount = 0;
     let comboFlashLife = 0;
     let activeLevelIndex = 0;
-    let levelElapsed = 0;
+    let levelElapsed = initialGameplay.levelElapsed;
     let demoActive = false;
-    let bombs = freshBombs(LEVELS[activeLevelIndex]);
-    const player = {
-      x: LEVELS[activeLevelIndex].start.x,
-      y: LEVELS[activeLevelIndex].start.y,
-      controlVx: 0,
-      blastVx: 0,
-      vy: 0,
-      grounded: true,
-      onMovingPlatform: false,
-    };
+    let bombs = initialGameplay.bombs;
+    let interactionStates = initialGameplay.interactionStates;
+    let dispatchScanned = initialGameplay.dispatchScanned;
+    const player = initialGameplay.player;
 
-    const horizontalVelocity = () => player.controlVx + player.blastVx;
+    const horizontalVelocity = () => playerHorizontalVelocity(player);
     const playerCenter = (): TrajectoryPoint => ({
       x: player.x + CONFIG.playerWidth / 2,
       y: player.y + CONFIG.playerHeight / 2,
     });
-    const recordTracePoint = (trace: TrajectoryTrace, force = false) => {
-      const point = playerCenter();
+    const recordTracePoint = (
+      trace: TrajectoryTrace,
+      force = false,
+      point = playerCenter(),
+    ) => {
       const previous = trace.points.at(-1);
       if (force || !previous || Math.hypot(point.x - previous.x, point.y - previous.y) >= 2) {
         trace.points.push(point);
@@ -433,18 +189,22 @@ export default function BlastEscape() {
       ];
       activeTrace = trace;
     };
-    const sampleActiveTrace = (dt: number) => {
+    const sampleActiveTrace = (
+      dt: number,
+      point = playerCenter(),
+      grounded = player.grounded,
+    ) => {
       if (!activeTrace) return;
       activeTrace.elapsed += dt;
       activeTrace.sampleElapsed += dt;
-      if (player.grounded) {
-        recordTracePoint(activeTrace, true);
+      if (grounded) {
+        recordTracePoint(activeTrace, true, point);
         finishActiveTrace();
         return;
       }
       if (activeTrace.sampleElapsed >= TRAJECTORY_SAMPLE_INTERVAL) {
         activeTrace.sampleElapsed %= TRAJECTORY_SAMPLE_INTERVAL;
-        recordTracePoint(activeTrace);
+        recordTracePoint(activeTrace, false, point);
       }
       if (
         activeTrace.elapsed >= MAX_TRAJECTORY_DURATION ||
@@ -462,25 +222,24 @@ export default function BlastEscape() {
       } else {
         finishActiveTrace();
       }
-      Object.assign(player, {
-        x: level.start.x,
-        y: level.start.y,
-        controlVx: 0,
-        blastVx: 0,
-        vy: 0,
-        grounded: true,
-        onMovingPlatform: false,
-      });
-      levelElapsed = 0;
+      const freshGameplay = createGameplayState(level);
+      Object.assign(player, freshGameplay.player);
+      levelElapsed = freshGameplay.levelElapsed;
       demoActive = false;
-      bombs = freshBombs(level);
+      bombs = freshGameplay.bombs;
+      interactionStates = freshGameplay.interactionStates;
+      dispatchScanned = freshGameplay.dispatchScanned;
       particles = [];
       contactParticles = [];
       waves = [];
       blastFlashes = [];
       landingSquash = 0;
+      landingAnimationElapsed = Number.POSITIVE_INFINITY;
+      playerAnimationState = 'idle';
+      playerAnimationElapsed = 0;
+      playerFacing = 1;
       launchVectors = [];
-      comboCount = 0;
+      comboCount = freshGameplay.comboCount;
       comboFlashCount = 0;
       comboFlashLife = 0;
       shake = 0;
@@ -488,13 +247,14 @@ export default function BlastEscape() {
       setStatus('playing');
     };
     resetRef.current = reset;
-    changeLevelRef.current = (index: number) => {
+    const goToLevel = (index: number) => {
       activeLevelIndex = Math.max(0, Math.min(LEVELS.length - 1, index));
       setLevelIndex(activeLevelIndex);
       reset();
     };
+    changeLevelRef.current = goToLevel;
     demoRef.current = () => {
-      activeLevelIndex = LEVELS.length - 1;
+      activeLevelIndex = LEVELS.findIndex((level) => level.id === 'level-8');
       setLevelIndex(activeLevelIndex);
       reset();
       demoActive = true;
@@ -517,129 +277,102 @@ export default function BlastEscape() {
     window.addEventListener('keyup', onKeyUp);
     window.addEventListener('blur', onBlur);
 
-    const playerRect = (): Rect => ({
-      x: player.x,
-      y: player.y,
-      w: CONFIG.playerWidth,
-      h: CONFIG.playerHeight,
-    });
-    const overlaps = (a: Rect, b: Rect) =>
-      a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
-    const touchesSpikes = (rect: Rect, spikes: Rect[] = []) =>
-      spikes.some((strip) =>
-        spikeTriangles(strip).some((triangle) => triangleOverlapsRect(triangle, rect)),
-      );
-
-    const movePlayer = (dt: number) => {
-      const level = LEVELS[activeLevelIndex];
-      const wasGrounded = player.grounded;
-      const movingBefore = level.movingPlatform
-        ? movingPlatformAt(level.movingPlatform, levelElapsed)
-        : undefined;
-      levelElapsed += dt;
-      const movingAfter = level.movingPlatform
-        ? movingPlatformAt(level.movingPlatform, levelElapsed)
-        : undefined;
-
-      if (player.grounded && player.onMovingPlatform && movingBefore && movingAfter) {
-        player.x += movingAfter.rect.x - movingBefore.rect.x;
+    const addLandingEffects = (
+      event: Extract<GameplayEvent, { type: 'landed' }>,
+    ) => {
+      landingSquash = Math.min(1, (event.impactVelocity - 250) / 430 + 0.32);
+      landingAnimationElapsed = 0;
+      for (let index = 0; index < 4; index += 1) {
+        const direction = index < 2 ? -1 : 1;
+        contactParticles.push({
+          x: event.x + CONFIG.playerWidth / 2 + direction * (4 + Math.random() * 7),
+          y: event.footY - 2,
+          vx: direction * (32 + Math.random() * 64),
+          vy: -(24 + Math.random() * 66),
+          life: 0.18 + Math.random() * 0.12,
+          size: 2 + Math.random() * 2,
+          color: index === 0 || index === 3 ? '#d5c9b7' : '#8d8791',
+        });
       }
-
-      const collisionPlatforms = [
-        ...level.platforms.map((rect) => ({ rect, moving: false })),
-        ...(movingAfter ? [{ rect: movingAfter.rect, moving: true }] : []),
-      ];
-      const keys = keysRef.current;
-      const demoDirection =
-        levelElapsed < 0.7 ? 1
-          : levelElapsed < 2.12 ? 0
-            : levelElapsed < 2.8 ? 1
-              : levelElapsed < 3.15 ? -1
-                : levelElapsed < 3.75 ? 1
-                  : levelElapsed < 4 ? -1
-                    : 1;
-      const direction = demoActive
-        ? demoDirection
-        : (keys.has('d') || keys.has('arrowright') ? 1 : 0) -
-          (keys.has('a') || keys.has('arrowleft') ? 1 : 0);
-      const acceleration = player.grounded ? CONFIG.runAcceleration : CONFIG.airAcceleration;
-      if (direction !== 0) player.controlVx += direction * acceleration * dt;
-      else if (player.grounded) {
-        player.controlVx *= Math.pow(CONFIG.groundFriction, dt * 60);
-      }
-      player.controlVx = Math.max(
-        -CONFIG.maxRunSpeed,
-        Math.min(CONFIG.maxRunSpeed, player.controlVx),
-      );
-      const blastRetention = player.grounded
-        ? CONFIG.blastGroundRetention
-        : CONFIG.blastAirRetention;
-      player.blastVx *= Math.pow(blastRetention, dt * 60);
-      if (Math.abs(player.blastVx) < 0.5) player.blastVx = 0;
-      player.vy = Math.min(CONFIG.maxFallSpeed, player.vy + CONFIG.gravity * dt);
-
-      const oldX = player.x;
-      const totalVx = horizontalVelocity();
-      player.x += totalVx * dt;
-      for (const platform of collisionPlatforms) {
-        if (!overlaps(playerRect(), platform.rect)) continue;
-        let collidedHorizontally = false;
-        if (totalVx > 0 && oldX + CONFIG.playerWidth <= platform.rect.x + 2) {
-          player.x = platform.rect.x - CONFIG.playerWidth;
-          collidedHorizontally = true;
-        } else if (totalVx < 0 && oldX >= platform.rect.x + platform.rect.w - 2) {
-          player.x = platform.rect.x + platform.rect.w;
-          collidedHorizontally = true;
-        }
-        if (collidedHorizontally) {
-          player.controlVx = 0;
-          player.blastVx = 0;
-          break;
-        }
-      }
-
-      const oldY = player.y;
-      player.y += player.vy * dt;
-      const impactVelocity = player.vy;
-      player.grounded = false;
-      player.onMovingPlatform = false;
-      for (const platform of collisionPlatforms) {
-        if (!overlaps(playerRect(), platform.rect)) continue;
-        if (player.vy >= 0 && oldY + CONFIG.playerHeight <= platform.rect.y + 4) {
-          player.y = platform.rect.y - CONFIG.playerHeight;
-          player.vy = 0;
-          player.grounded = true;
-          player.onMovingPlatform = platform.moving;
-        } else if (player.vy < 0 && oldY >= platform.rect.y + platform.rect.h - 4) {
-          player.y = platform.rect.y + platform.rect.h;
-          player.vy = 0;
-        }
-      }
-      if (!wasGrounded && player.grounded && impactVelocity > 250) {
-        landingSquash = Math.min(1, (impactVelocity - 250) / 430 + 0.32);
-        const footY = player.y + CONFIG.playerHeight;
-        for (let index = 0; index < 4; index += 1) {
-          const direction = index < 2 ? -1 : 1;
-          contactParticles.push({
-            x: player.x + CONFIG.playerWidth / 2 + direction * (4 + Math.random() * 7),
-            y: footY - 2,
-            vx: direction * (32 + Math.random() * 64),
-            vy: -(24 + Math.random() * 66),
-            life: 0.18 + Math.random() * 0.12,
-            size: 2 + Math.random() * 2,
-            color: index === 0 || index === 3 ? '#d5c9b7' : '#8d8791',
-          });
-        }
-      }
-      if (player.grounded) comboCount = 0;
-      sampleActiveTrace(dt);
     };
 
-    const explode = (bomb: Bomb) => {
-      waves.push({ x: bomb.x, y: bomb.y, radius: 8, life: 1 });
+    const addContactBurst = (
+      x: number,
+      y: number,
+      color: string,
+      count = 8,
+    ) => {
+      for (let index = 0; index < count; index += 1) {
+        const angle = (Math.PI * 2 * index) / count + Math.random() * 0.24;
+        const speed = 42 + Math.random() * 82;
+        contactParticles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 18,
+          life: 0.22 + Math.random() * 0.2,
+          size: 2 + Math.random() * 2,
+          color,
+        });
+      }
+    };
+
+    const stateColor = (kind: 'neutral' | 'cold' | 'heat' | 'magnetic') =>
+      kind === 'cold'
+        ? VISUAL.cold
+        : kind === 'heat'
+          ? VISUAL.hot
+          : kind === 'magnetic'
+            ? VISUAL.mint
+            : VISUAL.structureEdge;
+
+    const addGameplayCue = (event: GameplayEvent, level: (typeof LEVELS)[number]) => {
+      if (event.type === 'traversal-state-changed') {
+        const center = playerCenter();
+        addContactBurst(center.x, center.y, stateColor(event.current.kind), event.reason === 'expired' ? 5 : 10);
+        return;
+      }
+
+      if (event.type === 'traversal-interaction-contact' && event.accepted) {
+        const interaction = level.traversalInteractions?.find(
+          (candidate) => candidate.id === event.interactionId,
+        );
+        if (!interaction) return;
+        const x = interaction.rect.x + interaction.rect.w / 2;
+        const y = interaction.rect.y + interaction.rect.h / 2;
+        const color = stateColor(event.stateKind);
+        waves.push({ x, y, radius: 5, life: 0.72, color });
+        addContactBurst(x, y, color, 8);
+        return;
+      }
+
+      if (event.type === 'magnetic-attached' || event.type === 'magnetic-released') {
+        const center = playerCenter();
+        waves.push({ x: center.x, y: center.y, radius: 6, life: 0.62, color: VISUAL.mint });
+        addContactBurst(center.x, center.y, VISUAL.mint, 7);
+        shake = Math.max(shake, event.type === 'magnetic-attached' ? 3.5 : 1.5);
+        return;
+      }
+
+      if (event.type === 'dispatch-scanned' && level.dispatchSequence) {
+        const scanner = level.dispatchSequence.scanner;
+        const x = scanner.x + scanner.w / 2;
+        const y = scanner.y + scanner.h / 2;
+        waves.push({ x, y, radius: 8, life: 1, color: VISUAL.gold });
+        waves.push({ x, y, radius: 2, life: 0.72, color: VISUAL.player });
+        addContactBurst(x, y, VISUAL.gold, 14);
+        shake = Math.max(shake, 4);
+      }
+    };
+
+    const addBombEffects = (
+      event: Extract<GameplayEvent, { type: 'bomb-exploded' }>,
+    ) => {
+      const { bomb, blast } = event;
+      waves.push({ x: bomb.x, y: bomb.y, radius: 8, life: 1, color: VISUAL.amber });
       blastFlashes.push({ x: bomb.x, y: bomb.y, life: 1 });
-      for (let i = 0; i < 18; i += 1) {
-        const angle = (Math.PI * 2 * i) / 18 + Math.random() * 0.25;
+      for (let index = 0; index < 18; index += 1) {
+        const angle = (Math.PI * 2 * index) / 18 + Math.random() * 0.25;
         const speed = 100 + Math.random() * 270;
         particles.push({
           x: bomb.x,
@@ -650,53 +383,30 @@ export default function BlastEscape() {
         });
       }
 
-      const centerX = player.x + CONFIG.playerWidth / 2;
-      const centerY = player.y + CONFIG.playerHeight / 2;
-      const rawX = centerX - bomb.x;
-      const rawY = centerY - bomb.y;
-      const distance = Math.hypot(rawX, rawY);
       if (demoActive) {
         console.info('[LEVEL8_DEMO]', bomb.label, JSON.stringify({
           time: levelElapsed.toFixed(2),
-          x: centerX.toFixed(1),
-          y: centerY.toFixed(1),
-          distance: distance.toFixed(1),
-          controlVx: player.controlVx.toFixed(1),
-          blastVx: player.blastVx.toFixed(1),
-          vy: player.vy.toFixed(1),
-          comboCount,
+          x: blast.centerX.toFixed(1),
+          y: blast.centerY.toFixed(1),
+          distance: blast.distance.toFixed(1),
+          controlVx: event.playerBefore.controlVx.toFixed(1),
+          blastVx: event.playerBefore.blastVx.toFixed(1),
+          vy: event.playerBefore.vy.toFixed(1),
+          comboCount: event.comboBefore,
         }));
       }
-      if (distance > CONFIG.explosionRadius) return;
+      if (!blast.hit) return;
 
-      const biasedY = rawY - CONFIG.explosionVerticalBias;
-      const length = Math.max(1, Math.hypot(rawX, biasedY));
-      const falloff = 1 - distance / CONFIG.explosionRadius;
-      const impulse = Math.min(
-        CONFIG.explosionMaxImpulse,
-        Math.max(
-          CONFIG.explosionMinImpulse,
-          CONFIG.explosionImpulse * (0.35 + falloff * 0.88),
-        ),
-      );
-      const impulseX = (rawX / length) * impulse;
-      const impulseY = (biasedY / length) * impulse;
-      const continuesAirChain = !player.grounded && comboCount > 0;
-      comboCount = continuesAirChain ? comboCount + 1 : 1;
-      if (continuesAirChain) {
-        comboFlashCount = comboCount;
+      if (event.continuesAirChain) {
+        comboFlashCount = event.comboCount;
         comboFlashLife = 1.5;
       }
-      player.blastVx += impulseX;
-      player.vy += impulseY;
-      player.grounded = false;
-      player.onMovingPlatform = false;
       shake = CONFIG.screenShake;
       launchVectors.push({
-        x: centerX,
-        y: centerY,
-        vx: impulseX,
-        vy: impulseY,
+        x: blast.centerX,
+        y: blast.centerY,
+        vx: blast.impulseX,
+        vy: blast.impulseY,
         life: 1.15,
         label: bomb.label,
       });
@@ -706,32 +416,60 @@ export default function BlastEscape() {
     const update = (dt: number, time: number) => {
       if (escapedAt === 0) {
         const level = LEVELS[activeLevelIndex];
-        for (let i = 0; i < 3; i += 1) {
-          movePlayer(dt / 3);
-          if (touchesSpikes(playerRect(), level.spikes)) {
+        const keys = keysRef.current;
+        const manualDirection = ((keys.has('d') || keys.has('arrowright') ? 1 : 0) -
+          (keys.has('a') || keys.has('arrowleft') ? 1 : 0)) as Direction;
+        const gameplay = {
+          levelElapsed,
+          player,
+          bombs,
+          comboCount,
+          interactionStates,
+          dispatchScanned,
+        };
+        const events = stepGameplay(
+          gameplay,
+          level,
+          demoActive
+            ? (elapsed) => directionAtTime(LEVEL_8_CLEAN_ROUTE, elapsed)
+            : manualDirection,
+          dt,
+        );
+        levelElapsed = gameplay.levelElapsed;
+        bombs = gameplay.bombs;
+        comboCount = gameplay.comboCount;
+        interactionStates = gameplay.interactionStates;
+        dispatchScanned = gameplay.dispatchScanned;
+
+        for (const event of events) {
+          addGameplayCue(event, level);
+          if (event.type === 'moved') {
+            sampleActiveTrace(event.dt, event.point, event.grounded);
+          } else if (event.type === 'landed') {
+            addLandingEffects(event);
+          } else if (event.type === 'bomb-exploded') {
+            addBombEffects(event);
+          } else if (event.type === 'cleared') {
+            escapedAt = time;
+            finishActiveTrace();
+            setStatus('escaped');
+            const clearedIndex = activeLevelIndex;
+            setClearedLevels((previous) =>
+              previous.includes(clearedIndex) ? previous : [...previous, clearedIndex],
+            );
+          } else if (event.type === 'died') {
+            if (demoActive && event.reason === 'fall') {
+              console.info('[LEVEL8_DEMO] fell', JSON.stringify({ time: levelElapsed.toFixed(2) }));
+            }
             reset(false);
             return;
           }
         }
-        for (const bomb of bombs) {
-          bomb.timer -= dt;
-          if (bomb.timer <= 0) {
-            explode(bomb);
-            bomb.timer += CONFIG.bombRepeatInterval;
-          }
-        }
-        const exitUnlocked = !level.requiredCombo || comboCount >= level.requiredCombo;
-        if (exitUnlocked && overlaps(playerRect(), level.exit)) {
-          escapedAt = time;
-          finishActiveTrace();
-          setStatus('escaped');
-        }
-        if (player.y > CONFIG.worldHeight + 80) {
-          if (demoActive) {
-            console.info('[LEVEL8_DEMO] fell', JSON.stringify({ time: levelElapsed.toFixed(2) }));
-          }
-          reset(false);
-        }
+      } else if (
+        activeLevelIndex < LEVELS.length - 1 &&
+        time - escapedAt > LEVEL_ADVANCE_DELAY
+      ) {
+        goToLevel(activeLevelIndex + 1);
       }
 
       particles.forEach((particle) => {
@@ -759,6 +497,24 @@ export default function BlastEscape() {
       launchVectors = launchVectors.filter((vector) => vector.life > 0);
       comboFlashLife = Math.max(0, comboFlashLife - dt);
       landingSquash = Math.max(0, landingSquash - dt * 5.5);
+      landingAnimationElapsed += dt;
+      const velocity = horizontalVelocity();
+      if (Math.abs(velocity) >= 1) playerFacing = velocity < 0 ? -1 : 1;
+      const landingDuration = spriteManifest
+        ? animationDurationSeconds(spriteManifest, 'land')
+        : 0.4;
+      const nextAnimationState = playerAnimationStateFor(
+        player.grounded,
+        velocity,
+        landingAnimationElapsed,
+        landingDuration,
+      );
+      if (nextAnimationState === playerAnimationState) {
+        playerAnimationElapsed += dt;
+      } else {
+        playerAnimationState = nextAnimationState;
+        playerAnimationElapsed = 0;
+      }
       shake *= Math.pow(0.04, dt);
     };
 
@@ -785,10 +541,109 @@ export default function BlastEscape() {
       ctx.fill();
     };
 
+    const drawFactoryZone = (levelIndex: number, time: number) => {
+      const zone = factoryZoneForLevelIndex(levelIndex);
+      const accent = zone.accent === 'cold'
+        ? VISUAL.cold
+        : zone.accent === 'mint'
+          ? VISUAL.mint
+          : zone.accent === 'gold'
+            ? VISUAL.gold
+            : VISUAL.hot;
+
+      ctx.save();
+      ctx.globalAlpha = 0.24;
+      ctx.fillStyle = VISUAL.structureDark;
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 2;
+
+      if (zone.id === 'mobility-test') {
+        [214, 480, 746].forEach((x, index) => {
+          ctx.strokeRect(x, 82 + (index % 2) * 42, 92, 126);
+          for (let y = 96; y < 192 + (index % 2) * 42; y += 16) {
+            ctx.fillStyle = index === levelIndex % 3 ? accent : VISUAL.structureEdge;
+            ctx.fillRect(x + 8, y, index === levelIndex % 3 ? 18 : 8, 2);
+          }
+        });
+        ctx.fillStyle = accent;
+        for (let x = 116; x < 872; x += 32) ctx.fillRect(x, 248, 12, 2);
+      } else if (zone.id === 'coolant-works') {
+        ctx.fillRect(54, 72, 852, 14);
+        [154, 418, 746].forEach((x) => {
+          ctx.fillRect(x, 72, 18, 134);
+          ctx.strokeRect(x - 6, 98, 30, 18);
+        });
+        ctx.fillStyle = accent;
+        for (let x = 170; x < 820; x += 82) {
+          const dripY = 118 + Math.round(((time / 18 + x) % 54) / 2) * 2;
+          ctx.fillRect(x, dripY, 3, 8);
+        }
+        ctx.strokeRect(70, 154, 120, 88);
+        ctx.strokeRect(770, 164, 112, 78);
+      } else if (zone.id === 'thermal-processing') {
+        [74, 792].forEach((x) => {
+          ctx.fillRect(x, 92, 96, 190);
+          ctx.strokeRect(x + 12, 118, 72, 128);
+          ctx.fillStyle = accent;
+          for (let y = 136; y < 230; y += 22) ctx.fillRect(x + 24, y, 48, 4);
+          ctx.fillStyle = VISUAL.structureDark;
+        });
+        ctx.fillStyle = accent;
+        for (let x = 226; x < 750; x += 74) ctx.fillRect(x, 104, 38, 3);
+        ctx.strokeRect(346, 70, 268, 70);
+      } else if (zone.id === 'induction-transfer') {
+        ctx.fillRect(62, 76, 838, 8);
+        ctx.fillRect(62, 108, 838, 4);
+        [160, 352, 544, 736].forEach((x) => {
+          ctx.strokeRect(x, 88, 62, 42);
+          ctx.fillStyle = accent;
+          ctx.fillRect(x + 8, 100, 46, 4);
+          ctx.fillStyle = VISUAL.structureDark;
+        });
+        [244, 468, 692].forEach((x) => {
+          ctx.strokeRect(x, 168, 84, 54);
+          ctx.fillRect(x + 8, 178, 68, 34);
+        });
+      } else {
+        ctx.globalAlpha = 0.34;
+        [104, 292, 480].forEach((x) => {
+          ctx.strokeRect(x, 102, 132, 154);
+          ctx.strokeRect(x + 18, 122, 96, 114);
+        });
+        ctx.fillStyle = accent;
+        for (let x = 614; x < 858; x += 48) {
+          ctx.beginPath();
+          ctx.moveTo(x, 132);
+          ctx.lineTo(x + 18, 144);
+          ctx.lineTo(x, 156);
+          ctx.lineTo(x + 7, 144);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.strokeRect(850, 84, 82, 190);
+        ctx.fillRect(924, 96, 4, 166);
+      }
+
+      ctx.globalAlpha = 0.34;
+      ctx.fillStyle = accent;
+      ctx.font = '700 8px ui-monospace, monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(zone.functionLabel, 38, 42);
+      ctx.restore();
+    };
+
     const draw = (time: number) => {
       const level = LEVELS[activeLevelIndex];
+      const stabilizerId = level.movingPlatform?.stabilizedByInteractionId;
+      const movingPlatformStabilized = stabilizerId
+        ? interactionStates[stabilizerId]?.active ?? false
+        : false;
       const movingPlatform = level.movingPlatform
-        ? movingPlatformAt(level.movingPlatform, levelElapsed)
+        ? movingPlatformAt(
+          level.movingPlatform,
+          levelElapsed,
+          movingPlatformStabilized,
+        )
         : undefined;
       ctx.setTransform(canvas.width / CONFIG.worldWidth, 0, 0, canvas.height / CONFIG.worldHeight, 0, 0);
       ctx.clearRect(0, 0, CONFIG.worldWidth, CONFIG.worldHeight);
@@ -836,6 +691,67 @@ export default function BlastEscape() {
       ctx.fillStyle = 'rgba(255, 173, 55, 0.07)';
       for (let x = 238; x < 754; x += 96) ctx.fillRect(x, 116, 26, 2);
 
+      drawFactoryZone(activeLevelIndex, time);
+
+      level.traversalStateSources?.forEach((source) => {
+        if (
+          source.grants !== 'cold' &&
+          source.grants !== 'heat' &&
+          source.grants !== 'magnetic'
+        ) return;
+        const isCold = source.grants === 'cold';
+        const isHeat = source.grants === 'heat';
+        const sourceColor = isCold ? VISUAL.cold : isHeat ? VISUAL.hot : VISUAL.mint;
+        ctx.fillStyle = isCold ? '#172a32' : isHeat ? '#321b18' : '#17302d';
+        ctx.fillRect(source.rect.x, source.rect.y, source.rect.w, source.rect.h);
+        ctx.strokeStyle = sourceColor;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(source.rect.x, source.rect.y, source.rect.w, source.rect.h);
+        ctx.fillStyle = isCold
+          ? 'rgba(116, 217, 255, 0.28)'
+          : isHeat
+            ? 'rgba(255, 81, 62, 0.32)'
+            : 'rgba(102, 242, 213, 0.3)';
+        for (let x = source.rect.x + 9; x < source.rect.x + source.rect.w; x += 18) {
+          ctx.fillRect(x, source.rect.y + 7, 5, source.rect.h - 14);
+        }
+        ctx.fillStyle = sourceColor;
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          isCold ? 'COOLANT' : isHeat ? 'FURNACE' : 'INDUCTION',
+          source.rect.x + source.rect.w / 2,
+          source.rect.y - 7,
+        );
+      });
+
+      if (debugEnabled) {
+        const stateColors = {
+          cold: '#74d9ff',
+          heat: VISUAL.hot,
+          magnetic: VISUAL.mint,
+        } as const;
+        level.traversalStateSources?.forEach((source) => {
+          ctx.fillStyle = `${stateColors[source.grants]}24`;
+          ctx.fillRect(source.rect.x, source.rect.y, source.rect.w, source.rect.h);
+          ctx.strokeStyle = stateColors[source.grants];
+          ctx.setLineDash([5, 4]);
+          ctx.strokeRect(source.rect.x, source.rect.y, source.rect.w, source.rect.h);
+          ctx.setLineDash([]);
+        });
+        level.traversalInteractions?.forEach((interaction) => {
+          ctx.strokeStyle = 'rgba(255, 196, 79, 0.72)';
+          ctx.setLineDash([3, 3]);
+          ctx.strokeRect(
+            interaction.rect.x,
+            interaction.rect.y,
+            interaction.rect.w,
+            interaction.rect.h,
+          );
+          ctx.setLineDash([]);
+        });
+      }
+
       if (level.pit) {
         const pitGradient = ctx.createLinearGradient(0, level.pit.y, 0, level.pit.y + level.pit.h);
         pitGradient.addColorStop(0, 'rgba(5, 4, 9, 0.42)');
@@ -854,20 +770,74 @@ export default function BlastEscape() {
         ctx.fillRect(level.pit.x, level.pit.y, level.pit.w, 2);
       }
 
-      if (level.movingPlatform) {
-        const trackY = level.movingPlatform.y + level.movingPlatform.h / 2;
+      level.waterHazards?.forEach((hazard) => {
+        const frozen = interactionStates[hazard.frozenByInteractionId]?.active ?? false;
+        const waterGradient = ctx.createLinearGradient(0, hazard.rect.y, 0, hazard.rect.y + hazard.rect.h);
+        waterGradient.addColorStop(0, frozen ? 'rgba(116, 217, 255, 0.38)' : 'rgba(42, 118, 155, 0.86)');
+        waterGradient.addColorStop(1, frozen ? 'rgba(35, 80, 105, 0.82)' : 'rgba(8, 33, 50, 0.98)');
+        ctx.fillStyle = waterGradient;
+        ctx.fillRect(hazard.rect.x, hazard.rect.y, hazard.rect.w, hazard.rect.h);
+        ctx.fillStyle = frozen ? '#d8f7ff' : 'rgba(116, 217, 255, 0.58)';
+        for (let x = hazard.rect.x + 8; x < hazard.rect.x + hazard.rect.w; x += 30) {
+          ctx.fillRect(x, hazard.rect.y + 3, 18, frozen ? 3 : 2);
+        }
+      });
+
+      level.traversalInteractions?.forEach((interaction) => {
+        if (
+          interaction.kind !== 'freeze-water' ||
+          !interaction.resultRect ||
+          !interactionStates[interaction.id]?.active
+        ) return;
+        ctx.fillStyle = 'rgba(116, 217, 255, 0.82)';
+        ctx.fillRect(
+          interaction.resultRect.x,
+          interaction.resultRect.y,
+          interaction.resultRect.w,
+          interaction.resultRect.h,
+        );
+        ctx.fillStyle = '#d8f7ff';
+        ctx.fillRect(
+          interaction.resultRect.x,
+          interaction.resultRect.y,
+          interaction.resultRect.w,
+          3,
+        );
+        ctx.fillStyle = VISUAL.cold;
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          'CONDENSATE FROZEN',
+          interaction.resultRect.x + interaction.resultRect.w / 2,
+          interaction.resultRect.y - 7,
+        );
+      });
+
+      const track = level.movingPlatform;
+      if (track) {
+        const trackY = track.y + track.h / 2;
         ctx.strokeStyle = 'rgba(102, 242, 213, 0.16)';
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(level.movingPlatform.fromX + level.movingPlatform.w / 2, trackY);
-        ctx.lineTo(level.movingPlatform.toX + level.movingPlatform.w / 2, trackY);
+        ctx.moveTo(track.fromX + track.w / 2, trackY);
+        ctx.lineTo(track.toX + track.w / 2, trackY);
         ctx.stroke();
-        [level.movingPlatform.fromX, level.movingPlatform.toX].forEach((x) => {
+        [track.fromX, track.toX].forEach((x) => {
           ctx.fillStyle = VISUAL.structureDark;
-          ctx.fillRect(x + level.movingPlatform.w / 2 - 7, trackY - 8, 14, 16);
+          ctx.fillRect(x + track.w / 2 - 7, trackY - 8, 14, 16);
           ctx.fillStyle = 'rgba(102, 242, 213, 0.62)';
-          ctx.fillRect(x + level.movingPlatform.w / 2 - 2, trackY - 4, 4, 8);
+          ctx.fillRect(x + track.w / 2 - 2, trackY - 4, 4, 8);
         });
+        if (track.stabilizedX !== undefined) {
+          ctx.strokeStyle = 'rgba(116, 217, 255, 0.58)';
+          ctx.setLineDash([4, 3]);
+          ctx.strokeRect(track.stabilizedX, track.y - 5, track.w, track.h + 10);
+          ctx.setLineDash([]);
+          ctx.fillStyle = VISUAL.cold;
+          ctx.font = '700 8px ui-monospace, monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText('COLD DOCK', track.stabilizedX + track.w / 2, track.y - 10);
+        }
       }
 
       level.platforms.forEach((platform) => {
@@ -894,27 +864,165 @@ export default function BlastEscape() {
         }
       });
 
+      level.meltableBarriers?.forEach((barrier) => {
+        const melted = interactionStates[barrier.meltedByInteractionId]?.active ?? false;
+        if (melted) {
+          ctx.fillStyle = 'rgba(255, 81, 62, 0.34)';
+          ctx.fillRect(barrier.rect.x - 8, barrier.rect.y + barrier.rect.h - 5, barrier.rect.w + 16, 5);
+          ctx.fillStyle = VISUAL.amber;
+          ctx.font = '700 8px ui-monospace, monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText('SEAL OPEN', barrier.rect.x + barrier.rect.w / 2, barrier.rect.y - 7);
+          return;
+        }
+        ctx.fillStyle = '#33282d';
+        ctx.fillRect(barrier.rect.x, barrier.rect.y, barrier.rect.w, barrier.rect.h);
+        ctx.fillStyle = '#564048';
+        for (let y = barrier.rect.y + 12; y < barrier.rect.y + barrier.rect.h; y += 28) {
+          ctx.fillRect(barrier.rect.x + 3, y, barrier.rect.w - 6, 3);
+        }
+        ctx.fillStyle = VISUAL.hot;
+        ctx.fillRect(barrier.rect.x, barrier.rect.y + barrier.rect.h / 2 - 3, barrier.rect.w, 6);
+        ctx.strokeStyle = '#ffb05a';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(barrier.rect.x, barrier.rect.y, barrier.rect.w, barrier.rect.h);
+        ctx.fillStyle = VISUAL.hot;
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('THERMAL SEAL', barrier.rect.x + barrier.rect.w / 2, barrier.rect.y - 7);
+      });
+
+      level.traversalInteractions?.forEach((interaction) => {
+        if (interaction.kind !== 'reactivate-charge') return;
+        const active = interactionStates[interaction.id]?.active ?? false;
+        ctx.fillStyle = active ? '#3b201d' : '#242126';
+        ctx.fillRect(interaction.rect.x, interaction.rect.y, interaction.rect.w, interaction.rect.h);
+        ctx.strokeStyle = active ? VISUAL.hot : '#756b76';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(interaction.rect.x, interaction.rect.y, interaction.rect.w, interaction.rect.h);
+        ctx.fillStyle = active ? '#ffb05a' : '#756b76';
+        for (let x = interaction.rect.x + 10; x < interaction.rect.x + interaction.rect.w; x += 18) {
+          ctx.fillRect(x, interaction.rect.y + 8, 5, interaction.rect.h - 16);
+        }
+        ctx.fillStyle = active ? VISUAL.hot : '#8f838d';
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          active ? 'CHARGE ONLINE' : 'IGNITION',
+          interaction.rect.x + interaction.rect.w / 2,
+          interaction.rect.y - 7,
+        );
+      });
+
+      level.traversalInteractions?.forEach((interaction) => {
+        if (interaction.kind !== 'thaw-ice' || !interaction.deactivatesInteractionId) return;
+        const spanFrozen = interactionStates[interaction.deactivatesInteractionId]?.active ?? false;
+        ctx.fillStyle = '#321b18';
+        ctx.fillRect(interaction.rect.x, interaction.rect.y, interaction.rect.w, interaction.rect.h);
+        ctx.strokeStyle = VISUAL.hot;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(interaction.rect.x, interaction.rect.y, interaction.rect.w, interaction.rect.h);
+        ctx.fillStyle = spanFrozen ? 'rgba(255, 81, 62, 0.34)' : 'rgba(255, 176, 90, 0.5)';
+        for (let x = interaction.rect.x + 10; x < interaction.rect.x + interaction.rect.w; x += 18) {
+          ctx.fillRect(x, interaction.rect.y + 8, 5, interaction.rect.h - 16);
+        }
+        ctx.fillStyle = VISUAL.hot;
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          spanFrozen ? 'THAW CONTROL' : 'SPAN OPEN',
+          interaction.rect.x + interaction.rect.w / 2,
+          interaction.rect.y - 7,
+        );
+      });
+
+      level.traversalInteractions?.forEach((interaction) => {
+        if (interaction.kind !== 'magnetic-attach') return;
+        const attached = player.magneticAttachment?.interactionId === interaction.id;
+        const active = attached || (interactionStates[interaction.id]?.active ?? false);
+        const rail = traversalInteractionResultAt(interaction, levelElapsed);
+        if (!rail) return;
+        if (interaction.movingResult) {
+          const motion = interaction.movingResult;
+          ctx.strokeStyle = 'rgba(102, 242, 213, 0.24)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(motion.fromX, motion.y + motion.h / 2);
+          ctx.lineTo(motion.toX + motion.w, motion.y + motion.h / 2);
+          ctx.stroke();
+          ctx.fillStyle = 'rgba(102, 242, 213, 0.34)';
+          ctx.fillRect(motion.fromX - 4, motion.y - 6, 5, motion.h + 12);
+          ctx.fillRect(motion.toX + motion.w - 1, motion.y - 6, 5, motion.h + 12);
+        }
+        ctx.fillStyle = '#20282a';
+        ctx.fillRect(rail.x, rail.y, rail.w, rail.h);
+        ctx.fillStyle = active ? VISUAL.mint : 'rgba(102, 242, 213, 0.3)';
+        ctx.fillRect(rail.x + 4, rail.y + rail.h - 4, rail.w - 8, 3);
+        ctx.strokeStyle = active ? VISUAL.mint : 'rgba(102, 242, 213, 0.42)';
+        ctx.lineWidth = active ? 2 : 1;
+        ctx.strokeRect(rail.x, rail.y, rail.w, rail.h);
+        for (let x = rail.x + 18; x < rail.x + rail.w; x += 42) {
+          ctx.fillStyle = active ? '#b8fff0' : '#4a7770';
+          ctx.fillRect(x, rail.y + 4, 6, 4);
+        }
+        ctx.fillStyle = VISUAL.mint;
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          attached ? 'MAG LOCK' : interaction.movingResult ? 'SHIFT CARRIER' : 'INDUCTION RAIL',
+          rail.x + rail.w / 2,
+          rail.y - 7,
+        );
+      });
+
+      level.hotSurfaces?.forEach((surface) => {
+        const cooled = interactionStates[surface.cooledByInteractionId]?.active ?? false;
+        ctx.fillStyle = cooled ? 'rgba(116, 217, 255, 0.72)' : 'rgba(255, 81, 62, 0.86)';
+        ctx.fillRect(surface.rect.x, surface.rect.y, surface.rect.w, surface.rect.h);
+        ctx.fillStyle = cooled ? '#d8f7ff' : '#ffb05a';
+        for (let x = surface.rect.x + 8; x < surface.rect.x + surface.rect.w; x += 22) {
+          ctx.fillRect(x, surface.rect.y + 2, 10, 2);
+        }
+        ctx.fillStyle = cooled ? VISUAL.cold : VISUAL.hot;
+        ctx.font = '700 8px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          cooled ? 'PLATE COOLED' : 'OVERHEAT',
+          surface.rect.x + surface.rect.w / 2,
+          surface.rect.y - 7,
+        );
+      });
+
       if (movingPlatform) {
         const { rect, velocityX } = movingPlatform;
         ctx.fillStyle = '#252e31';
         ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
-        ctx.fillStyle = VISUAL.mint;
+        ctx.fillStyle = movingPlatformStabilized ? VISUAL.cold : VISUAL.mint;
         ctx.fillRect(rect.x + 4, rect.y, rect.w - 8, 3);
-        ctx.strokeStyle = 'rgba(102, 242, 213, 0.46)';
+        ctx.strokeStyle = movingPlatformStabilized
+          ? 'rgba(116, 217, 255, 0.72)'
+          : 'rgba(102, 242, 213, 0.46)';
         ctx.lineWidth = 1;
         ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
         ctx.fillStyle = '#12171a';
         ctx.fillRect(rect.x + 8, rect.y + 8, rect.w - 16, rect.h - 12);
 
-        const direction = Math.sign(velocityX);
-        ctx.strokeStyle = 'rgba(102, 242, 213, 0.68)';
-        ctx.lineWidth = 1.5;
-        for (let x = rect.x + 42; x <= rect.x + rect.w - 30; x += 32) {
-          ctx.beginPath();
-          ctx.moveTo(x - direction * 6, rect.y + 10);
-          ctx.lineTo(x, rect.y + 14);
-          ctx.lineTo(x - direction * 6, rect.y + 18);
-          ctx.stroke();
+        if (movingPlatformStabilized) {
+          ctx.fillStyle = VISUAL.cold;
+          ctx.font = '700 8px ui-monospace, monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText('CARRIAGE LOCKED', rect.x + rect.w / 2, rect.y + 17);
+        } else {
+          const direction = Math.sign(velocityX);
+          ctx.strokeStyle = 'rgba(102, 242, 213, 0.68)';
+          ctx.lineWidth = 1.5;
+          for (let x = rect.x + 42; x <= rect.x + rect.w - 30; x += 32) {
+            ctx.beginPath();
+            ctx.moveTo(x - direction * 6, rect.y + 10);
+            ctx.lineTo(x, rect.y + 14);
+            ctx.lineTo(x - direction * 6, rect.y + 18);
+            ctx.stroke();
+          }
         }
       }
 
@@ -953,44 +1061,82 @@ export default function BlastEscape() {
         );
       }
 
-      const exit = level.exit;
-      const exitUnlocked = !level.requiredCombo || comboCount >= level.requiredCombo;
-      const exitColor = exitUnlocked ? VISUAL.gold : '#77717f';
-      ctx.fillStyle = exitUnlocked ? 'rgba(255,200,86,0.055)' : 'rgba(119,113,127,0.05)';
-      ctx.fillRect(exit.x - 13, exit.y - 20, exit.w + 26, exit.h + 20);
-      ctx.fillStyle = '#241f27';
-      ctx.fillRect(exit.x - 5, exit.y - 5, exit.w + 10, exit.h + 5);
-      ctx.fillStyle = '#0d0c11';
-      ctx.fillRect(exit.x + 4, exit.y + 4, exit.w - 8, exit.h - 4);
-      ctx.strokeStyle = exitColor;
-      ctx.lineWidth = 2;
-      ctx.strokeRect(exit.x, exit.y, exit.w, exit.h);
-      ctx.fillStyle = exitColor;
-      ctx.fillRect(exit.x, exit.y, exit.w, 3);
-      ctx.fillRect(exit.x + exit.w - 6, exit.y + 8, 2, exit.h - 16);
-      ctx.beginPath();
-      ctx.arc(exit.x + exit.w - 11, exit.y + exit.h / 2, 3, 0, Math.PI * 2);
-      ctx.fill();
-      if (exitUnlocked) {
-        ctx.strokeStyle = 'rgba(255, 196, 79, 0.64)';
+      if (level.dispatchSequence) {
+        const { scanner, openDoor } = level.dispatchSequence;
+        ctx.fillStyle = '#181a20';
+        ctx.fillRect(scanner.x, scanner.y, scanner.w, scanner.h);
+        ctx.strokeStyle = dispatchScanned ? VISUAL.hot : VISUAL.mint;
         ctx.lineWidth = 2;
+        ctx.strokeRect(scanner.x, scanner.y, scanner.w, scanner.h);
+        ctx.fillStyle = dispatchScanned ? 'rgba(255, 81, 62, 0.2)' : 'rgba(102, 242, 213, 0.14)';
+        ctx.fillRect(scanner.x + 5, scanner.y + 5, scanner.w - 10, scanner.h - 10);
+        ctx.fillStyle = dispatchScanned ? VISUAL.hot : VISUAL.mint;
+        ctx.font = '700 9px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(dispatchScanned ? 'ORDER CANCELLED' : 'DISPATCH SCAN', scanner.x + scanner.w / 2, scanner.y - 8);
+        ctx.fillStyle = '#05070a';
+        ctx.fillRect(openDoor.x, openDoor.y, openDoor.w, openDoor.h);
+        ctx.strokeStyle = VISUAL.gold;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(openDoor.x, openDoor.y, openDoor.w, openDoor.h);
+        ctx.fillStyle = VISUAL.gold;
+        ctx.fillRect(openDoor.x + openDoor.w - 5, openDoor.y, 5, openDoor.h);
+        ctx.font = '700 9px ui-monospace, monospace';
+        ctx.fillText('EXIT OPEN', openDoor.x + openDoor.w / 2, openDoor.y - 8);
+        if (dispatchScanned) {
+          ctx.fillStyle = 'rgba(7, 8, 12, 0.9)';
+          ctx.fillRect(320, 30, 320, 74);
+          ctx.strokeStyle = VISUAL.hot;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(320, 30, 320, 74);
+          ctx.fillStyle = VISUAL.hot;
+          ctx.font = '900 21px ui-monospace, monospace';
+          ctx.fillText('OUTBOUND ORDER // CANCELLED', 480, 61);
+          ctx.fillStyle = '#b7afb9';
+          ctx.font = '700 10px ui-monospace, monospace';
+          ctx.fillText('NO ACTIVE DIRECTIVE', 480, 84);
+        }
+      } else {
+        const exit = level.exit;
+        const exitUnlocked = !level.requiredCombo || comboCount >= level.requiredCombo;
+        const exitColor = exitUnlocked ? VISUAL.gold : '#77717f';
+        ctx.fillStyle = exitUnlocked ? 'rgba(255,200,86,0.055)' : 'rgba(119,113,127,0.05)';
+        ctx.fillRect(exit.x - 13, exit.y - 20, exit.w + 26, exit.h + 20);
+        ctx.fillStyle = '#241f27';
+        ctx.fillRect(exit.x - 5, exit.y - 5, exit.w + 10, exit.h + 5);
+        ctx.fillStyle = '#0d0c11';
+        ctx.fillRect(exit.x + 4, exit.y + 4, exit.w - 8, exit.h - 4);
+        ctx.strokeStyle = exitColor;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(exit.x, exit.y, exit.w, exit.h);
+        ctx.fillStyle = exitColor;
+        ctx.fillRect(exit.x, exit.y, exit.w, 3);
+        ctx.fillRect(exit.x + exit.w - 6, exit.y + 8, 2, exit.h - 16);
         ctx.beginPath();
-        ctx.moveTo(exit.x + 14, exit.y + exit.h / 2);
-        ctx.lineTo(exit.x + exit.w - 20, exit.y + exit.h / 2);
-        ctx.lineTo(exit.x + exit.w - 27, exit.y + exit.h / 2 - 6);
-        ctx.moveTo(exit.x + exit.w - 20, exit.y + exit.h / 2);
-        ctx.lineTo(exit.x + exit.w - 27, exit.y + exit.h / 2 + 6);
-        ctx.stroke();
+        ctx.arc(exit.x + exit.w - 11, exit.y + exit.h / 2, 3, 0, Math.PI * 2);
+        ctx.fill();
+        if (exitUnlocked) {
+          ctx.strokeStyle = 'rgba(255, 196, 79, 0.64)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(exit.x + 14, exit.y + exit.h / 2);
+          ctx.lineTo(exit.x + exit.w - 20, exit.y + exit.h / 2);
+          ctx.lineTo(exit.x + exit.w - 27, exit.y + exit.h / 2 - 6);
+          ctx.moveTo(exit.x + exit.w - 20, exit.y + exit.h / 2);
+          ctx.lineTo(exit.x + exit.w - 27, exit.y + exit.h / 2 + 6);
+          ctx.stroke();
+        }
+        ctx.font = '700 10px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          exitUnlocked ? 'OUTBOUND' : `${level.requiredCombo}X TO OPEN`,
+          exit.x + exit.w / 2,
+          exit.y - 10,
+        );
       }
-      ctx.font = '700 10px ui-monospace, monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(
-        exitUnlocked ? 'OUTBOUND' : `${level.requiredCombo}X TO OPEN`,
-        exit.x + exit.w / 2,
-        exit.y - 10,
-      );
 
       bombs.forEach((bomb) => {
+        const powered = bombIsPowered(bomb, interactionStates);
         const visibleTimer = Math.max(0, bomb.timer);
         const fraction = Math.min(1, visibleTimer / CONFIG.bombFuseDuration);
         const urgency = 1 - fraction;
@@ -1034,16 +1180,18 @@ export default function BlastEscape() {
         ctx.stroke();
         ctx.fillStyle = '#e7ded0';
         ctx.fillRect(-11, -8, 22, 3);
-        ctx.fillStyle = VISUAL.hot;
+        ctx.fillStyle = powered ? VISUAL.hot : '#625963';
         ctx.fillRect(-15, -2, 30, 7);
         ctx.fillStyle = '#4b2c2d';
         ctx.fillRect(-10, 0, 20, 3);
         ctx.fillStyle = '#171419';
         ctx.fillRect(-4, -16, 8, 5);
-        ctx.fillStyle = urgency > 0.72 ? '#fff1dc' : VISUAL.amber;
+        ctx.fillStyle = powered
+          ? (urgency > 0.72 ? '#fff1dc' : VISUAL.amber)
+          : '#77717f';
         ctx.fillRect(-2, -15, 4, 3);
         ctx.restore();
-        ctx.strokeStyle = VISUAL.amber;
+        ctx.strokeStyle = powered ? VISUAL.amber : '#625963';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.arc(bomb.x, bomb.y, 21, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - fraction));
@@ -1051,7 +1199,12 @@ export default function BlastEscape() {
         ctx.fillStyle = '#f4f0e8';
         ctx.font = '700 11px ui-monospace, monospace';
         ctx.textAlign = 'center';
-        ctx.fillText(visibleTimer.toFixed(1), bomb.x, bomb.y - 29);
+        ctx.fillText(powered ? visibleTimer.toFixed(1) : '--', bomb.x, bomb.y - 29);
+        if (!powered) {
+          ctx.fillStyle = '#8f838d';
+          ctx.font = '700 8px ui-monospace, monospace';
+          ctx.fillText('DORMANT', bomb.x, bomb.y + 43);
+        }
         ctx.fillStyle = 'rgba(244, 240, 232, 0.62)';
         ctx.font = '700 8px ui-monospace, monospace';
         ctx.fillText(bomb.label, bomb.x, bomb.y + 31);
@@ -1064,10 +1217,12 @@ export default function BlastEscape() {
       });
       ctx.globalAlpha = 1;
       waves.forEach((wave) => {
-        ctx.strokeStyle = `rgba(255,180,55,${wave.life})`;
+        ctx.globalAlpha = Math.min(1, wave.life);
+        ctx.strokeStyle = wave.color;
         ctx.lineWidth = 7 * wave.life + 1;
         ctx.beginPath(); ctx.arc(wave.x, wave.y, wave.radius, 0, Math.PI * 2); ctx.stroke();
       });
+      ctx.globalAlpha = 1;
       particles.forEach((particle) => {
         ctx.globalAlpha = Math.min(1, particle.life * 2);
         ctx.fillStyle = particle.life > 0.35 ? '#ffd35d' : '#ff543d';
@@ -1123,22 +1278,74 @@ export default function BlastEscape() {
       ctx.translate(player.x + CONFIG.playerWidth / 2, player.y + CONFIG.playerHeight);
       ctx.scale(1 + landingSquash * 0.08, 1 - landingSquash * 0.12);
       ctx.translate(-CONFIG.playerWidth / 2, -CONFIG.playerHeight);
-      ctx.fillStyle = VISUAL.player;
-      roundedRect(ctx, 0, 0, CONFIG.playerWidth, CONFIG.playerHeight, 5);
-      ctx.fill();
-      ctx.fillStyle = VISUAL.playerShade;
-      ctx.fillRect(3, 24, 20, 2);
-      ctx.fillRect(5, 34, 6, 2);
-      ctx.fillRect(15, 34, 6, 2);
-      ctx.fillStyle = VISUAL.sensor;
-      roundedRect(ctx, 4, 8, 18, 7, 2);
-      ctx.fill();
-      ctx.fillStyle = VISUAL.hot;
-      ctx.fillRect(horizontalVelocity() >= 0 ? 17 : 6, 10, 3, 3);
-      ctx.fillStyle = '#6c6670';
-      ctx.font = '700 6px ui-monospace, monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('U-07', 13, 31);
+      if (spriteAtlas && spriteManifest) {
+        const frame = animationFrameAt(
+          spriteManifest,
+          playerAnimationState,
+          playerAnimationElapsed,
+        );
+        ctx.save();
+        ctx.translate(CONFIG.playerWidth / 2, 0);
+        ctx.scale(playerFacing, 1);
+        ctx.translate(-CONFIG.playerWidth / 2, 0);
+        ctx.drawImage(
+          spriteAtlas,
+          frame.rect.x,
+          frame.rect.y,
+          frame.rect.w,
+          frame.rect.h,
+          -3,
+          -2,
+          spriteManifest.animation.cellWidth,
+          spriteManifest.animation.cellHeight,
+        );
+        ctx.restore();
+      } else {
+        ctx.fillStyle = VISUAL.player;
+        roundedRect(ctx, 0, 0, CONFIG.playerWidth, CONFIG.playerHeight, 5);
+        ctx.fill();
+        ctx.fillStyle = VISUAL.playerShade;
+        ctx.fillRect(3, 24, 20, 2);
+        ctx.fillRect(5, 34, 6, 2);
+        ctx.fillRect(15, 34, 6, 2);
+        ctx.fillStyle = VISUAL.sensor;
+        roundedRect(ctx, 4, 8, 18, 7, 2);
+        ctx.fill();
+        ctx.fillStyle = VISUAL.hot;
+        ctx.fillRect(horizontalVelocity() >= 0 ? 17 : 6, 10, 3, 3);
+        ctx.fillStyle = '#6c6670';
+        ctx.font = '700 6px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('U-07', 13, 31);
+      }
+      if (player.traversalState.kind === 'cold') {
+        ctx.strokeStyle = `rgba(116, 217, 255, ${0.55 + Math.sin(time / 120) * 0.18})`;
+        ctx.lineWidth = 2;
+        roundedRect(ctx, -3, -3, CONFIG.playerWidth + 6, CONFIG.playerHeight + 6, 7);
+        ctx.stroke();
+        ctx.fillStyle = VISUAL.cold;
+        ctx.fillRect(3, 2, 3, 3);
+        ctx.fillRect(20, 19, 2, 2);
+      }
+      if (player.traversalState.kind === 'heat') {
+        ctx.strokeStyle = `rgba(255, 81, 62, ${0.58 + Math.sin(time / 95) * 0.2})`;
+        ctx.lineWidth = 2;
+        roundedRect(ctx, -3, -3, CONFIG.playerWidth + 6, CONFIG.playerHeight + 6, 7);
+        ctx.stroke();
+        ctx.fillStyle = '#ffb05a';
+        ctx.fillRect(3, 19, 3, 3);
+        ctx.fillRect(20, 2, 2, 2);
+      }
+      if (player.traversalState.kind === 'magnetic') {
+        ctx.strokeStyle = `rgba(102, 242, 213, ${0.58 + Math.sin(time / 105) * 0.2})`;
+        ctx.lineWidth = 2;
+        roundedRect(ctx, -3, -3, CONFIG.playerWidth + 6, CONFIG.playerHeight + 6, 7);
+        ctx.stroke();
+        ctx.fillStyle = VISUAL.mint;
+        ctx.fillRect(3, 2, 3, 3);
+        ctx.fillRect(20, 19, 2, 2);
+        if (player.magneticAttachment) ctx.fillRect(8, -6, 10, 3);
+      }
       ctx.restore();
 
       if (activeLevelIndex === 3 && comboCount === 1 && !player.grounded) {
@@ -1168,7 +1375,7 @@ export default function BlastEscape() {
 
       if (debugEnabled) {
         ctx.fillStyle = 'rgba(7, 9, 13, 0.82)';
-        roundedRect(ctx, 30, 28, 390, 137, 8); ctx.fill();
+        roundedRect(ctx, 30, 28, 390, 156, 8); ctx.fill();
         ctx.fillStyle = '#66f2d5';
         ctx.font = '700 12px ui-monospace, monospace';
         ctx.textAlign = 'left';
@@ -1188,18 +1395,36 @@ export default function BlastEscape() {
           46,
           149,
         );
+        ctx.fillText(
+          `state       ${player.traversalState.kind}  ${player.traversalState.remainingSeconds.toFixed(2)}s`,
+          46,
+          168,
+        );
       }
 
       if (escapedAt > 0) {
+        const nextLevel = LEVELS[activeLevelIndex + 1];
         ctx.fillStyle = 'rgba(4,4,8,0.64)';
         ctx.fillRect(0, 0, CONFIG.worldWidth, CONFIG.worldHeight);
-        ctx.fillStyle = '#ffc44f';
+        ctx.fillStyle = VISUAL.gold;
         ctx.font = '900 74px ui-sans-serif, system-ui, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('OUTBOUND', 480, 284);
+        ctx.fillText(nextLevel ? 'OUTBOUND' : 'END OF LINE', 480, 284);
         ctx.fillStyle = '#f5f2eb';
         ctx.font = '600 16px ui-monospace, monospace';
-        ctx.fillText('DIRECTIVE COMPLETE / PRESS R TO REPEAT', 480, 322);
+        if (nextLevel) {
+          ctx.fillText(`NEXT / ${nextLevel.name} — ${nextLevel.subtitle}`, 480, 322);
+          const progress = Math.min(1, (time - escapedAt) / LEVEL_ADVANCE_DELAY);
+          ctx.fillStyle = 'rgba(255, 196, 79, 0.2)';
+          ctx.fillRect(390, 344, 180, 4);
+          ctx.fillStyle = VISUAL.gold;
+          ctx.fillRect(390, 344, 180 * progress, 4);
+        } else {
+          ctx.fillText('ORDER CANCELLED / DEPARTURE CHOSEN', 480, 322);
+          ctx.fillStyle = '#b7afb9';
+          ctx.font = '600 11px ui-monospace, monospace';
+          ctx.fillText('BLAST ESCAPE  ·  THANK YOU FOR PLAYING', 480, 350);
+        }
       }
       ctx.restore();
     };
@@ -1214,6 +1439,7 @@ export default function BlastEscape() {
     animationFrame = requestAnimationFrame(frame);
 
     return () => {
+      spriteDisposed = true;
       cancelAnimationFrame(animationFrame);
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
@@ -1231,7 +1457,12 @@ export default function BlastEscape() {
         <div className="level-nav" aria-label="Select level">
           {LEVELS.map((level, index) => (
             <button
-              className={levelIndex === index ? 'level-button active' : 'level-button'}
+              aria-label={`${level.name}${clearedLevels.includes(index) ? ' (cleared)' : ''}`}
+              className={[
+                'level-button',
+                levelIndex === index ? 'active' : '',
+                clearedLevels.includes(index) ? 'cleared' : '',
+              ].filter(Boolean).join(' ')}
               key={level.name}
               onClick={() => selectLevel(index)}
               type="button"
@@ -1251,13 +1482,9 @@ export default function BlastEscape() {
           aria-label={`${LEVELS[levelIndex].name}: ${LEVELS[levelIndex].subtitle}`}
         />
         <div className="corner-label">{LEVELS[levelIndex].name} / {LEVELS[levelIndex].subtitle}</div>
-        {status === 'escaped' && (
-          <button
-            className="restart-overlay"
-            onClick={() => levelIndex === 0 ? selectLevel(1) : restart()}
-            type="button"
-          >
-            {levelIndex === 0 ? 'Play Level 2' : 'Ride again'}
+        {status === 'escaped' && levelIndex === LEVELS.length - 1 && (
+          <button className="restart-overlay" onClick={() => selectLevel(0)} type="button">
+            Run it again from Level 1
           </button>
         )}
       </section>

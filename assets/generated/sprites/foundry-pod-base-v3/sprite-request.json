@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "kind": "sprite-gen-request",
+  "engine": "component-row",
+  "character": {
+    "id": "foundry-pod-base-v3",
+    "description": "Approved Foundry Pod identity; balanced right-facing idle candidate for the 32 x 40 gameplay frame",
+    "base_image": "artifacts/sprite-pipeline/foundry-pod-base-idle-v5.png"
+  },
+  "cell": {
+    "shape": "rect",
+    "width": 32,
+    "height": 40,
+    "safe_margin_x": 3,
+    "safe_margin_y": 2
+  },
+  "chroma_key": {
+    "name": "magenta",
+    "hex": "#FF00FF",
+    "rgb": [
+      255,
+      0,
+      255
+    ],
+    "selection": "material-aware"
+  },
+  "chroma": {
+    "mode": "ycbcr",
+    "unmix_reach": 4,
+    "spill_max_fraction": 0.005
+  },
+  "fit": {
+    "pixel_unfake": true,
+    "logical_height": 40,
+    "palette_size": 12,
+    "detail_bias": true,
+    "outline": false,
+    "align_x": "foot-centroid",
+    "align_y": "bottom",
+    "ground_frames": true
+  },
+  "states": {
+    "idle": {
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "action": "single neutral right-facing idle used only to lock the production base"
+    }
+  },
+  "style": "true low-resolution pixel art; approved Blast Escape palette and Foundry Pod silhouette",
+  "motion_phase_guides": false
+}

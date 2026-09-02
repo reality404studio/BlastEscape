@@ -1,0 +1,167 @@
+{
+  "ok": true,
+  "engine": "component-row",
+  "kind": "sprite-gen-inspect-report",
+  "run_dir": "/Users/rafaela/01_PROJECT_NOW/_Hackerton/06.templerunlocal/blast-escape/assets/generated/sprites/foundry-pod",
+  "states": [
+    "idle",
+    "walk",
+    "airborne",
+    "land"
+  ],
+  "thresholds": {
+    "histogram_min": 0.0,
+    "dhash_min": 0.55,
+    "motion_min": 0.01
+  },
+  "rows": [
+    {
+      "state": "idle",
+      "source": "frames",
+      "expected_frames": 4,
+      "found_frames": 4,
+      "natural_pose_count": 4,
+      "frame_files": [
+        "frames/idle/frame-0.png",
+        "frames/idle/frame-1.png",
+        "frames/idle/frame-2.png",
+        "frames/idle/frame-3.png"
+      ],
+      "metrics": {
+        "histogram_intersection": {
+          "min": 0.9894497944004353,
+          "mean": 0.9916946129214917
+        },
+        "dhash_similarity": {
+          "min": 0.921875,
+          "mean": 0.9583333333333334
+        },
+        "motion_presence": 0.009787884880514706,
+        "centroid_sigma": {
+          "x": 0.024740555379222276,
+          "y": 0.2541430072058209
+        }
+      },
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "idle: motion presence is too low (0.0098 < 0.0100)"
+      ]
+    },
+    {
+      "state": "walk",
+      "source": "frames",
+      "expected_frames": 8,
+      "found_frames": 8,
+      "natural_pose_count": 8,
+      "frame_files": [
+        "frames/walk/frame-0.png",
+        "frames/walk/frame-1.png",
+        "frames/walk/frame-2.png",
+        "frames/walk/frame-3.png",
+        "frames/walk/frame-4.png",
+        "frames/walk/frame-5.png",
+        "frames/walk/frame-6.png",
+        "frames/walk/frame-7.png"
+      ],
+      "metrics": {
+        "histogram_intersection": {
+          "min": 0.9643845720515346,
+          "mean": 0.979863388096866
+        },
+        "dhash_similarity": {
+          "min": 0.84375,
+          "mean": 0.9112723214285714
+        },
+        "motion_presence": 0.048241298472514,
+        "centroid_sigma": {
+          "x": 0.14494998623555935,
+          "y": 0.6023175599507737
+        }
+      },
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "walk: native logical exceeds the physical cap 32x38 — capped frames (reroll candidates): 0:24x39, 6:24x39, 7:24x40",
+        "walk: frames exceed the safe area 26x36 but fit within the margin zone (informational, no action): 1:24x37, 2:24x38, 3:24x38, 4:24x38"
+      ]
+    },
+    {
+      "state": "airborne",
+      "source": "frames",
+      "expected_frames": 4,
+      "found_frames": 4,
+      "natural_pose_count": 4,
+      "frame_files": [
+        "frames/airborne/frame-0.png",
+        "frames/airborne/frame-1.png",
+        "frames/airborne/frame-2.png",
+        "frames/airborne/frame-3.png"
+      ],
+      "metrics": {
+        "histogram_intersection": {
+          "min": 0.9560084168153332,
+          "mean": 0.9724248652135727
+        },
+        "dhash_similarity": {
+          "min": 0.734375,
+          "mean": 0.84375
+        },
+        "motion_presence": 0.10627122268178105,
+        "centroid_sigma": {
+          "x": 0.10780644112273959,
+          "y": 1.187656988160942
+        }
+      },
+      "ok": true,
+      "errors": [],
+      "warnings": [
+        "airborne: dropped 1 collapsed per-frame pitch(es) below 7.01",
+        "airborne: dropped 1 collapsed per-frame pitch(es) below 7.10",
+        "airborne: frame 1 pitch detection inconclusive — consensus fallback 11.68x11.84",
+        "airborne: frame 2 own pitch 6.00x6.00 is outside the consensus pitch family 11.68x11.84 — harmonic/collapsed misdetection; snapped at consensus"
+      ]
+    },
+    {
+      "state": "land",
+      "source": "frames",
+      "expected_frames": 4,
+      "found_frames": 4,
+      "natural_pose_count": 4,
+      "frame_files": [
+        "frames/land/frame-0.png",
+        "frames/land/frame-1.png",
+        "frames/land/frame-2.png",
+        "frames/land/frame-3.png"
+      ],
+      "metrics": {
+        "histogram_intersection": {
+          "min": 0.952014271776371,
+          "mean": 0.9661931161961905
+        },
+        "dhash_similarity": {
+          "min": 0.703125,
+          "mean": 0.8098958333333334
+        },
+        "motion_presence": 0.11401287402982026,
+        "centroid_sigma": {
+          "x": 0.04589512918073162,
+          "y": 0.4530773227891562
+        }
+      },
+      "ok": true,
+      "errors": [],
+      "warnings": []
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    "idle: motion presence is too low (0.0098 < 0.0100)",
+    "walk: native logical exceeds the physical cap 32x38 — capped frames (reroll candidates): 0:24x39, 6:24x39, 7:24x40",
+    "walk: frames exceed the safe area 26x36 but fit within the margin zone (informational, no action): 1:24x37, 2:24x38, 3:24x38, 4:24x38",
+    "airborne: dropped 1 collapsed per-frame pitch(es) below 7.01",
+    "airborne: dropped 1 collapsed per-frame pitch(es) below 7.10",
+    "airborne: frame 1 pitch detection inconclusive — consensus fallback 11.68x11.84",
+    "airborne: frame 2 own pitch 6.00x6.00 is outside the consensus pitch family 11.68x11.84 — harmonic/collapsed misdetection; snapped at consensus"
+  ]
+}

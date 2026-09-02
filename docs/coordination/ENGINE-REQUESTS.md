@@ -8,6 +8,32 @@ Do **not** solve a shared-engine gap by adding a private one-off physics or mech
 
 None.
 
+## Resolved requests
+
+### ER-002 — Timed moving-platform stabilization
+
+**Status:** RESOLVED
+**Requested by:** G9A / Level 11
+**Need:** A `stabilize-machine` interaction must temporarily fix an existing moving platform at a data-defined docking position.
+**Why shared:** Browser play, replay, rendering, and later machinery routes must observe the same platform position and lifetime.
+**Minimal contract:** Moving-platform data names the controlling interaction and dock coordinate; the existing platform function returns the dock with zero velocity while active and its normal cycle otherwise.
+**Evidence / reproduction:** `tests/machine-stabilization.test.ts`, `docs/reports/G9A-COLD-LEVEL-11-001.md`, and `artifacts/level-validation/level-11.json`.
+**Workaround available:** no
+**Blocks:** resolved for G9A Level 11
+**Suggested owner:** G3 Mechanics / G1 Runtime
+
+### ER-001 — Timed interaction-result collision surfaces
+
+**Status:** RESOLVED
+**Requested by:** G9A / Level 10
+**Need:** A `freeze-water` interaction must be able to expose a temporary shared-core collision surface and protect the corresponding water hazard.
+**Why shared:** Browser play, replay, and later cold levels must resolve the same surface lifetime and collision rules.
+**Minimal contract:** Level data names the interaction, result rectangle, active lifetime, and protected water span; `stepGameplay` owns activation, expiry, collision, and death.
+**Evidence / reproduction:** `tests/water-freezing.test.ts`, `docs/reports/G9A-COLD-LEVEL-10-001.md`, and `artifacts/level-validation/level-10.json`.
+**Workaround available:** no
+**Blocks:** resolved for G9A Level 10
+**Suggested owner:** G3 Mechanics / G1 Runtime
+
 ## Template
 
 ### ER-NNN — Short capability name

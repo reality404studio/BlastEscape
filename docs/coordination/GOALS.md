@@ -12,92 +12,260 @@ This is the durable goal graph for Codex `/goal` sessions. The Director may revi
 
 ### G0 — Director / Contracts
 
-**State:** READY  
-**Owns:** game-wide contracts, coordination docs, acceptance gates.  
-**Must produce/reconcile:** GAME_BIBLE, TECHNICAL_CONTRACT, LEVEL_CURRICULUM, VISUAL_BIBLE, NARRATIVE_BIBLE as needed.  
+**State:** DONE
+**Owns:** game-wide contracts, coordination docs, acceptance gates.
+**Must produce/reconcile:** GAME_BIBLE, TECHNICAL_CONTRACT, LEVEL_CURRICULUM, VISUAL_BIBLE, NARRATIVE_BIBLE as needed.
 **Done when:** downstream work has stable contracts and each proposed goal has measurable acceptance criteria.
+
+**Evidence:** `docs/PROTOTYPE-AUDIT.md`, `docs/GAME-BIBLE.md`,
+`docs/TECHNICAL-CONTRACT.md`, `docs/LEVEL-CURRICULUM.md`,
+`docs/VISUAL-BIBLE.md`, and `docs/NARRATIVE-BIBLE.md`.
 
 ### G1 — Runtime / Physics
 
-**State:** PROPOSED  
-**Depends on:** G0.  
-**Owns:** shared gameplay core, fixed-step/replay characteristics, movement/blast characterization tests.  
-**Hard constraint:** do not change hand-feel merely to make architecture cleaner.  
+**State:** DONE
+**Depends on:** G0.
+**Owns:** shared gameplay core, fixed-step/replay characteristics, movement/blast characterization tests.
+**Hard constraint:** do not change hand-feel merely to make architecture cleaner.
 **Done when:** real runtime and validation tooling can share authoritative movement/blast logic, or an incremental migration path with characterization tests is in place.
+
+**Current slice:** extract typed level data and pure gameplay formulas without
+changing constants, coordinates, or update order; make the browser runtime consume
+them; add deterministic characterization tests and frame-schedule evidence.
+
+**Evidence:** `docs/reports/G1-CHARACTERIZATION-001.md` and
+`docs/reports/G1-AUTHORITATIVE-CORE-002.md`.
 
 ### G2 — Level Lab / Simulation
 
-**State:** PROPOSED  
-**Depends on:** G1 sufficiently stable.  
-**Owns:** data-driven level schema, editor/lab, replay/script inputs, reachability/exploit/noisy-human/mechanic evaluators where practical.  
+**State:** DONE
+**Depends on:** G1 sufficiently stable.
+**Owns:** data-driven level schema, editor/lab, replay/script inputs, reachability/exploit/noisy-human/mechanic evaluators where practical.
 **Done when:** a new level can be authored/tuned without editing the giant gameplay component and can emit validation evidence.
 
-### G3 — Traversal States: Cold / Heat / Magnetism
+**Current slice:** add intent-bearing level definitions, a shared-core replay
+runner, reachability/exploit/noisy-human/mechanic evaluators, and machine-readable
+reports using Level 8 as the first complete reference fixture.
 
-**State:** PROPOSED  
-**Depends on:** G1.  
-**Owns:** temporary state model, interactions with factory elements, tests, debug visualization.  
-**Done when:** each mechanic has a minimal readable introduction behavior and can combine without creating new core inputs.
+**Evidence:** `docs/reports/G2-LEVEL-LAB-001.md` and
+`artifacts/level-validation/level-8.json`.
+
+### G3A — Traversal-State Substrate
+
+**State:** DONE
+**Depends on:** G1.
+**Owns:** temporary-state lifetime/transition model, interaction hooks, tests,
+debug visualization, and shared visual event boundaries.
+**Done when:** cold, heat, and magnetism can be implemented as data/state
+interactions without adding new player inputs or forking the core.
+
+**Current slice:** add one mutually exclusive temporary state slot, typed factory
+sources and interaction contacts, authoritative acquisition/refresh/expiry events,
+and runtime debug visibility without changing existing level behavior.
+
+**Evidence:** `docs/reports/G3A-TRAVERSAL-STATE-SUBSTRATE-001.md`.
+
+### G3B — Cold
+
+**State:** DONE
+**Depends on:** G3A.
+**Owns:** cold acquisition, expiry, readable effects on water/steam/machinery/hot
+surfaces, and tests.
+**Done when:** Level 9 can teach one unmistakable cold interaction and later levels
+can reuse it through the shared substrate.
+
+**Current slice:** Level 9 teaches source acquisition and a safe `cool-surface`
+application before reusing blast locomotion. Water freezing remains Level 10 so
+the curriculum does not introduce two cold applications at once.
+
+**Evidence:** `docs/reports/G3B-COLD-LEVEL-9-001.md` and
+`artifacts/level-validation/level-9.json`.
+
+### G3C — Heat
+
+**State:** DONE
+**Depends on:** G3A; cold interaction contract sufficiently stable.
+**Owns:** heat acquisition, expiry, melt/thaw/reactivation interactions, and tests.
+**Done when:** Level 15 can teach heat with blast still present and heat/cold
+opposition is deterministic and readable.
+
+**Current slice:** define and implement the smallest shared heat interaction path
+needed for a safe Level 15 introduction, preserving the one-slot traversal-state
+contract and authoring the level intent before geometry.
+
+**Evidence:** `docs/reports/G3C-HEAT-LEVEL-15-001.md` and
+`artifacts/level-validation/level-15.json`.
+
+### G3D — Magnetism
+
+**State:** DONE
+**Depends on:** G3A.
+**Owns:** timed attachment/release/discharge on suitable metal infrastructure and
+tests.
+**Done when:** Level 20 can teach overhead traversal without free flight or a new
+input button.
+
+**Current slice:** define the smallest deterministic timed attachment/release
+contract, author Level 20 intent before geometry, and teach one readable overhead
+crossing while preserving left/right-only control.
+
+**Evidence:** `docs/reports/G3D-MAGNETISM-LEVEL-20-001.md` and
+`artifacts/level-validation/level-20.json`.
 
 ### G4 — Art Direction / Protagonist
 
-**State:** PROPOSED  
-**Depends on:** G0.  
-**Owns:** pixel scale, palette, outline/lighting rules, factory visual grammar, protagonist silhouette/base design.  
-**Human gate:** base protagonist identity approval before mass animation generation.  
+**State:** DONE
+**Depends on:** G0.
+**Owns:** pixel scale, palette, outline/lighting rules, factory visual grammar, protagonist silhouette/base design.
+**Human gate:** base protagonist identity approval before mass animation generation.
 **Done when:** visual bible is executable and one base protagonist identity is approved.
+
+**Current slice:** the executable visual contract and three gameplay-scale base
+identity candidates are complete. The human selected A — Foundry Pod on
+2026-08-31, resolving HC-ART-001 and unblocking G5.
+
+**Evidence:** `docs/VISUAL-BIBLE.md`,
+`docs/reports/G4-PROTAGONIST-CANDIDATES-001.md`, and
+`artifacts/art-direction/`.
 
 ### G5 — Sprite Pipeline
 
-**State:** PROPOSED  
-**Depends on:** G4 protagonist approval.  
-**Owns:** SpriteGen setup/instructions, source request metadata, curated atlas/manifest integration.  
-**Reference:** `https://github.com/aldegad/sprite-gen`.  
+**State:** DONE
+**Depends on:** G4 protagonist approval.
+**Owns:** SpriteGen setup/instructions, source request metadata, curated atlas/manifest integration.
+**Reference:** `https://github.com/aldegad/sprite-gen`.
 **Done when:** approved character states are reproducibly generated/curated and consumed by the runtime.
+
+**Current slice:** the Foundry Pod base is locked at true `32 x 40` pixel scale;
+idle, walk, airborne, and land rows passed SpriteGen extraction, motion QA, and
+atlas composition. Runtime now consumes the shipping manifest's exact frame
+rectangles and timing without changing the authoritative collision box.
+
+**Evidence:** `docs/reports/G5-SPRITE-PIPELINE-001.md`,
+`assets/generated/sprites/foundry-pod/`, and `public/sprites/foundry-pod/`.
 
 ### G6 — FX / Game Feel
 
-**State:** PROPOSED  
-**Depends on:** G0; shared runtime event boundaries preferred.  
-**Owns:** explosion, impact, cold, heat, magnet feedback; camera impulse; hit-stop/impact freeze; particles/debris.  
+**State:** ACTIVE
+**Depends on:** G0; shared runtime event boundaries preferred.
+**Owns:** explosion, impact, cold, heat, magnet feedback; camera impulse; hit-stop/impact freeze; particles/debris.
 **Done when:** mute play remains tactile and effects do not perturb authoritative simulation.
+
+**Current slice:** authoritative blast, landing, traversal-state, accepted
+interaction, magnetic attachment/release, and dispatch-scan events now drive
+presentation-only flashes, pulses, debris, squash, and camera impulses. Visual
+mute-first inspection remains before completion.
+
+**Evidence:** `docs/reports/G6-EVENT-FEEDBACK-001.md`.
 
 ### G7 — Environmental Storytelling
 
-**State:** PROPOSED  
-**Depends on:** G0.  
-**Owns:** factory zones, props, signage, production/inspection context, visual foreshadowing, ending-space language.  
-**Cannot own:** gameplay physics or level-route rewrites unless coordinated.  
+**State:** VERIFYING
+**Depends on:** G0.
+**Owns:** factory zones, props, signage, production/inspection context, visual foreshadowing, ending-space language.
+**Cannot own:** gameplay physics or level-route rewrites unless coordinated.
 **Done when:** a player can infer shipment/testing/factory context without dialogue.
 
-### G8 — Early Curriculum
+**Current slice:** a tested five-zone presentation map and low-contrast runtime
+background pass now progress from mobility testing through production, transfer,
+and dispatch without entering gameplay state. Interactive visual inspection
+remains before completion.
 
-**State:** PROPOSED  
-**Depends on:** G2 and relevant parts of G3.  
-**Owns:** Levels 1–9 after schema migration, preserving known good feel/routes where appropriate.  
-**Done when:** blast curriculum is coherent and cold introduction is readable.
+**Evidence:** `docs/reports/G7-ZONE-STORY-001.md`.
 
-### G9 — Middle Curriculum
+### G8A — Blast Curriculum Migration / Preservation
 
-**State:** PROPOSED  
-**Depends on:** G2 + G3.  
-**Owns:** Levels 10–20.  
-**Done when:** cold+blast, heat+blast, and magnet introduction progress without checklist-like repetition.
+**State:** DONE
+**Depends on:** G2.
+**Owns:** Levels 1–8 after schema migration, preserving known good feel/routes and
+locking regression evidence before tuning.
+**Done when:** the blast curriculum is coherent in the shared schema and every
+accepted route has replay/validator evidence.
+
+**Evidence:** `docs/reports/G8A-BLAST-CURRICULUM-001.md` and
+`artifacts/level-validation/level-1.json` through `level-8.json`.
+
+### G8B — Cold Introduction
+
+**State:** DONE
+**Depends on:** G2 + G3B.
+**Owns:** Level 9.
+**Done when:** cold is introduced safely and readably in the real runtime without
+dialogue or a new input.
+
+**Evidence:** `docs/reports/G3B-COLD-LEVEL-9-001.md`.
+
+### G9A — Cold Curriculum
+
+**State:** DONE
+**Depends on:** G2 + G3B.
+**Owns:** Levels 10–14.
+**Done when:** cold+blast develops through route/timing/recovery variations rather
+than five isolated gimmicks.
+
+**Current slice:** Levels 10–14 are accepted. Level 14 closes the cold curriculum
+by combining ice, carriage stabilization, B1/B2 route planning, and a precise
+direct-over-B1 mastery shortcut without new mechanics.
+
+**Evidence:** `docs/reports/G9A-COLD-LEVEL-10-001.md`,
+`docs/reports/G9A-COLD-LEVEL-11-001.md`,
+`docs/reports/G9A-COLD-LEVEL-12-001.md`,
+`docs/reports/G9A-COLD-LEVEL-13-001.md`,
+`docs/reports/G9A-COLD-LEVEL-14-001.md`, and their Level Lab JSON artifacts.
+
+### G9B — Heat Curriculum
+
+**State:** DONE
+**Depends on:** G2 + G3C.
+**Owns:** Levels 15–19.
+**Done when:** heat is introduced and recombined with blast/cold without a
+checklist-like sequence.
+
+**Current slice:** Levels 15–19 are accepted. Level 19 closes the heat curriculum
+with a fast heat+B1 primary route and a slower cold+B2 recovery branch, so cold
+is selective rather than an every-route checklist item.
+
+**Evidence:** `docs/reports/G3C-HEAT-LEVEL-15-001.md`,
+`docs/reports/G9B-HEAT-LEVEL-16-001.md`,
+`docs/reports/G9B-HEAT-LEVEL-17-001.md`,
+`docs/reports/G9B-HEAT-LEVEL-18-001.md`,
+`docs/reports/G9B-HEAT-LEVEL-19-001.md`, and their Level Lab JSON artifacts.
+
+### G9C — Magnet Introduction
+
+**State:** DONE
+**Depends on:** G2 + G3D.
+**Owns:** Level 20.
+**Done when:** timed overhead attachment/release is readable, bounded, and not
+free flight.
+
+**Evidence:** `docs/reports/G3D-MAGNETISM-LEVEL-20-001.md`.
 
 ### G10 — Synthesis / Ending
 
-**State:** PROPOSED  
-**Depends on:** G2 + G3 + narrative contract.  
-**Owns:** Levels 21–25, dispatch scanner sequence, cancellation reveal, open-door exit.  
-**Human gate:** ending meaning must remain cancellation -> no new objective -> player-controlled departure.  
+**State:** DONE
+**Depends on:** G2 + G3B + G3C + G3D + narrative contract.
+**Owns:** Levels 21–25, dispatch scanner sequence, cancellation reveal, open-door exit.
+**Human gate:** ending meaning must remain cancellation -> no new objective -> player-controlled departure.
 **Done when:** synthesis levels are fair and the ending lands without dialogue/cutscene exposition.
+
+**Current slice:** Levels 21–25 and the canonical ending are accepted. Level 25
+returns to a concise B1-to-B2 air chain, then separates dispatch scanning from
+completion: cancellation preserves control, and only the player's later movement
+through the already-open door ends the run.
+
+**Evidence:** `docs/reports/G10-SYNTHESIS-LEVEL-21-001.md` and
+`docs/reports/G10-SYNTHESIS-LEVEL-22-001.md`,
+`docs/reports/G10-SYNTHESIS-LEVEL-23-001.md`,
+`docs/reports/G10-SYNTHESIS-LEVEL-24-001.md`, and
+`docs/reports/G10-ENDING-LEVEL-25-001.md`, plus their Level Lab artifacts.
 
 ### G11 — Final QA / Release
 
-**State:** PROPOSED  
-**Depends on:** G4–G10 materially complete.  
-**Owns:** save/continue, restart UX, title/pause/credits, input/readability, build/perf, regression suite, playtime evidence.  
-**Human gate:** request one end-to-end human playthrough before final declaration.  
+**State:** PROPOSED
+**Depends on:** G4–G10 materially complete.
+**Owns:** save/continue, restart UX, title/pause/credits, input/readability, build/perf, regression suite, playtime evidence.
+**Human gate:** request one end-to-end human playthrough before final declaration.
 **Done when:** release gates in `docs/GOAL-ORCHESTRATION.md` are met or explicitly waived.
 
 ## Director rules

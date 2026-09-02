@@ -1,0 +1,111 @@
+{
+  "generatedBy": "npm run validate:levels",
+  "schemaVersion": 1,
+  "levelId": "level-13",
+  "levelName": "LEVEL 13 — COLD CATCH",
+  "replayId": "level-13-cold-catch-clean-route",
+  "status": "pass",
+  "evaluations": [
+    {
+      "evaluator": "reachability",
+      "id": "accepted-route-clears",
+      "status": "pass",
+      "summary": "Accepted replay clears in 3.967s.",
+      "metrics": {
+        "outcome": "cleared",
+        "elapsedSeconds": 3.966666666666654,
+        "maximumAirCombo": 1
+      }
+    },
+    {
+      "evaluator": "exploit",
+      "id": "simple-policy-bypass",
+      "status": "pass",
+      "summary": "No forbidden constant-direction policy clears the level.",
+      "metrics": {
+        "testedPolicies": [
+          "hold-left",
+          "neutral"
+        ],
+        "bypassPolicies": []
+      }
+    },
+    {
+      "evaluator": "noisy-human",
+      "id": "timing-jitter-30ms",
+      "status": "pass",
+      "summary": "100/100 deterministic jittered replays cleared.",
+      "metrics": {
+        "jitterMilliseconds": 30,
+        "samples": 100,
+        "clears": 100,
+        "clearRate": 1,
+        "minimumClearRate": 0.8
+      }
+    },
+    {
+      "evaluator": "mechanic",
+      "id": "intended-mechanic-use",
+      "status": "pass",
+      "summary": "Accepted replay exercises the required blasts and combo.",
+      "metrics": {
+        "requiredBlastHits": [
+          "B1"
+        ],
+        "actualBlastHits": [
+          "B1"
+        ],
+        "missingBlastHits": [],
+        "requiredInteractions": [
+          "catch-basin-freeze"
+        ],
+        "actualInteractions": [
+          "catch-basin-freeze"
+        ],
+        "missingInteractions": [],
+        "requiredStates": [
+          "cold"
+        ],
+        "actualStates": [
+          "cold"
+        ],
+        "missingStates": [],
+        "minimumAirCombo": 0,
+        "actualMaximumAirCombo": 1
+      }
+    }
+  ],
+  "acceptedReplay": {
+    "replayId": "level-13-cold-catch-clean-route",
+    "levelId": "level-13",
+    "outcome": "cleared",
+    "elapsedSeconds": 3.966666666666654,
+    "frames": 238,
+    "frameRate": 60,
+    "deathReason": null,
+    "blastExplosions": [
+      "B1"
+    ],
+    "blastHits": [
+      "B1"
+    ],
+    "acceptedInteractions": [
+      "catch-basin-freeze"
+    ],
+    "acquiredStates": [
+      "cold"
+    ],
+    "dispatchScanned": false,
+    "landingCount": 0,
+    "maximumAirCombo": 1,
+    "highestPointY": 300.72444813149997,
+    "finalPlayer": {
+      "x": 764.576767549682,
+      "y": 314,
+      "controlVx": 151.67220217824467,
+      "blastVx": 0,
+      "vy": 0
+    }
+  },
+  "caveat": "These evaluators reject broken or contract-violating routes; they do not prove fun."
+}

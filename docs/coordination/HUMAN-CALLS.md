@@ -6,18 +6,34 @@ This ledger is for decisions that genuinely require human taste, judgment, exter
 
 None.
 
-## Expected gates
+## Resolved calls
 
 ### HC-ART-001 — Protagonist base identity
 
-**Status:** NOT YET OPEN  
-**Owner:** G4 Art Direction / G5 Sprite Pipeline  
-**Decision needed:** choose or approve the base protagonist design before mass sprite generation.  
-**Why human:** identity/silhouette is a taste and authorship decision; regenerating all states after changing it is expensive.  
-**Expected evidence:** 2–4 candidates or SpriteGen curation view, shown at gameplay scale and on representative factory backgrounds.  
-**Default if deferred:** select the most readable candidate that best communicates "unfinished armless service/industrial robot with no jump hardware" and record the choice as provisional.  
-**Blocked work:** final character animation production.  
-**Unblocked work:** environment art, runtime integration scaffold, effects, level tools.
+**Status:** RESOLVED
+**Owner:** G4 Art Direction / G5 Sprite Pipeline
+**Decision needed:** choose the base protagonist identity before full sprite and animation production.
+**Why human:** the silhouette is a taste/authorship decision, and changing it after animation production would invalidate expensive downstream work.
+**Options:**
+1. **A — Foundry Pod (Director recommendation):** closest key-art continuity and clearest gameplay-scale separation of shell, sensor, undercarriage, and feet.
+2. **B — Inspection Wedge:** strongest forward direction, with a more technical/scout-like character.
+3. **C — Cratelet Unit:** most vulnerable cargo/service-unit identity, with a deliberately plain wide shell.
+4. **Request one bounded revision:** name the candidate to revise and one or two concrete traits to retain/change; do not start a new visual direction without recording that material change.
+**Evidence:** `docs/reports/G4-PROTAGONIST-CANDIDATES-001.md` and the three PNGs in `artifacts/art-direction/`.
+**Default if deferred:** provisionally select A because it scores highest on the executable rubric and best preserves the existing key-art/runtime identity.
+**Resolution:** A — Foundry Pod, selected by the human on 2026-08-31. The
+approved identity preserves its rounded off-white shell, dark horizontal sensor,
+restrained amber status light, compact undercarriage, and two readable feet.
+**Recorded in:** the commit containing this resolution entry.
+**Previously blocked work:** final character source sprite, complete
+animation/state production, and G5 runtime atlas integration.
+**Now unblocked:** G5 may create and lock a canonical pixel-art idle anchor, then
+produce curated animation rows and integrate the resulting atlas/manifest.
+**Downstream outcome:** G5 completed that base lock, four-state animation set,
+and runtime integration on 2026-09-02. Evidence:
+`docs/reports/G5-SPRITE-PIPELINE-001.md`.
+
+## Expected gates
 
 ### HC-QA-001 — End-to-end release playthrough
 

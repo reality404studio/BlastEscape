@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "kind": "sprite-gen-score-report",
+  "source_report": "/Users/rafaela/01_PROJECT_NOW/_Hackerton/06.templerunlocal/blast-escape/assets/generated/sprites/foundry-pod-base-v3",
+  "overall_score": 97.0,
+  "candidate_rank": 99,
+  "rows": [
+    {
+      "state": "idle",
+      "score": 97.0,
+      "candidate_rank": 99,
+      "expected_frames": 1,
+      "found_frames": 1,
+      "errors": [],
+      "warnings": [
+        "idle: motion presence is too low (0.0000 < 0.0100)"
+      ],
+      "hints": []
+    }
+  ],
+  "hints": []
+}

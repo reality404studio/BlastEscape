@@ -1,5 +1,5 @@
 {
-  "name": "sites-project",
+  "name": "blast-escape",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -9,7 +9,9 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "validate:levels": "node --experimental-strip-types scripts/validate-levels.ts"
   },
   "dependencies": {
     "next": "16.2.6",
